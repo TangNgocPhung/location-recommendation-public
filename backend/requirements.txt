@@ -1,0 +1,14 @@
+fastapi==0.116.1
+psycopg[binary]==3.2.9
+pydantic-settings>=2.10,<3
+redis>=5.2,<7
+uvicorn[standard]==0.35.0
+alembic>=1.16,<2
+h3>=4.1,<5
+opensearch-py>=2.6,<3
+neo4j>=5.24,<6
+# Learning-to-Rank (Phase 5). LightGBM cần cả lúc huấn luyện lẫn lúc phục vụ:
+# `app.ltr.model` nạp model.txt để chấm điểm. Thiếu gói này thì `?ranker=ltr`
+# rơi về công thức tuyến tính chứ không lỗi — xem app/ltr/model.py.
+lightgbm>=4.5,<5
+numpy>=1.26,<3

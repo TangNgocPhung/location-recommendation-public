@@ -1,0 +1,45 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+!*.env.example
+config/production.env
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+
+# JavaScript / Vinext / Cloudflare
+node_modules/
+.next/
+.vinext/
+.wrangler/
+dist/
+*.tsbuildinfo
+
+# Local data and IDE files
+.pnpm-store/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Preserve any archived repository metadata outside version control.
+.git-backups/
+
+# Stray files from unrelated tooling (không thuộc đồ án)
+/inspect_workbook.mjs
+/web_state.mjs
+/source/
+/previews/
+
+# Dữ liệu định tuyến OSRM (lộ trình B16). Dựng lại bằng scripts/build_osrm.sh.
+# KHÔNG commit: riêng vietnam-latest.osm.pbf đã 328 MB, và đồ thị .osrm sinh ra
+# hàng chục file nhị phân phụ thuộc phiên bản OSRM đang dùng — commit chúng vừa
+# làm repo phình vừa làm người khác chạy nhầm đồ thị của phiên bản khác.
+osrm/*.osm.pbf
+osrm/*.osrm*

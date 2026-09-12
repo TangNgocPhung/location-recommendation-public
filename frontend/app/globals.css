@@ -1,0 +1,215 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import 'maplibre-gl/dist/maplibre-gl.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-app-sans);
+  --font-mono: var(--font-app-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+body {
+  font-family: var(--font-app-sans);
+}
+
+/* maplibre-gl.css nạp sau Tailwind và không nằm trong layer nào, nên
+   .maplibregl-map{position:relative} đè utility `absolute` của div chứa bản đồ
+   (utility Tailwind v4 nằm trong @layer utilities, mà CSS không layer luôn thắng
+   CSS có layer). MapLibre chỉ gắn class này lúc khởi tạo, nên container đang
+   absolute inset-0 bỗng thành relative, mất inset, sập còn 0px — và overflow:hidden
+   cắt sạch canvas: không tile, không chấm POI, không nút zoom, click cũng không
+   trúng đâu. Selector hai class (0,2,0) thắng (0,1,0) bất kể thứ tự nạp. */
+.map-canvas-host.maplibregl-map {
+  position: absolute;
+  inset: 0;
+}
+
+.map-fallback {
+  background-color: #e8f1ec;
+  background-image:
+    linear-gradient(32deg, transparent 45%, rgb(255 255 255 / 78%) 46%, rgb(255 255 255 / 78%) 49%, transparent 50%),
+    linear-gradient(122deg, transparent 43%, rgb(255 255 255 / 62%) 44%, rgb(255 255 255 / 62%) 47%, transparent 48%),
+    linear-gradient(rgb(15 138 98 / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(15 138 98 / 7%) 1px, transparent 1px);
+  background-size: 180px 180px, 220px 220px, 36px 36px, 36px 36px;
+}
+
+:root {
+  /* Bao cho trinh duyet biet dang o giao dien sang hay toi, de cac widget do
+     HE DIEU HANH ve — popup cua <select>, thanh cuon, date picker — doi mau
+     theo. Thieu dong nay thi trong nen toi, danh sach <option> van la nen
+     trang voi chu trang: khong doc duoc gi ca. Khong the sua bang class
+     Tailwind vi popup nam ngoai cay DOM cua trang. */
+  color-scheme: light;
+  --font-app-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-app-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --background: oklch(0.982 0.012 162);
+  --foreground: oklch(0.22 0.025 166);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.025 166);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.025 166);
+  --primary: oklch(0.49 0.14 164);
+  --primary-foreground: oklch(0.99 0.008 160);
+  --secondary: oklch(0.94 0.035 156);
+  --secondary-foreground: oklch(0.32 0.07 163);
+  --muted: oklch(0.955 0.016 162);
+  --muted-foreground: oklch(0.52 0.035 164);
+  --accent: oklch(0.91 0.065 154);
+  --accent-foreground: oklch(0.29 0.07 163);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.9 0.025 160);
+  --input: oklch(0.89 0.025 160);
+  --ring: oklch(0.56 0.13 164);
+  --chart-1: oklch(0.6 0.15 164);
+  --chart-2: oklch(0.68 0.13 105);
+  --chart-3: oklch(0.64 0.14 50);
+  --chart-4: oklch(0.54 0.12 235);
+  --chart-5: oklch(0.57 0.15 320);
+  --radius: 0.8rem;
+  --sidebar: oklch(0.97 0.018 162);
+  --sidebar-foreground: oklch(0.22 0.025 166);
+  --sidebar-primary: oklch(0.49 0.14 164);
+  --sidebar-primary-foreground: oklch(0.99 0.008 160);
+  --sidebar-accent: oklch(0.91 0.065 154);
+  --sidebar-accent-foreground: oklch(0.29 0.07 163);
+  --sidebar-border: oklch(0.9 0.025 160);
+  --sidebar-ring: oklch(0.56 0.13 164);
+}
+
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at 10% 0%, oklch(0.94 0.055 154 / 45%), transparent 34rem),
+    var(--background);
+}
+
+.maplibregl-map {
+  font-family: var(--font-app-sans);
+}
+
+.maplibregl-popup-content {
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 14px 40px rgb(11 52 38 / 16%);
+}
+
+/* Panel chi tiết trượt vào từ mép phải khung bản đồ. Viết tay thay vì mượn
+   tiện ích animate của Tailwind: panel cao hết khung và tự cuộn bên trong, nên
+   nếu lớp animate không phân giải được thì nó vẫn phải hiện đúng chỗ chứ không
+   được kẹt ngoài màn hình. Chỉ dịch ngang — animate width/height sẽ bắt trình
+   duyệt bố cục lại mỗi khung hình, và MapLibre ngay bên dưới trả giá cho việc đó. */
+@keyframes poi-detail-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.poi-detail-slide {
+  animation: poi-detail-slide-in 260ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Người bật "giảm chuyển động" ở cấp hệ điều hành thường là người bị chóng mặt
+   vì hiệu ứng trượt. Bỏ hẳn animation chứ không rút ngắn thời lượng. */
+@media (prefers-reduced-motion: reduce) {
+  .poi-detail-slide {
+    animation: none;
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "measuredAt": "20260911T162902Z",
+  "k": 10,
+  "queries": 3,
+  "baselineNdcg": 0.6406,
+  "configs": [
+    {
+      "config": "A",
+      "description": "PostGIS thuan (pg_trgm + ST_DWithin)",
+      "ndcg": 0.6204,
+      "mrr": 0.6667,
+      "map": 0.5556,
+      "recall": 0.6667,
+      "precision": 0.1667,
+      "latencyMs": 192.1,
+      "latencyP95Ms": 211.8,
+      "rankerUsed": [
+        "linear"
+      ]
+    },
+    {
+      "config": "B",
+      "description": "+ OpenSearch BM25 + geo (tat kenh vector)",
+      "ndcg": 0.4098,
+      "mrr": 0.5,
+      "map": 0.3037,
+      "recall": 0.5556,
+      "precision": 0.1333,
+      "latencyMs": 410.1,
+      "latencyP95Ms": 650.9,
+      "rankerUsed": [
+        "linear"
+      ]
+    },
+    {
+      "config": "C",
+      "description": "+ RRF 3 kenh (them kenh vector, hop nhat thu hang)",
+      "ndcg": 0.4098,
+      "mrr": 0.5,
+      "map": 0.3037,
+      "recall": 0.5556,
+      "precision": 0.1333,
+      "latencyMs": 345.0,
+      "latencyP95Ms": 352.4,
+      "rankerUsed": [
+        "linear"
+      ]
+    },
+    {
+      "config": "D",
+      "description": "+ Spatio-Temporal + du 9 tin hieu co trong so",
+      "ndcg": 0.6406,
+      "mrr": 0.6667,
+      "map": 0.6389,
+      "recall": 0.6667,
+      "precision": 0.1667,
+      "latencyMs": 246.9,
+      "latencyP95Ms": 316.0,
+      "rankerUsed": [
+        "linear"
+      ]
+    },
+    {
+      "config": "E",
+      "description": "+ LTR (LightGBM LambdaMART)",
+      "ndcg": 0.6406,
+      "mrr": 0.6667,
+      "map": 0.6389,
+      "recall": 0.6667,
+      "precision": 0.1667,
+      "latencyMs": 190.7,
+      "latencyP95Ms": 198.7,
+      "rankerUsed": [
+        "linear"
+      ]
+    }
+  ],
+  "signalAblation": [
+    {
+      "signal": "text",
+      "weight": 0.26,
+      "ndcg_without": 0.387,
+      "delta": -0.2536
+    },
+    {
+      "signal": "rating",
+      "weight": 0.12,
+      "ndcg_without": 0.6327,
+      "delta": -0.0079
+    },
+    {
+      "signal": "popularity",
+      "weight": 0.08,
+      "ndcg_without": 0.6327,
+      "delta": -0.0079
+    },
+    {
+      "signal": "spatial",
+      "weight": 0.24,
+      "ndcg_without": 0.6406,
+      "delta": 0.0
+    },
+    {
+      "signal": "trending",
+      "weight": 0.08,
+      "ndcg_without": 0.6406,
+      "delta": 0.0
+    },
+    {
+      "signal": "recency",
+      "weight": 0.12,
+      "ndcg_without": 0.6406,
+      "delta": 0.0
+    },
+    {
+      "signal": "context",
+      "weight": 0.1,
+      "ndcg_without": 0.6406,
+      "delta": 0.0
+    },
+    {
+      "signal": "graph",
+      "weight": 0.1,
+      "ndcg_without": 0.6406,
+      "delta": 0.0
+    },
+    {
+      "signal": "ctr",
+      "weight": 0.08,
+      "ndcg_without": 0.6406,
+      "delta": 0.0
+    }
+  ]
+}

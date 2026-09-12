@@ -1,0 +1,296 @@
+x-backend-environment: &backend-environment
+  APP_ENV: ${APP_ENV:-development}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  DATABASE_URL: postgresql://${POSTGRES_USER:?POSTGRES_USER must be set}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@database:5432/${POSTGRES_DB:?POSTGRES_DB must be set}
+  REDIS_URL: redis://redis:6379/0
+  SEARCH_BACKEND: ${SEARCH_BACKEND:-auto}
+  OPENSEARCH_URL: ${OPENSEARCH_URL:-http://opensearch:9200}
+  OPENSEARCH_INDEX: ${OPENSEARCH_INDEX:-nearby-pois}
+  GRAPH_BACKEND: ${GRAPH_BACKEND:-auto}
+  NEO4J_URL: ${NEO4J_URL:-bolt://neo4j:7687}
+  NEO4J_USER: ${NEO4J_USER:-neo4j}
+  NEO4J_PASSWORD: ${NEO4J_PASSWORD:-nearby_graph_dev}
+  EVENT_STREAM: ${EVENT_STREAM:-nearby:events:v1}
+  RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-120}
+  ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?ALLOWED_ORIGINS must be set}
+  OVERPASS_URL: ${OVERPASS_URL:-https://overpass-api.de/api/interpreter}
+  OSM_BBOX: ${OSM_BBOX:-10.70,106.60,10.90,106.82}
+  OSM_MAX_POIS: ${OSM_MAX_POIS:-3000}
+  OSRM_URL: ${OSRM_URL:-http://osrm:5000}
+
+services:
+  database:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB must be set}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - nearby-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - nearby-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  opensearch:
+    image: opensearchproject/opensearch:2.17.1
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      - DISABLE_SECURITY_PLUGIN=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "${OPENSEARCH_PORT:-9200}:9200"
+    volumes:
+      - nearby-opensearch-data:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  neo4j:
+    image: neo4j:5.24-community
+    environment:
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-nearby_graph_dev}
+      NEO4J_server_memory_heap_max__size: 512m
+      NEO4J_server_memory_pagecache_size: 256m
+      GRAPH_PW: ${NEO4J_PASSWORD:-nearby_graph_dev}
+    ports:
+      - "${NEO4J_HTTP_PORT:-7474}:7474"
+      - "${NEO4J_BOLT_PORT:-7687}:7687"
+    volumes:
+      - nearby-neo4j-data:/data
+    healthcheck:
+      # Dùng HTTP thay cypher-shell: cypher-shell chạy trên JVM nên riêng việc
+      # khởi động đã quá 5 giây trên máy đang tải, healthcheck timeout trước khi
+      # nó kịp trả lời và Neo4j bị đánh dấu unhealthy VĨNH VIỄN dù chạy hoàn toàn
+      # bình thường — kéo theo graph-sync không bao giờ khởi động được vì
+      # depends_on: service_healthy. Endpoint HTTP trả lời trong ~86 ms.
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474/ >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
+  migrate:
+    build: ./backend
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      <<: *backend-environment
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: "on-failure:5"
+
+  backend-tests:
+    profiles: ["test"]
+    build:
+      context: ./backend
+      target: test
+    environment:
+      APP_ENV: test
+      DATABASE_URL: postgresql://test:test@localhost:5432/test
+      REDIS_URL: redis://localhost:6379/15
+      ALLOWED_ORIGINS: http://localhost
+
+  osm-import:
+    profiles: ["data"]
+    build: ./backend
+    command:
+      [
+        "python",
+        "-m",
+        "scripts.import_osm_pois",
+        "--bbox",
+        "${OSM_BBOX:-10.70,106.60,10.90,106.82}",
+        "--max-pois",
+        "${OSM_MAX_POIS:-3000}",
+      ]
+    environment:
+      <<: *backend-environment
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  search-index:
+    profiles: ["data"]
+    build: ./backend
+    command: ["python", "-m", "app.search.reindex", "--recreate"]
+    environment:
+      <<: *backend-environment
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      opensearch:
+        condition: service_healthy
+
+  graph-sync:
+    profiles: ["data"]
+    build: ./backend
+    command: ["python", "-m", "app.graph.sync", "--recreate"]
+    environment:
+      <<: *backend-environment
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      neo4j:
+        condition: service_healthy
+
+  feature-store:
+    profiles: ["data"]
+    build: ./backend
+    command: ["python", "-m", "app.features.materialize"]
+    environment:
+      <<: *backend-environment
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  backend:
+    build: ./backend
+    environment:
+      <<: *backend-environment
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  stream-worker:
+    build: ./backend
+    command: ["python", "-m", "app.stream_worker"]
+    restart: unless-stopped
+    environment:
+      <<: *backend-environment
+      CONSUMER_GROUP: ${CONSUMER_GROUP:-realtime-scoring}
+      CONSUMER_NAME: ${CONSUMER_NAME:-worker-1}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:${GATEWAY_PORT:-8081}
+      NEXT_PUBLIC_MAP_STYLE_URL: ${MAP_STYLE_URL:-}
+    ports:
+      - "${FRONTEND_PORT:-3001}:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      # `node -e` phai khoi dong ca runtime Node truoc khi chay dong lenh:
+      # rieng phan do da an gan het 4 giay tren may dang tai, nen healthcheck cu
+      # bao "exceeded timeout (4s)" lien tuc du `GET /` tra 200. Do len 15s va
+      # gian nhip kiem tra — container nay chi can biet la con song.
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3000').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 15s
+      retries: 10
+      start_period: 40s
+
+
+  # Chỉ đường thật (lộ trình B16). Dữ liệu dựng sẵn trong ./osrm bằng
+  # scripts/build_osrm.sh — KHÔNG dựng lúc khởi động: osrm-extract mất vài phút
+  # và ngốn RAM, chạy nó mỗi lần `up` sẽ làm cả stack không lên nổi trên máy
+  # yếu. Thiếu file .osrm thì container này thoát và mọi thứ còn lại vẫn chạy,
+  # backend tự rơi về deep-link Google Maps.
+  osrm:
+    image: osrm/osrm-backend:latest
+    command: ["osrm-routed", "--algorithm", "mld", "--max-matching-size", "-1", "/data/hcm.osrm"]
+    volumes:
+      - ./osrm:/data:ro
+    ports:
+      - "${OSRM_PORT:-5001}:5000"
+    restart: "no"
+    healthcheck:
+      # Image osrm/osrm-backend KHONG co wget cung KHONG co curl (`command -v
+      # wget curl` tra rong), nen healthcheck cu thoat 127 moi lan va container
+      # nay unhealthy vinh vien du no dinh tuyen binh thuong — den bao sai, con
+      # bat ky service nao `depends_on: service_healthy` osrm thi treo mai mai.
+      #
+      # Dung /dev/tcp cua bash de goi HTTP ma khong can cai them goi. Phai goi
+      # `bash` TUONG MINH: CMD-SHELL chay /bin/sh, ma /bin/sh trong image nay la
+      # dash, va dash bao "cannot create /dev/tcp/...: Directory nonexistent".
+      test:
+        - CMD
+        - bash
+        - -c
+        - "exec 3<>/dev/tcp/127.0.0.1/5000 && printf 'GET /route/v1/driving/106.7009,10.7757;106.7018,10.7784?overview=false HTTP/1.0\r\n\r\n' >&3 && grep -q '\"code\":\"Ok\"' <&3"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  gateway:
+    build: ./gateway
+    restart: unless-stopped
+    ports:
+      - "${GATEWAY_PORT:-8081}:8080"
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  nearby-postgres-data:
+  nearby-redis-data:
+  nearby-opensearch-data:
+  nearby-neo4j-data:

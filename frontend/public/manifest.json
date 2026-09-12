@@ -1,0 +1,27 @@
+{
+  "name": "Nearby — Khám phá địa điểm quanh bạn",
+  "short_name": "Nearby",
+  "description": "Tìm kiếm định vị và đánh giá địa điểm theo khoảng cách, thời điểm và ngữ cảnh.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#0f8a62",
+  "lang": "vi",
+  "categories": ["navigation", "travel", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

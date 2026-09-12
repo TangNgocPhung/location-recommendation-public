@@ -1,0 +1,4362 @@
+[
+  {
+    "query": "phở",
+    "group": "ngắn",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000002",
+        "name": "Phở Nhà Mình",
+        "category": "Ăn uống",
+        "address": "38 Pasteur, Quận 1",
+        "distance_m": 174,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000007",
+        "name": "Nhà hát Thành phố",
+        "category": "Văn hóa",
+        "address": "7 Công trường Lam Sơn, Quận 1",
+        "distance_m": 277,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000003",
+        "name": "Bảo tàng Thành phố",
+        "category": "Văn hóa",
+        "address": "65 Lý Tự Trọng, Quận 1",
+        "distance_m": 177,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000008",
+        "name": "Bánh mì Góc Phố",
+        "category": "Ăn uống",
+        "address": "54 Lê Thánh Tôn, Quận 1",
+        "distance_m": 400,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000005",
+        "name": "Bếp Chợ Lớn",
+        "category": "Ăn uống",
+        "address": "112 Nguyễn Huệ, Quận 1",
+        "distance_m": 463,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "9ce8ce89-a8db-4418-83df-ac6a9f181d0b",
+        "name": "Phở 24",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 427,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "b3edab08-62f3-4fab-93f3-1139b66126cb",
+        "name": "phòng GYM Phạm văn Mách",
+        "category": "Thể thao",
+        "address": "",
+        "distance_m": 608,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000027",
+        "name": "Cà phê Ban Công",
+        "category": "Cà phê",
+        "address": "123 Lý Chính Thắng, Quận 3",
+        "distance_m": 2011,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "38b84aa2-45cd-4648-b6f0-ff6a33bcc514",
+        "name": "Phở 24",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 559,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "bún",
+    "group": "ngắn",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000012",
+        "name": "Bún bò Sài Gòn",
+        "category": "Ăn uống",
+        "address": "18 Nam Kỳ Khởi Nghĩa, Quận 1",
+        "distance_m": 551,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000016",
+        "name": "Chợ Bến Thành",
+        "category": "Chợ",
+        "address": "Lê Lợi, Quận 1",
+        "distance_m": 454,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000024",
+        "name": "Bún riêu Quận 4",
+        "category": "Ăn uống",
+        "address": "15 Tôn Thất Thuyết, Quận 4",
+        "distance_m": 1836,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "cebf30dd-62a4-4d48-8bcd-260e8e74756f",
+        "name": "Chuck's Burgers",
+        "category": "Ăn uống",
+        "address": "71, Đường Pasteur",
+        "distance_m": 69,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "970d1587-fc14-4031-aaae-5ba24ef2b8a8",
+        "name": "Bến Thành",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 876,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "8a3629a0-5ea9-41f8-978e-02f2e2283800",
+        "name": "Quán Bún Bò Gánh",
+        "category": "Ăn uống",
+        "address": "2A, Lê Quý Đôn",
+        "distance_m": 970,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000027",
+        "name": "Cà phê Ban Công",
+        "category": "Cà phê",
+        "address": "123 Lý Chính Thắng, Quận 3",
+        "distance_m": 2011,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "fd6db586-b0b2-43c0-ab07-69e9f1321972",
+        "name": "Cà Phê Ben House",
+        "category": "Cà phê",
+        "address": "Tôn Thất Thiệp",
+        "distance_m": 287,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "76bffc9f-f7ad-4da9-af76-eb235bcc77c0",
+        "name": "Quán Bụi",
+        "category": "Ăn uống",
+        "address": "39, Lý Tự Trọng",
+        "distance_m": 414,
+        "openNow": false,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "cơm",
+    "group": "ngắn",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "a5616fdc-6e71-4212-9715-b0e22fab2cff",
+        "name": "Commonwealth Bank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 311,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "48e18349-1927-4dd5-9861-f06fc3766983",
+        "name": "Quán Cơm Tâm Mộc",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 354,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "e55c45b6-e0d2-4398-91d4-7e8c10137c65",
+        "name": "Nhà Hàng Cơm Nhà Homemade Meals",
+        "category": "Ăn uống",
+        "address": "151, Ðồng Khởi",
+        "distance_m": 277,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000013",
+        "name": "Hồ Con Rùa",
+        "category": "Địa danh",
+        "address": "Công trường Quốc Tế, Quận 3",
+        "distance_m": 1405,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000025",
+        "name": "Cơm tấm Quận 5",
+        "category": "Ăn uống",
+        "address": "88 Nguyễn Trãi, Quận 5",
+        "distance_m": 4195,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "9781a5ed-6b64-4eb8-9078-da6775cc6993",
+        "name": "The Pizza Company",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1082,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "8746f5f3-6ea9-40b8-8dea-08a3ce4a3f5c",
+        "name": "Highlands Coffee",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 160,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "dc797aa8-f7c1-40e9-ad96-250adb89143d",
+        "name": "Nhà Hàng Rơm BBQ",
+        "category": "Ăn uống",
+        "address": "2-4-6, Lưu Văn Lang",
+        "distance_m": 287,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "514218cb-1deb-4e1c-9802-5a31c6cba24d",
+        "name": "Khách Sạn Compass Park View",
+        "category": "Lưu trú",
+        "address": "",
+        "distance_m": 945,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "cà phê",
+    "group": "ngắn",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "4ad4888a-57a1-41c8-a03f-c74f02e546a0",
+        "name": "Cà Phê The Central",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 238,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "777a7592-06f0-4437-88c6-1ce3e1bcf39d",
+        "name": "Cà Phê Milestone",
+        "category": "Ăn uống",
+        "address": "210B, Nguyễn Khắc Nhu",
+        "distance_m": 1566,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "71836580-180a-4bf3-9230-2483cea34005",
+        "name": "Cà Phê Koi Thé",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 285,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "d195ecf0-2507-496d-a64f-5d6513870772",
+        "name": "Cà Phê Princess And The Pea",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 93,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "f861d694-2f8b-49ed-ae44-fa3b7d8f9a6c",
+        "name": "Cà Phê The Note",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1515,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "e37ee84f-0edc-43dc-829c-a3cac2eb63ce",
+        "name": "Cà Phê The Refinery",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 420,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "b08260fa-f055-499c-96ab-0309bce62bb6",
+        "name": "Cà Phê Donna",
+        "category": "Cà phê",
+        "address": "18A, Nguyễn Huệ",
+        "distance_m": 188,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "cebf30dd-62a4-4d48-8bcd-260e8e74756f",
+        "name": "Chuck's Burgers",
+        "category": "Ăn uống",
+        "address": "71, Đường Pasteur",
+        "distance_m": 69,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "81097479-427e-4628-abbc-378ee63c34f8",
+        "name": "Cà Phê The Plus",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 974,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "bánh mì",
+    "group": "ngắn",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000008",
+        "name": "Bánh mì Góc Phố",
+        "category": "Ăn uống",
+        "address": "54 Lê Thánh Tôn, Quận 1",
+        "distance_m": 400,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "3bb03d4d-63c3-4e5f-b5c3-ec5e340072d7",
+        "name": "Cửa Hàng Bánh Mì Givral",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 185,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "f264a845-80a2-4102-91c1-5d0fbac984cd",
+        "name": "Central Parc Bánh Mì",
+        "category": "Cà phê",
+        "address": "Pasteur, Quận 1",
+        "distance_m": 424,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "9c41ad23-9e94-4586-99df-d901c9943ff1",
+        "name": "Bánh Mì The One",
+        "category": "Ăn uống",
+        "address": "53G, Nguyễn Du",
+        "distance_m": 460,
+        "openNow": false,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000009",
+        "name": "Công viên Bến Bạch Đằng",
+        "category": "Công viên",
+        "address": "Tôn Đức Thắng, Quận 1",
+        "distance_m": 728,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "ebc4a9af-e516-4914-ae2e-e7c3897812fe",
+        "name": "Nhà Hàng My Bahn Mi",
+        "category": "Ăn uống",
+        "address": "57, Nguyễn Du",
+        "distance_m": 421,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "335cbbc8-58c7-4e46-9975-fcfa1b24dc88",
+        "name": "Cửa Hàng Bánh Mì",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1539,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "3996a3f9-8609-413a-bbd5-3d91291a4f18",
+        "name": "Bánh Mì Huỳnh Hoa",
+        "category": "Ăn uống",
+        "address": "26, Đường Lê Thị Riêng, Quận 1",
+        "distance_m": 1014,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "fccfc9d5-cb50-4bdb-be7e-52970e1abffe",
+        "name": "Bangkok Bank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 650,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "trà sữa",
+    "group": "ngắn",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "e9b90980-3b1c-495d-b038-56dca336d9e2",
+        "name": "Trà Sữa Bobapop",
+        "category": "Cà phê",
+        "address": "24, Huỳnh Thúc Kháng",
+        "distance_m": 378,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "145f1b50-6bf9-4fa9-95b3-4c9fb210a5df",
+        "name": "Cửa Hàng Thời Trang Maison",
+        "category": "Mua sắm",
+        "address": "63, Đường Pasteur",
+        "distance_m": 98,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "8e148be6-21e7-4c75-ade3-4ff7b90b3849",
+        "name": "Trà Sữa R&B",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 526,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "23fb7564-22db-482e-b360-f2e624962cf1",
+        "name": "Trà sữa TenRen",
+        "category": "Cà phê",
+        "address": "42, Trần Cao Vân",
+        "distance_m": 964,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "ce64ff97-9004-43f1-bfe1-10a2dcc18841",
+        "name": "Cửa Hàng Thời Trang Huy Hoàng",
+        "category": "Mua sắm",
+        "address": "65, Pasteur",
+        "distance_m": 76,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000008",
+        "name": "Bánh mì Góc Phố",
+        "category": "Ăn uống",
+        "address": "54 Lê Thánh Tôn, Quận 1",
+        "distance_m": 400,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "76f1deba-dcd7-405f-b29d-68ba62e8444a",
+        "name": "Trà Sữa Phúc Long",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 968,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "cf293baa-796b-402f-b065-586a12769dd5",
+        "name": "Cửa Hàng Thời Trang Luis Vuitton",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 234,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "433d5c2d-1835-41fc-a82a-fec534a20638",
+        "name": "Trà sữa Tea Cup",
+        "category": "Cà phê",
+        "address": "174, Phan Xích Long",
+        "distance_m": 2821,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "công viên",
+    "group": "ngắn",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000009",
+        "name": "Công viên Bến Bạch Đằng",
+        "category": "Công viên",
+        "address": "Tôn Đức Thắng, Quận 1",
+        "distance_m": 728,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000023",
+        "name": "Công viên Lê Văn Tám",
+        "category": "Công viên",
+        "address": "Hai Bà Trưng, Quận 1",
+        "distance_m": 1355,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000021",
+        "name": "Vincom Center Đồng Khởi",
+        "category": "Mua sắm",
+        "address": "72 Lê Thánh Tôn, Quận 1",
+        "distance_m": 401,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000004",
+        "name": "Vườn xanh Tao Đàn",
+        "category": "Công viên",
+        "address": "Trương Định, Quận 1",
+        "distance_m": 805,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000007",
+        "name": "Nhà hát Thành phố",
+        "category": "Văn hóa",
+        "address": "7 Công trường Lam Sơn, Quận 1",
+        "distance_m": 277,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "0417b23b-5484-40d8-a9d0-79c9f1d02fcc",
+        "name": "Công viên bờ sông Sài Gòn",
+        "category": "Địa danh",
+        "address": "",
+        "distance_m": 1064,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "b4902b28-7735-43ef-b522-57d3dcdd751a",
+        "name": "Nhà Hàng Cung Đình Rex",
+        "category": "Ăn uống",
+        "address": "146, Đường Pasteur",
+        "distance_m": 31,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000027",
+        "name": "Cà phê Ban Công",
+        "category": "Cà phê",
+        "address": "123 Lý Chính Thắng, Quận 3",
+        "distance_m": 2011,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "28797458-ea6e-4441-8e15-4de16a3f3447",
+        "name": "Cộng Cà Phê",
+        "category": "Cà phê",
+        "address": "Mạc Thị Bưởi",
+        "distance_m": 497,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "bảo tàng",
+    "group": "ngắn",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000003",
+        "name": "Bảo tàng Thành phố",
+        "category": "Văn hóa",
+        "address": "65 Lý Tự Trọng, Quận 1",
+        "distance_m": 177,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000018",
+        "name": "Bảo tàng Chứng tích Chiến tranh",
+        "category": "Văn hóa",
+        "address": "28 Võ Văn Tần, Quận 3",
+        "distance_m": 1066,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "376358d0-09a2-4301-95dd-17773fe624f4",
+        "name": "BaoViet Bank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 902,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "c2006e55-1c7c-451f-9c0d-3b7139be8004",
+        "name": "Quán Bar Piu Piu",
+        "category": "Giải trí",
+        "address": "97, Hai Bà Trưng",
+        "distance_m": 398,
+        "openNow": true,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "95ec933b-64ae-44c5-a152-4f12354ca1ed",
+        "name": "Quán Bar Code",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 352,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "1970718c-0bda-4795-8f92-0572ff916de9",
+        "name": "Cửa Hàng Gạo Chợ Đào",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 1458,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "38cf563e-b74f-4d80-a3ab-bcf3ec3435d5",
+        "name": "Bar's Bar",
+        "category": "Giải trí",
+        "address": "47, Phan Chu Trinh",
+        "distance_m": 533,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "a8655565-738a-46e5-b062-a75ecb32d6a7",
+        "name": "Bảo Tàng FITO",
+        "category": "Văn hóa",
+        "address": "41, Hoàng Dư Khương",
+        "distance_m": 3165,
+        "openNow": false,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "b1859801-7dc6-4f50-b73a-c1f53f629c66",
+        "name": "Bảo Tàng Địa Chất",
+        "category": "Văn hóa",
+        "address": "",
+        "distance_m": 1267,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "cà phê gần Bến Thành",
+    "group": "địa danh",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 757,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "ac6aac3a-22b1-4e9a-bfe7-ad829685f0ad",
+        "name": "Cà Phê F.r.i.e.n.d.s",
+        "category": "Cà phê",
+        "address": "24/8, Hẻm Thủ Khoa Huân",
+        "distance_m": 142,
+        "openNow": true,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "777a7592-06f0-4437-88c6-1ce3e1bcf39d",
+        "name": "Cà Phê Milestone",
+        "category": "Ăn uống",
+        "address": "210B, Nguyễn Khắc Nhu",
+        "distance_m": 1115,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "71836580-180a-4bf3-9230-2483cea34005",
+        "name": "Cà Phê Koi Thé",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 381,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "b0eb6888-1f61-493d-966b-a1ae0c6d1002",
+        "name": "Cà Phê Amazing",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 119,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "f861d694-2f8b-49ed-ae44-fa3b7d8f9a6c",
+        "name": "Cà Phê The Note",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1064,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "21116c96-fc00-4430-b507-3080ef0b0df7",
+        "name": "Cà Phê Fanny",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 420,
+        "openNow": true,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "4ad4888a-57a1-41c8-a03f-c74f02e546a0",
+        "name": "Cà Phê The Central",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 535,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "d0af5704-442f-4ca4-910d-258ef7c7e91e",
+        "name": "Street Food Market",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 154,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "bf848931-6c65-4508-abc7-009ebb1413c6",
+        "name": "Cà Phê Juicy",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 1519,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "quán ăn gần chợ Bến Thành",
+    "group": "địa danh",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "bde9ac61-5ad8-4db0-94c7-1b3ee5540a57",
+        "name": "Quán Ăn Tú Điệp",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 519,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "30974284-98b6-4c63-8aef-c4bece6151c2",
+        "name": "Quán Ăn Cô Tấm",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 595,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10f96f91-bec5-4926-9165-62f43335f924",
+        "name": "Cửa hàng Điện Quang",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 297,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "396bc580-0f70-47cb-b7c2-e03962468226",
+        "name": "Quán Pub Urban Basement",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 209,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "5cf9a5d5-6272-4cb8-b73e-c946e4083e94",
+        "name": "Quán Ăn Mì Quảng",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1839,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "4e4e2759-a44b-49aa-842d-fe75faac9d09",
+        "name": "Quán Pub Zesty",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 280,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "1eba5864-c6be-4788-aaf0-9ca837d7f7f4",
+        "name": "Quán Phở 2000",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 97,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "f214dc5f-67d4-4c1f-847f-a43d5eb2f459",
+        "name": "Thực Phẩm Hữu Cơ An Toàn - Nam An",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 277,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "8217f528-0375-4487-a508-9bda25dcaee2",
+        "name": "Khách Sạn An An",
+        "category": "Lưu trú",
+        "address": "40, Đường Bùi Viện",
+        "distance_m": 667,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000024",
+        "name": "Bún riêu Quận 4",
+        "category": "Ăn uống",
+        "address": "15 Tôn Thất Thuyết, Quận 4",
+        "distance_m": 1507,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "phở ở Quận 1",
+    "group": "địa danh",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000002",
+        "name": "Phở Nhà Mình",
+        "category": "Ăn uống",
+        "address": "38 Pasteur, Quận 1",
+        "distance_m": 174,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000007",
+        "name": "Nhà hát Thành phố",
+        "category": "Văn hóa",
+        "address": "7 Công trường Lam Sơn, Quận 1",
+        "distance_m": 277,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000003",
+        "name": "Bảo tàng Thành phố",
+        "category": "Văn hóa",
+        "address": "65 Lý Tự Trọng, Quận 1",
+        "distance_m": 177,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000008",
+        "name": "Bánh mì Góc Phố",
+        "category": "Ăn uống",
+        "address": "54 Lê Thánh Tôn, Quận 1",
+        "distance_m": 400,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000005",
+        "name": "Bếp Chợ Lớn",
+        "category": "Ăn uống",
+        "address": "112 Nguyễn Huệ, Quận 1",
+        "distance_m": 463,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "9ce8ce89-a8db-4418-83df-ac6a9f181d0b",
+        "name": "Phở 24",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 427,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "b3edab08-62f3-4fab-93f3-1139b66126cb",
+        "name": "phòng GYM Phạm văn Mách",
+        "category": "Thể thao",
+        "address": "",
+        "distance_m": 608,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000027",
+        "name": "Cà phê Ban Công",
+        "category": "Cà phê",
+        "address": "123 Lý Chính Thắng, Quận 3",
+        "distance_m": 2011,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "38b84aa2-45cd-4648-b6f0-ff6a33bcc514",
+        "name": "Phở 24",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 559,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "cà phê Thủ Đức",
+    "group": "địa danh",
+    "latitude": 10.8494,
+    "longitude": 106.7537,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "094b43bf-be32-4b06-8c29-4669755c1ce9",
+        "name": "Trung tâm Thể dục Thể thao Quận Thủ Đức",
+        "category": "Thể thao",
+        "address": "26, Chương Dương",
+        "distance_m": 801,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "e7d1e304-82e7-464e-a133-15ab3708c9c8",
+        "name": "Trường Trung học phổ thông Thủ Đức",
+        "category": "Văn hóa",
+        "address": "fg, Đặng Văn Bi",
+        "distance_m": 747,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "f0f87ba1-2184-4df8-b8e5-ffa1e6bcbe2d",
+        "name": "cantin trung hoc Thu Duc",
+        "category": "Mua sắm",
+        "address": "Đường số 9",
+        "distance_m": 918,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "e801f6c0-5a81-4eda-ae1c-e25b606dff6d",
+        "name": "Zakka Thủ Đức",
+        "category": "Mua sắm",
+        "address": "4s, Đường số 30",
+        "distance_m": 1496,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "e49a72ca-d66e-4714-943a-ab1b41fa2e72",
+        "name": "Cà Phê Tuấn Tú",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 644,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "81cb7aa7-3818-41a5-b4df-e34d8d768da5",
+        "name": "Cà Phê Cô Phương",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 347,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "11de656b-077f-4ac5-9840-52c88bbc18ce",
+        "name": "Trường Đại Học Kinh Tế - Luật",
+        "category": "Giáo dục",
+        "address": "Kha Vạn Cân",
+        "distance_m": 236,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "66201dd4-7cf4-4d24-b081-14f7e01f9253",
+        "name": "Cà Phê Ngôi Nhà Gỗ",
+        "category": "Cà phê",
+        "address": "563-565, Kha Vạn Cân",
+        "distance_m": 421,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "3eed8023-0a5e-4377-b952-946887c8edb2",
+        "name": "Cà Phê Dường Như",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 1596,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "d9efa6ad-89b4-4735-9b36-7d66ba56e98e",
+        "name": "Pharmacity",
+        "category": "Y tế",
+        "address": "86, 7214",
+        "distance_m": 361,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "nhà hàng gần Nhà thờ Đức Bà",
+    "group": "địa danh",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "d4cd6d9e-471f-41fa-ba69-619f5041519e",
+        "name": "Nhà Hàng - Không Thể Thiếu Nhau",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 325,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "f53e4807-32cb-4c97-bf2f-b87b07e5a940",
+        "name": "Nhà Hàng Ngon",
+        "category": "Ăn uống",
+        "address": "160, Pasteur",
+        "distance_m": 280,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 343,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "ca93d9d9-69f0-4f7a-bc4b-e5f640b3c7b9",
+        "name": "Nhà Hàng Ghém",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 191,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "3efc79bb-f01b-48f0-9e51-a51f140d1fd7",
+        "name": "Nhà Hàng Nhật Annz",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 574,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "2e29983c-6d13-4f2d-890e-eb702a3cded9",
+        "name": "Nhà Hàng Buffet Vasta",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 776,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "d9d94222-40fb-441b-af0d-f04f3bd9cd61",
+        "name": "Nhà Hàng Chaba Thai",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 720,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "b507b553-91cf-4a9a-9be7-4fb01813b273",
+        "name": "Nhà Thuốc Tây Tín Đức",
+        "category": "Y tế",
+        "address": "",
+        "distance_m": 3587,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "4d5ac240-59e0-41af-a875-d314f7abacc7",
+        "name": "Nhà Hát \"Hàng Không Mẫu Hạm\"",
+        "category": "Văn hóa",
+        "address": "30, Đường Trần Hưng Ðạo",
+        "distance_m": 1450,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "3615a7c2-712a-49b0-a6df-80cbb77e61e5",
+        "name": "Nhà Hàng Shamoji",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 705,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "quán cà phê gần Dinh Độc Lập",
+    "group": "địa danh",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "b78ede9b-4b2e-4f61-92e9-da513f0727f5",
+        "name": "Quán Cà Phê Papa",
+        "category": "Cà phê",
+        "address": "6B, Công trường Quốc Tế",
+        "distance_m": 699,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "8ed1ea9c-b812-42d4-8da7-a90573b499ce",
+        "name": "Quán Cà Phê Mellower",
+        "category": "Cà phê",
+        "address": "Nguyễn Du",
+        "distance_m": 530,
+        "openNow": false,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "3897eee1-92db-466b-bc50-dafedc1902e0",
+        "name": "Quán Phở Hoa",
+        "category": "Ăn uống",
+        "address": "260C, Đường Pasteur",
+        "distance_m": 413,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "3395681f-8668-47d3-bb3e-d263244bb06a",
+        "name": "Cà Phê Press",
+        "category": "Cà phê",
+        "address": "14, Alexandre de Rhodes",
+        "distance_m": 274,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "a22cfed4-6f44-4cb1-854a-6e942d324c56",
+        "name": "Cà Phê Mylife",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 296,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "9a0dde0c-476a-4788-82fa-bcebe5ddbd1a",
+        "name": "Nhà Hàng Phúc Quang Chay",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 870,
+        "openNow": false,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "58ddae1e-cd8f-446e-a08b-adba3f33ed4b",
+        "name": "Cà Phê Thức",
+        "category": "Cà phê",
+        "address": "Q1, Đường Pasteur",
+        "distance_m": 355,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "c66d71ca-9d22-4409-9d63-8505bb4702fe",
+        "name": "Cà Phê Fugashin",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 358,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "777a7592-06f0-4437-88c6-1ce3e1bcf39d",
+        "name": "Cà Phê Milestone",
+        "category": "Ăn uống",
+        "address": "210B, Nguyễn Khắc Nhu",
+        "distance_m": 1468,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "1768c4b7-5056-4af9-9ab0-e6fdde489ae3",
+        "name": "Quán Bar Phoenix",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 2766,
+        "openNow": false,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "ăn uống Quận 6",
+    "group": "địa danh",
+    "latitude": 10.746,
+    "longitude": 106.635,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "004273a9-bc3a-4337-95d9-c62714415b66",
+        "name": "Cà Phê Guitar Quận 6",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 763,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "3cb20169-13ea-41db-8738-697ac3d763f3",
+        "name": "Quán Ăn Dương Thành",
+        "category": "Ăn uống",
+        "address": "64-68, Phan Xích Long",
+        "distance_m": 1674,
+        "openNow": true,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "6926314e-3bd4-48ff-b1d4-5b5812dbf9da",
+        "name": "Trung Tâm Hướng Nghiệp Quận 6",
+        "category": "Giáo dục",
+        "address": "200, Gia Phu",
+        "distance_m": 1760,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "96e12eb1-3ea5-4edc-a246-1d4aad6b3b88",
+        "name": "Quán Ăn Gia Phú",
+        "category": "Ăn uống",
+        "address": "513/28-30, Gia Phú",
+        "distance_m": 1307,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "97c6ff7f-d434-4cfc-95c0-972ee159cb63",
+        "name": "Trạm Y Tế Phường 14 Quận 6",
+        "category": "Y tế",
+        "address": "137 bis, Đường Tân Hòa Đông, 6",
+        "distance_m": 1576,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000025",
+        "name": "Cơm tấm Quận 5",
+        "category": "Ăn uống",
+        "address": "88 Nguyễn Trãi, Quận 5",
+        "distance_m": 3834,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "7f6976bd-c502-49f3-a54b-befc33423cd1",
+        "name": "King Ẩm Thực",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 394,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "4939f5cc-d489-40c0-a860-1a2edd0ccd67",
+        "name": "Techcombank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 394,
+        "openNow": true,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "a1a30c11-9a37-45d9-8787-5723e9b76cc3",
+        "name": "TT Kỹ Thuật Tổng Hợp Hướng Nghiệp Quận 11",
+        "category": "Giáo dục",
+        "address": "445/2, Đường Lạc Long Quân",
+        "distance_m": 3275,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "698f9883-59f8-4510-b5c8-14e6dbb924fc",
+        "name": "Công Viên Dương 4",
+        "category": "Công viên",
+        "address": "",
+        "distance_m": 4039,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "ca phe",
+    "group": "không dấu",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "4ad4888a-57a1-41c8-a03f-c74f02e546a0",
+        "name": "Cà Phê The Central",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 238,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "777a7592-06f0-4437-88c6-1ce3e1bcf39d",
+        "name": "Cà Phê Milestone",
+        "category": "Ăn uống",
+        "address": "210B, Nguyễn Khắc Nhu",
+        "distance_m": 1566,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "71836580-180a-4bf3-9230-2483cea34005",
+        "name": "Cà Phê Koi Thé",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 285,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "d195ecf0-2507-496d-a64f-5d6513870772",
+        "name": "Cà Phê Princess And The Pea",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 93,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "f861d694-2f8b-49ed-ae44-fa3b7d8f9a6c",
+        "name": "Cà Phê The Note",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1515,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "e37ee84f-0edc-43dc-829c-a3cac2eb63ce",
+        "name": "Cà Phê The Refinery",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 420,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "b08260fa-f055-499c-96ab-0309bce62bb6",
+        "name": "Cà Phê Donna",
+        "category": "Cà phê",
+        "address": "18A, Nguyễn Huệ",
+        "distance_m": 188,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "cebf30dd-62a4-4d48-8bcd-260e8e74756f",
+        "name": "Chuck's Burgers",
+        "category": "Ăn uống",
+        "address": "71, Đường Pasteur",
+        "distance_m": 69,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "81097479-427e-4628-abbc-378ee63c34f8",
+        "name": "Cà Phê The Plus",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 974,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "pho ngon",
+    "group": "không dấu",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000002",
+        "name": "Phở Nhà Mình",
+        "category": "Ăn uống",
+        "address": "38 Pasteur, Quận 1",
+        "distance_m": 174,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000007",
+        "name": "Nhà hát Thành phố",
+        "category": "Văn hóa",
+        "address": "7 Công trường Lam Sơn, Quận 1",
+        "distance_m": 277,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000003",
+        "name": "Bảo tàng Thành phố",
+        "category": "Văn hóa",
+        "address": "65 Lý Tự Trọng, Quận 1",
+        "distance_m": 177,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "f53e4807-32cb-4c97-bf2f-b87b07e5a940",
+        "name": "Nhà Hàng Ngon",
+        "category": "Ăn uống",
+        "address": "160, Pasteur",
+        "distance_m": 229,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000012",
+        "name": "Bún bò Sài Gòn",
+        "category": "Ăn uống",
+        "address": "18 Nam Kỳ Khởi Nghĩa, Quận 1",
+        "distance_m": 551,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000008",
+        "name": "Bánh mì Góc Phố",
+        "category": "Ăn uống",
+        "address": "54 Lê Thánh Tôn, Quận 1",
+        "distance_m": 400,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "d7b461e9-88a8-443c-8b0d-a92a9919416d",
+        "name": "Cửa Hàng Văn Phòng Phẩm Hồng Ngọc",
+        "category": "Mua sắm",
+        "address": "E 20-22, Khánh Hội",
+        "distance_m": 1687,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "874076fd-2b72-47f5-9512-4eafbef8d817",
+        "name": "Tiệm Bánh Ngọt Pháp",
+        "category": "Ăn uống",
+        "address": "234, Đường Lê Thánh Tôn",
+        "distance_m": 607,
+        "openNow": false,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "f2858290-e4f3-4635-b61f-ef0c7352500d",
+        "name": "Khách Sạn Ngọc Minh",
+        "category": "Lưu trú",
+        "address": "18, Đông Du",
+        "distance_m": 518,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "banh mi",
+    "group": "không dấu",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000008",
+        "name": "Bánh mì Góc Phố",
+        "category": "Ăn uống",
+        "address": "54 Lê Thánh Tôn, Quận 1",
+        "distance_m": 400,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "3bb03d4d-63c3-4e5f-b5c3-ec5e340072d7",
+        "name": "Cửa Hàng Bánh Mì Givral",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 185,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "f264a845-80a2-4102-91c1-5d0fbac984cd",
+        "name": "Central Parc Bánh Mì",
+        "category": "Cà phê",
+        "address": "Pasteur, Quận 1",
+        "distance_m": 424,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "9c41ad23-9e94-4586-99df-d901c9943ff1",
+        "name": "Bánh Mì The One",
+        "category": "Ăn uống",
+        "address": "53G, Nguyễn Du",
+        "distance_m": 460,
+        "openNow": false,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000009",
+        "name": "Công viên Bến Bạch Đằng",
+        "category": "Công viên",
+        "address": "Tôn Đức Thắng, Quận 1",
+        "distance_m": 728,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "ebc4a9af-e516-4914-ae2e-e7c3897812fe",
+        "name": "Nhà Hàng My Bahn Mi",
+        "category": "Ăn uống",
+        "address": "57, Nguyễn Du",
+        "distance_m": 421,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "335cbbc8-58c7-4e46-9975-fcfa1b24dc88",
+        "name": "Cửa Hàng Bánh Mì",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1539,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "3996a3f9-8609-413a-bbd5-3d91291a4f18",
+        "name": "Bánh Mì Huỳnh Hoa",
+        "category": "Ăn uống",
+        "address": "26, Đường Lê Thị Riêng, Quận 1",
+        "distance_m": 1014,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "fccfc9d5-cb50-4bdb-be7e-52970e1abffe",
+        "name": "Bangkok Bank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 650,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "quan an",
+    "group": "không dấu",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "30974284-98b6-4c63-8aef-c4bece6151c2",
+        "name": "Quán Ăn Cô Tấm",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 515,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "5cf9a5d5-6272-4cb8-b73e-c946e4083e94",
+        "name": "Quán Ăn Mì Quảng",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1499,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "c2006e55-1c7c-451f-9c0d-3b7139be8004",
+        "name": "Quán Bar Piu Piu",
+        "category": "Giải trí",
+        "address": "97, Hai Bà Trưng",
+        "distance_m": 398,
+        "openNow": true,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "bde9ac61-5ad8-4db0-94c7-1b3ee5540a57",
+        "name": "Quán Ăn Tú Điệp",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 805,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "cba2bac9-c8b3-4d4e-8cfb-10c3c2dc129a",
+        "name": "Quán Bar Saigon Saigon",
+        "category": "Giải trí",
+        "address": "19-23 Công Trường Lam Sơn",
+        "distance_m": 280,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "f214dc5f-67d4-4c1f-847f-a43d5eb2f459",
+        "name": "Thực Phẩm Hữu Cơ An Toàn - Nam An",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 286,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "95ec933b-64ae-44c5-a152-4f12354ca1ed",
+        "name": "Quán Bar Code",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 352,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "10f96f91-bec5-4926-9165-62f43335f924",
+        "name": "Cửa hàng Điện Quang",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 546,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "28f69600-5e23-476a-b11a-9b4bef46d9c6",
+        "name": "Quán Bar Trung Tâm",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 364,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "dda7daca-272e-4b1b-935f-05c6aa84d54c",
+        "name": "Quán Ăn DimSum",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1582,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "cong vien",
+    "group": "không dấu",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000009",
+        "name": "Công viên Bến Bạch Đằng",
+        "category": "Công viên",
+        "address": "Tôn Đức Thắng, Quận 1",
+        "distance_m": 728,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000023",
+        "name": "Công viên Lê Văn Tám",
+        "category": "Công viên",
+        "address": "Hai Bà Trưng, Quận 1",
+        "distance_m": 1355,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000021",
+        "name": "Vincom Center Đồng Khởi",
+        "category": "Mua sắm",
+        "address": "72 Lê Thánh Tôn, Quận 1",
+        "distance_m": 401,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000004",
+        "name": "Vườn xanh Tao Đàn",
+        "category": "Công viên",
+        "address": "Trương Định, Quận 1",
+        "distance_m": 805,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000007",
+        "name": "Nhà hát Thành phố",
+        "category": "Văn hóa",
+        "address": "7 Công trường Lam Sơn, Quận 1",
+        "distance_m": 277,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "0417b23b-5484-40d8-a9d0-79c9f1d02fcc",
+        "name": "Công viên bờ sông Sài Gòn",
+        "category": "Địa danh",
+        "address": "",
+        "distance_m": 1064,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "b4902b28-7735-43ef-b522-57d3dcdd751a",
+        "name": "Nhà Hàng Cung Đình Rex",
+        "category": "Ăn uống",
+        "address": "146, Đường Pasteur",
+        "distance_m": 31,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000027",
+        "name": "Cà phê Ban Công",
+        "category": "Cà phê",
+        "address": "123 Lý Chính Thắng, Quận 3",
+        "distance_m": 2011,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "28797458-ea6e-4441-8e15-4de16a3f3447",
+        "name": "Cộng Cà Phê",
+        "category": "Cà phê",
+        "address": "Mạc Thị Bưởi",
+        "distance_m": 497,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "tra sua",
+    "group": "không dấu",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "e9b90980-3b1c-495d-b038-56dca336d9e2",
+        "name": "Trà Sữa Bobapop",
+        "category": "Cà phê",
+        "address": "24, Huỳnh Thúc Kháng",
+        "distance_m": 378,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "145f1b50-6bf9-4fa9-95b3-4c9fb210a5df",
+        "name": "Cửa Hàng Thời Trang Maison",
+        "category": "Mua sắm",
+        "address": "63, Đường Pasteur",
+        "distance_m": 98,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "8e148be6-21e7-4c75-ade3-4ff7b90b3849",
+        "name": "Trà Sữa R&B",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 526,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "23fb7564-22db-482e-b360-f2e624962cf1",
+        "name": "Trà sữa TenRen",
+        "category": "Cà phê",
+        "address": "42, Trần Cao Vân",
+        "distance_m": 964,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "ce64ff97-9004-43f1-bfe1-10a2dcc18841",
+        "name": "Cửa Hàng Thời Trang Huy Hoàng",
+        "category": "Mua sắm",
+        "address": "65, Pasteur",
+        "distance_m": 76,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000008",
+        "name": "Bánh mì Góc Phố",
+        "category": "Ăn uống",
+        "address": "54 Lê Thánh Tôn, Quận 1",
+        "distance_m": 400,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "76f1deba-dcd7-405f-b29d-68ba62e8444a",
+        "name": "Trà Sữa Phúc Long",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 968,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "cf293baa-796b-402f-b065-586a12769dd5",
+        "name": "Cửa Hàng Thời Trang Luis Vuitton",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 234,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "433d5c2d-1835-41fc-a82a-fec534a20638",
+        "name": "Trà sữa Tea Cup",
+        "category": "Cà phê",
+        "address": "174, Phan Xích Long",
+        "distance_m": 2821,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "bao tang",
+    "group": "không dấu",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000003",
+        "name": "Bảo tàng Thành phố",
+        "category": "Văn hóa",
+        "address": "65 Lý Tự Trọng, Quận 1",
+        "distance_m": 177,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000018",
+        "name": "Bảo tàng Chứng tích Chiến tranh",
+        "category": "Văn hóa",
+        "address": "28 Võ Văn Tần, Quận 3",
+        "distance_m": 1066,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "376358d0-09a2-4301-95dd-17773fe624f4",
+        "name": "BaoViet Bank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 902,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "c2006e55-1c7c-451f-9c0d-3b7139be8004",
+        "name": "Quán Bar Piu Piu",
+        "category": "Giải trí",
+        "address": "97, Hai Bà Trưng",
+        "distance_m": 398,
+        "openNow": true,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "95ec933b-64ae-44c5-a152-4f12354ca1ed",
+        "name": "Quán Bar Code",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 352,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "1970718c-0bda-4795-8f92-0572ff916de9",
+        "name": "Cửa Hàng Gạo Chợ Đào",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 1458,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "38cf563e-b74f-4d80-a3ab-bcf3ec3435d5",
+        "name": "Bar's Bar",
+        "category": "Giải trí",
+        "address": "47, Phan Chu Trinh",
+        "distance_m": 533,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "a8655565-738a-46e5-b062-a75ecb32d6a7",
+        "name": "Bảo Tàng FITO",
+        "category": "Văn hóa",
+        "address": "41, Hoàng Dư Khương",
+        "distance_m": 3165,
+        "openNow": false,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "b1859801-7dc6-4f50-b73a-c1f53f629c66",
+        "name": "Bảo Tàng Địa Chất",
+        "category": "Văn hóa",
+        "address": "",
+        "distance_m": 1267,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "caphe",
+    "group": "sai chính tả",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000002",
+        "name": "Phở Nhà Mình",
+        "category": "Ăn uống",
+        "address": "38 Pasteur, Quận 1",
+        "distance_m": 174,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000007",
+        "name": "Nhà hát Thành phố",
+        "category": "Văn hóa",
+        "address": "7 Công trường Lam Sơn, Quận 1",
+        "distance_m": 277,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000003",
+        "name": "Bảo tàng Thành phố",
+        "category": "Văn hóa",
+        "address": "65 Lý Tự Trọng, Quận 1",
+        "distance_m": 177,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000021",
+        "name": "Vincom Center Đồng Khởi",
+        "category": "Mua sắm",
+        "address": "72 Lê Thánh Tôn, Quận 1",
+        "distance_m": 401,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "74c88fd9-9d91-4990-9856-bec59747a868",
+        "name": "Trung Tâm Hội Nghị Capella",
+        "category": "Ăn uống",
+        "address": "03, đặng văn sâm",
+        "distance_m": 4512,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "cebf30dd-62a4-4d48-8bcd-260e8e74756f",
+        "name": "Chuck's Burgers",
+        "category": "Ăn uống",
+        "address": "71, Đường Pasteur",
+        "distance_m": 69,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "ce64ff97-9004-43f1-bfe1-10a2dcc18841",
+        "name": "Cửa Hàng Thời Trang Huy Hoàng",
+        "category": "Mua sắm",
+        "address": "65, Pasteur",
+        "distance_m": 76,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "b4902b28-7735-43ef-b522-57d3dcdd751a",
+        "name": "Nhà Hàng Cung Đình Rex",
+        "category": "Ăn uống",
+        "address": "146, Đường Pasteur",
+        "distance_m": 31,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "708da43d-6fb1-44b4-bb9a-9565e2d9ff45",
+        "name": "Khách Sạn Metropole",
+        "category": "Lưu trú",
+        "address": "",
+        "distance_m": 543,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "nha hnag",
+    "group": "sai chính tả",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "3615a7c2-712a-49b0-a6df-80cbb77e61e5",
+        "name": "Nhà Hàng Shamoji",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 232,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "d9d94222-40fb-441b-af0d-f04f3bd9cd61",
+        "name": "Nhà Hàng Chaba Thai",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 457,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "3efc79bb-f01b-48f0-9e51-a51f140d1fd7",
+        "name": "Nhà Hàng Nhật Annz",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 436,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "4387da6f-14e4-4844-b443-54a10d36d8a8",
+        "name": "Nhà Hàng Miyama",
+        "category": "Ăn uống",
+        "address": "65, Lê Lợi",
+        "distance_m": 227,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000026",
+        "name": "Nhà sách Phú Nhuận",
+        "category": "Mua sắm",
+        "address": "212 Phan Xích Long, Phú Nhuận",
+        "distance_m": 2851,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "d4cd6d9e-471f-41fa-ba69-619f5041519e",
+        "name": "Nhà Hàng - Không Thể Thiếu Nhau",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 355,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "f53e4807-32cb-4c97-bf2f-b87b07e5a940",
+        "name": "Nhà Hàng Ngon",
+        "category": "Ăn uống",
+        "address": "160, Pasteur",
+        "distance_m": 229,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "2e29983c-6d13-4f2d-890e-eb702a3cded9",
+        "name": "Nhà Hàng Buffet Vasta",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 879,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "6a4ee179-da9b-48c6-a3d0-e1ed529628ea",
+        "name": "Nhà Hàng Lemongrass",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 268,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "quan cà fê",
+    "group": "sai chính tả",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "eee78354-e320-4df6-b5b6-0ede24c0f08c",
+        "name": "Cà Phê La Fenetre Soleil",
+        "category": "Cà phê",
+        "address": "44, 1st floor, Lý Tự Trọng",
+        "distance_m": 198,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10f96f91-bec5-4926-9165-62f43335f924",
+        "name": "Cửa hàng Điện Quang",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 546,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "8ed1ea9c-b812-42d4-8da7-a90573b499ce",
+        "name": "Quán Cà Phê Mellower",
+        "category": "Cà phê",
+        "address": "Nguyễn Du",
+        "distance_m": 344,
+        "openNow": false,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "cba2bac9-c8b3-4d4e-8cfb-10c3c2dc129a",
+        "name": "Quán Bar Saigon Saigon",
+        "category": "Giải trí",
+        "address": "19-23 Công Trường Lam Sơn",
+        "distance_m": 280,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "95ec933b-64ae-44c5-a152-4f12354ca1ed",
+        "name": "Quán Bar Code",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 352,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "a7221a1c-a0f8-4327-a93b-9499c01dc3eb",
+        "name": "Quán Rockbar",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 476,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "28f69600-5e23-476a-b11a-9b4bef46d9c6",
+        "name": "Quán Bar Trung Tâm",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 364,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "4d64cd13-2ee6-40dd-b054-6148945c9f05",
+        "name": "Mì Quảng Rau Sạch",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 740,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000024",
+        "name": "Bún riêu Quận 4",
+        "category": "Ăn uống",
+        "address": "15 Tôn Thất Thuyết, Quận 4",
+        "distance_m": 1836,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "banh my",
+    "group": "sai chính tả",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000008",
+        "name": "Bánh mì Góc Phố",
+        "category": "Ăn uống",
+        "address": "54 Lê Thánh Tôn, Quận 1",
+        "distance_m": 400,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "ebc4a9af-e516-4914-ae2e-e7c3897812fe",
+        "name": "Nhà Hàng My Bahn Mi",
+        "category": "Ăn uống",
+        "address": "57, Nguyễn Du",
+        "distance_m": 421,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000009",
+        "name": "Công viên Bến Bạch Đằng",
+        "category": "Công viên",
+        "address": "Tôn Đức Thắng, Quận 1",
+        "distance_m": 728,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "fccfc9d5-cb50-4bdb-be7e-52970e1abffe",
+        "name": "Bangkok Bank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 650,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000003",
+        "name": "Bảo tàng Thành phố",
+        "category": "Văn hóa",
+        "address": "65 Lý Tự Trọng, Quận 1",
+        "distance_m": 177,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "e6e40150-224e-4ad8-90f9-c1a9a412b333",
+        "name": "Khách Sạn Hà My",
+        "category": "Lưu trú",
+        "address": "",
+        "distance_m": 481,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "3bb03d4d-63c3-4e5f-b5c3-ec5e340072d7",
+        "name": "Cửa Hàng Bánh Mì Givral",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 185,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "a5616fdc-6e71-4212-9715-b0e22fab2cff",
+        "name": "Commonwealth Bank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 311,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "bc1e235a-bfe2-4399-bb5b-bdeff21ef70f",
+        "name": "Bánh Canh Hoàng Ty",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 2044,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "cong vien tao dan",
+    "group": "sai chính tả",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000009",
+        "name": "Công viên Bến Bạch Đằng",
+        "category": "Công viên",
+        "address": "Tôn Đức Thắng, Quận 1",
+        "distance_m": 728,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000023",
+        "name": "Công viên Lê Văn Tám",
+        "category": "Công viên",
+        "address": "Hai Bà Trưng, Quận 1",
+        "distance_m": 1355,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000003",
+        "name": "Bảo tàng Thành phố",
+        "category": "Văn hóa",
+        "address": "65 Lý Tự Trọng, Quận 1",
+        "distance_m": 177,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000021",
+        "name": "Vincom Center Đồng Khởi",
+        "category": "Mua sắm",
+        "address": "72 Lê Thánh Tôn, Quận 1",
+        "distance_m": 401,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000004",
+        "name": "Vườn xanh Tao Đàn",
+        "category": "Công viên",
+        "address": "Trương Định, Quận 1",
+        "distance_m": 805,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "e21e39fc-ca86-4b77-9766-6beea41f16dd",
+        "name": "Tan Hoang Long Hotel",
+        "category": "Lưu trú",
+        "address": "84, Mạc Thị Bưởi, District 1",
+        "distance_m": 367,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000007",
+        "name": "Nhà hát Thành phố",
+        "category": "Văn hóa",
+        "address": "7 Công trường Lam Sơn, Quận 1",
+        "distance_m": 277,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "0b096939-2f6d-4be3-9fa0-8a0e1bda0755",
+        "name": "Khách Sạn Tân Hải Long 3",
+        "category": "Lưu trú",
+        "address": "",
+        "distance_m": 522,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000027",
+        "name": "Cà phê Ban Công",
+        "category": "Cà phê",
+        "address": "123 Lý Chính Thắng, Quận 3",
+        "distance_m": 2011,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "pho bo",
+    "group": "sai chính tả",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000012",
+        "name": "Bún bò Sài Gòn",
+        "category": "Ăn uống",
+        "address": "18 Nam Kỳ Khởi Nghĩa, Quận 1",
+        "distance_m": 551,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000002",
+        "name": "Phở Nhà Mình",
+        "category": "Ăn uống",
+        "address": "38 Pasteur, Quận 1",
+        "distance_m": 174,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000007",
+        "name": "Nhà hát Thành phố",
+        "category": "Văn hóa",
+        "address": "7 Công trường Lam Sơn, Quận 1",
+        "distance_m": 277,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000003",
+        "name": "Bảo tàng Thành phố",
+        "category": "Văn hóa",
+        "address": "65 Lý Tự Trọng, Quận 1",
+        "distance_m": 177,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000008",
+        "name": "Bánh mì Góc Phố",
+        "category": "Ăn uống",
+        "address": "54 Lê Thánh Tôn, Quận 1",
+        "distance_m": 400,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "92566d95-5bb6-4ba7-82bd-22b8e5a71d0a",
+        "name": "nhà hàng bún bò nam bộ",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 774,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "e38dc4f6-0c10-4f99-ae76-1fd8a05b7655",
+        "name": "Phở Bò Phú Gia",
+        "category": "Ăn uống",
+        "address": "148, Đường Lý Chính Thắng",
+        "distance_m": 2138,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "e52d2ec2-45b3-4bec-a3c5-9a57510f2e25",
+        "name": "Khách Sạn Little Saigon Boutique",
+        "category": "Lưu trú",
+        "address": "36 Bis/2, Lê Lợi",
+        "distance_m": 139,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "6836efc0-ba4b-4f4f-ac8c-1d9f1dc76a74",
+        "name": "Nhà Hàng Le Bourgeois",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 209,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "ăn khuya",
+    "group": "theo giờ",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "f214dc5f-67d4-4c1f-847f-a43d5eb2f459",
+        "name": "Thực Phẩm Hữu Cơ An Toàn - Nam An",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 286,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000002",
+        "name": "Phở Nhà Mình",
+        "category": "Ăn uống",
+        "address": "38 Pasteur, Quận 1",
+        "distance_m": 174,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "8217f528-0375-4487-a508-9bda25dcaee2",
+        "name": "Khách Sạn An An",
+        "category": "Lưu trú",
+        "address": "40, Đường Bùi Viện",
+        "distance_m": 1121,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "30974284-98b6-4c63-8aef-c4bece6151c2",
+        "name": "Quán Ăn Cô Tấm",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 515,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "0b394f84-7f79-4192-828c-d53b47773d82",
+        "name": "Nhà Hàng Ấn Độ Curry Rice",
+        "category": "Ăn uống",
+        "address": "66, Đông Du",
+        "distance_m": 369,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "d195ecf0-2507-496d-a64f-5d6513870772",
+        "name": "Cà Phê Princess And The Pea",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 93,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "bde9ac61-5ad8-4db0-94c7-1b3ee5540a57",
+        "name": "Quán Ăn Tú Điệp",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 805,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "dda7daca-272e-4b1b-935f-05c6aa84d54c",
+        "name": "Quán Ăn DimSum",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1582,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "59c4307e-77b4-4e05-9cac-3a098162c94c",
+        "name": "Cửa Hàng Thời Trang An Phước",
+        "category": "Mua sắm",
+        "address": "94, Nguyễn Thị Minh Khai",
+        "distance_m": 777,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "cà phê sáng sớm",
+    "group": "theo giờ",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000010",
+        "name": "Cà phê Sân Thượng 81",
+        "category": "Cà phê",
+        "address": "81 Nguyễn Du, Quận 1",
+        "distance_m": 649,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "eee78354-e320-4df6-b5b6-0ede24c0f08c",
+        "name": "Cà Phê La Fenetre Soleil",
+        "category": "Cà phê",
+        "address": "44, 1st floor, Lý Tự Trọng",
+        "distance_m": 198,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000002",
+        "name": "Phở Nhà Mình",
+        "category": "Ăn uống",
+        "address": "38 Pasteur, Quận 1",
+        "distance_m": 174,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "e2c975c2-e6b3-404a-98da-4c8e2d55becb",
+        "name": "Cà Phê Soho",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 372,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "4ad4888a-57a1-41c8-a03f-c74f02e546a0",
+        "name": "Cà Phê The Central",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 238,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "777a7592-06f0-4437-88c6-1ce3e1bcf39d",
+        "name": "Cà Phê Milestone",
+        "category": "Ăn uống",
+        "address": "210B, Nguyễn Khắc Nhu",
+        "distance_m": 1566,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "71836580-180a-4bf3-9230-2483cea34005",
+        "name": "Cà Phê Koi Thé",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 285,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "d195ecf0-2507-496d-a64f-5d6513870772",
+        "name": "Cà Phê Princess And The Pea",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 93,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "f861d694-2f8b-49ed-ae44-fa3b7d8f9a6c",
+        "name": "Cà Phê The Note",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1515,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "2bb82eec-b741-4dae-84e9-7f61dd133bda",
+        "name": "Cà Phê Cuộc Sống Dễ Dàng",
+        "category": "Cà phê",
+        "address": "10A, Phạm Ngọc Thạch",
+        "distance_m": 904,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "quán bar buổi tối",
+    "group": "theo giờ",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "c2006e55-1c7c-451f-9c0d-3b7139be8004",
+        "name": "Quán Bar Piu Piu",
+        "category": "Giải trí",
+        "address": "97, Hai Bà Trưng",
+        "distance_m": 398,
+        "openNow": true,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "95ec933b-64ae-44c5-a152-4f12354ca1ed",
+        "name": "Quán Bar Code",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 352,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "76bffc9f-f7ad-4da9-af76-eb235bcc77c0",
+        "name": "Quán Bụi",
+        "category": "Ăn uống",
+        "address": "39, Lý Tự Trọng",
+        "distance_m": 414,
+        "openNow": false,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "70fb95cf-e25e-428a-a2ba-c891aa03f5e7",
+        "name": "Quán Bar Voodoo",
+        "category": "Giải trí",
+        "address": "92 (08) 3915 2836, Hồ Tùng Mậu",
+        "distance_m": 448,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "cba2bac9-c8b3-4d4e-8cfb-10c3c2dc129a",
+        "name": "Quán Bar Saigon Saigon",
+        "category": "Giải trí",
+        "address": "19-23 Công Trường Lam Sơn",
+        "distance_m": 280,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "f460ea72-d9bb-415a-a3c6-c58e61c5e462",
+        "name": "Quán Thi Bar",
+        "category": "Giải trí",
+        "address": "224, Đường Ðề Thám",
+        "distance_m": 1182,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "28f69600-5e23-476a-b11a-9b4bef46d9c6",
+        "name": "Quán Bar Trung Tâm",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 364,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "6f35ded1-b783-42dd-9ba7-41d9196d73b3",
+        "name": "Nhà Hàng Nướng Barbecue Garden",
+        "category": "Ăn uống",
+        "address": "135, Nam Kỳ Khởi Nghĩa",
+        "distance_m": 205,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000024",
+        "name": "Bún riêu Quận 4",
+        "category": "Ăn uống",
+        "address": "15 Tôn Thất Thuyết, Quận 4",
+        "distance_m": 1836,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "ăn sáng",
+    "group": "theo giờ",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "8217f528-0375-4487-a508-9bda25dcaee2",
+        "name": "Khách Sạn An An",
+        "category": "Lưu trú",
+        "address": "40, Đường Bùi Viện",
+        "distance_m": 1121,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000001",
+        "name": "Cà phê Bến Nghé",
+        "category": "Cà phê",
+        "address": "22 Lý Tự Trọng, Quận 1",
+        "distance_m": 314,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "f214dc5f-67d4-4c1f-847f-a43d5eb2f459",
+        "name": "Thực Phẩm Hữu Cơ An Toàn - Nam An",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 286,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "5fd47b72-9c5d-4e30-ba98-f4801918df74",
+        "name": "Khách Sạn Song Anh",
+        "category": "Lưu trú",
+        "address": "",
+        "distance_m": 370,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "0b394f84-7f79-4192-828c-d53b47773d82",
+        "name": "Nhà Hàng Ấn Độ Curry Rice",
+        "category": "Ăn uống",
+        "address": "66, Đông Du",
+        "distance_m": 369,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "30974284-98b6-4c63-8aef-c4bece6151c2",
+        "name": "Quán Ăn Cô Tấm",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 515,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000021",
+        "name": "Vincom Center Đồng Khởi",
+        "category": "Mua sắm",
+        "address": "72 Lê Thánh Tôn, Quận 1",
+        "distance_m": 401,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "59c4307e-77b4-4e05-9cac-3a098162c94c",
+        "name": "Cửa Hàng Thời Trang An Phước",
+        "category": "Mua sắm",
+        "address": "94, Nguyễn Thị Minh Khai",
+        "distance_m": 777,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "3efc79bb-f01b-48f0-9e51-a51f140d1fd7",
+        "name": "Nhà Hàng Nhật Annz",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 436,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "982176f0-cd83-4190-92d4-bc656aaf4c90",
+        "name": "Trường Cao Đẳng An Ninh Mạng ISPACE",
+        "category": "Giáo dục",
+        "address": "",
+        "distance_m": 2260,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "quán mở cửa bây giờ",
+    "group": "theo giờ",
+    "latitude": 10.7757,
+    "longitude": 106.7009,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "c2006e55-1c7c-451f-9c0d-3b7139be8004",
+        "name": "Quán Bar Piu Piu",
+        "category": "Giải trí",
+        "address": "97, Hai Bà Trưng",
+        "distance_m": 398,
+        "openNow": true,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "cba2bac9-c8b3-4d4e-8cfb-10c3c2dc129a",
+        "name": "Quán Bar Saigon Saigon",
+        "category": "Giải trí",
+        "address": "19-23 Công Trường Lam Sơn",
+        "distance_m": 280,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "3bb03d4d-63c3-4e5f-b5c3-ec5e340072d7",
+        "name": "Cửa Hàng Bánh Mì Givral",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 185,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "95ec933b-64ae-44c5-a152-4f12354ca1ed",
+        "name": "Quán Bar Code",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 352,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "48e18349-1927-4dd5-9861-f06fc3766983",
+        "name": "Quán Cơm Tâm Mộc",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 354,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "28f69600-5e23-476a-b11a-9b4bef46d9c6",
+        "name": "Quán Bar Trung Tâm",
+        "category": "Giải trí",
+        "address": "",
+        "distance_m": 364,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "eb1cab7b-8775-41f8-a4af-31fd2120f067",
+        "name": "Quán Bar The First",
+        "category": "Giải trí",
+        "address": "23 Đường Huỳnh Thúc Kháng, Bến Nghé, Quận 1, Hồ Chí Minh",
+        "distance_m": 371,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "10f96f91-bec5-4926-9165-62f43335f924",
+        "name": "Cửa hàng Điện Quang",
+        "category": "Mua sắm",
+        "address": "",
+        "distance_m": 546,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "3332ee30-8c11-47df-8cdb-c020b0f9c79d",
+        "name": "Quán Chả Giò Cua Biển 94",
+        "category": "Ăn uống",
+        "address": "84, Đinh Tiên Hoàng",
+        "distance_m": 1660,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "000a68be-95e4-40d7-baff-6791be483967",
+        "name": "Quán Bar No.5",
+        "category": "Giải trí",
+        "address": "44, Pasteur Street, District 1, Q1",
+        "distance_m": 514,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "cà phê",
+    "group": "đa tâm",
+    "latitude": 10.8494,
+    "longitude": 106.7537,
+    "radius": 3000,
+    "candidates": [
+      {
+        "poi_id": "81cb7aa7-3818-41a5-b4df-e34d8d768da5",
+        "name": "Cà Phê Cô Phương",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 347,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "66201dd4-7cf4-4d24-b081-14f7e01f9253",
+        "name": "Cà Phê Ngôi Nhà Gỗ",
+        "category": "Cà phê",
+        "address": "563-565, Kha Vạn Cân",
+        "distance_m": 421,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "d9efa6ad-89b4-4735-9b36-7d66ba56e98e",
+        "name": "Pharmacity",
+        "category": "Y tế",
+        "address": "86, 7214",
+        "distance_m": 361,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "e49a72ca-d66e-4714-943a-ab1b41fa2e72",
+        "name": "Cà Phê Tuấn Tú",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 644,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "eb747105-53a2-41bb-95a6-1f6fcd88ab1e",
+        "name": "Cà Phê Pha Kê",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 1656,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "7404146c-61d1-4683-86f5-371fa5f4fec1",
+        "name": "Phở Phú Lộc",
+        "category": "Ăn uống",
+        "address": "Dân Chủ",
+        "distance_m": 1274,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "ac0ab606-cc9f-4008-bd20-6d0bbd51b963",
+        "name": "Cà Phê Amy",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 1558,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "c9de38a3-0764-49cd-af21-aa46cf5fc4bf",
+        "name": "Cà Phê Gạch",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 1661,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "c10809d5-7fb7-47a0-a1d6-d6eeccd5e8f9",
+        "name": "Techcombank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 288,
+        "openNow": true,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "555a4e90-c7c8-4ee3-b2e2-38f871943a0b",
+        "name": "Cà Phê IM",
+        "category": "Cà phê",
+        "address": "14C, Thống Nhất",
+        "distance_m": 1778,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "quán ăn",
+    "group": "đa tâm",
+    "latitude": 10.8494,
+    "longitude": 106.7537,
+    "radius": 3000,
+    "candidates": [
+      {
+        "poi_id": "50593587-07a9-4beb-859b-678631d22798",
+        "name": "Quán Hiếu Ký Mì Gia",
+        "category": "Ăn uống",
+        "address": "15, Tô Ngọc Vân",
+        "distance_m": 210,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "67c8e1be-b909-498e-9428-95a17bc340fc",
+        "name": "Cà Phê Ấn Tượng",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 1763,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "10d6abc5-61d1-4993-9a6c-011c7655943f",
+        "name": "Chợ An Bình",
+        "category": "Chợ",
+        "address": "",
+        "distance_m": 2582,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "b65cd0cc-bcf3-4057-a70b-5983d3c9a1a4",
+        "name": "Liên Hoa Quán",
+        "category": "Ăn uống",
+        "address": "114, Đặng Văn Bi, Thu Duc",
+        "distance_m": 1035,
+        "openNow": false,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "094b43bf-be32-4b06-8c29-4669755c1ce9",
+        "name": "Trung tâm Thể dục Thể thao Quận Thủ Đức",
+        "category": "Thể thao",
+        "address": "26, Chương Dương",
+        "distance_m": 801,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "13d69cc1-52e7-4b05-983f-4cf44a9722df",
+        "name": "Bún Bò Thuận An 2",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1587,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "7eac4e0d-cd28-45d7-a167-633f10cff4eb",
+        "name": "Quán Cơm Tấm",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1724,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "e49a72ca-d66e-4714-943a-ab1b41fa2e72",
+        "name": "Cà Phê Tuấn Tú",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 644,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "9a2f1932-1ead-4262-bc6f-7ccce88b0916",
+        "name": "Tạp Hóa An Đức",
+        "category": "Mua sắm",
+        "address": "127, Đường Đỗ Xuân Hợp",
+        "distance_m": 2661,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "78993f4b-9ac6-4797-a9a6-53591984f67c",
+        "name": "Quán Cơm Gà Ta",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1878,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "cà phê",
+    "group": "đa tâm",
+    "latitude": 10.746,
+    "longitude": 106.635,
+    "radius": 3000,
+    "candidates": [
+      {
+        "poi_id": "69a8df0d-be3b-4be7-9452-29f05f95006f",
+        "name": "Cà Phê Boca",
+        "category": "Cà phê",
+        "address": "240/32, Nguyễn Văn Luông",
+        "distance_m": 115,
+        "openNow": false,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "004273a9-bc3a-4337-95d9-c62714415b66",
+        "name": "Cà Phê Guitar Quận 6",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 763,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "f17a60a5-791c-4cfe-a186-9b568768bb21",
+        "name": "Trường Trung học phổ thông Quốc Trí",
+        "category": "Giáo dục",
+        "address": "313, Đường Nguyễn Văn Luông",
+        "distance_m": 411,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "a07ec956-c983-43af-8c62-445b293756e5",
+        "name": "Cà Phê Story",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 1663,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "671d0473-b83c-4dba-ba52-55a5b677be16",
+        "name": "Cà Phê Hot",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 1868,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "81731f0a-12e6-47f3-ad2c-0caeb5c4709b",
+        "name": "Trường Trung học cơ sở&Trung học phổ thông Dân Lập Đào Duy Anh",
+        "category": "Giáo dục",
+        "address": "355, Nguyễn Văn Luông",
+        "distance_m": 515,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "97f4ae00-ec6d-4d12-bc3e-34957adb2c94",
+        "name": "Cà Phê Sam",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 2098,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "60d1d9d3-e4f3-42e1-8680-dbd8a1988d0a",
+        "name": "Cà Phê Gao Trần",
+        "category": "Cà phê",
+        "address": "20, Đường Lương Nhữ Học",
+        "distance_m": 2836,
+        "openNow": true,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "4939f5cc-d489-40c0-a860-1a2edd0ccd67",
+        "name": "Techcombank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 394,
+        "openNow": true,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "fdeffbaf-d3e7-4a8d-b916-2b150fb6e7fc",
+        "name": "Cà Phê Dinh Y",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 2953,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "quán ăn",
+    "group": "đa tâm",
+    "latitude": 10.746,
+    "longitude": 106.635,
+    "radius": 3000,
+    "candidates": [
+      {
+        "poi_id": "96e12eb1-3ea5-4edc-a246-1d4aad6b3b88",
+        "name": "Quán Ăn Gia Phú",
+        "category": "Ăn uống",
+        "address": "513/28-30, Gia Phú",
+        "distance_m": 1307,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "3cb20169-13ea-41db-8738-697ac3d763f3",
+        "name": "Quán Ăn Dương Thành",
+        "category": "Ăn uống",
+        "address": "64-68, Phan Xích Long",
+        "distance_m": 1674,
+        "openNow": true,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "004273a9-bc3a-4337-95d9-c62714415b66",
+        "name": "Cà Phê Guitar Quận 6",
+        "category": "Cà phê",
+        "address": "",
+        "distance_m": 763,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "215907ae-7cf3-4297-82b8-6d00e89a82fb",
+        "name": "Quán Hủ Tíu Chay",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1191,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "19a4e779-203a-4d5f-b9ca-c4ccae83c1f5",
+        "name": "Trạm Y tế Phường 1 Quận 11",
+        "category": "Y tế",
+        "address": "8/32, Tân Hoá, 11",
+        "distance_m": 1216,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "81731f0a-12e6-47f3-ad2c-0caeb5c4709b",
+        "name": "Trường Trung học cơ sở&Trung học phổ thông Dân Lập Đào Duy Anh",
+        "category": "Giáo dục",
+        "address": "355, Nguyễn Văn Luông",
+        "distance_m": 515,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "4939f5cc-d489-40c0-a860-1a2edd0ccd67",
+        "name": "Techcombank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 394,
+        "openNow": true,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "7f6976bd-c502-49f3-a54b-befc33423cd1",
+        "name": "King Ẩm Thực",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 394,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "97c6ff7f-d434-4cfc-95c0-972ee159cb63",
+        "name": "Trạm Y Tế Phường 14 Quận 6",
+        "category": "Y tế",
+        "address": "137 bis, Đường Tân Hòa Đông, 6",
+        "distance_m": 1576,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "bf79ec62-6e27-44b6-8f74-0cf499e2f5b0",
+        "name": "Lắk Kêu Quán",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1905,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "công viên",
+    "group": "đa tâm",
+    "latitude": 10.8494,
+    "longitude": 106.7537,
+    "radius": 10000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000009",
+        "name": "Công viên Bến Bạch Đằng",
+        "category": "Công viên",
+        "address": "Tôn Đức Thắng, Quận 1",
+        "distance_m": 9772,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000023",
+        "name": "Công viên Lê Văn Tám",
+        "category": "Công viên",
+        "address": "Hai Bà Trưng, Quận 1",
+        "distance_m": 9566,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "812d2395-45c5-46ba-932b-1a4004b08655",
+        "name": "Vietinbank",
+        "category": "Dịch vụ",
+        "address": "1, Võ Văn Ngân",
+        "distance_m": 261,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "c64778c0-dc38-4b50-8955-da42796ce9ac",
+        "name": "Công Viên Bình Qưới",
+        "category": "Công viên",
+        "address": "",
+        "distance_m": 2254,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "2bfdd4ba-b461-4a57-a59d-684ff59b72ec",
+        "name": "ATM DongA bank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 538,
+        "openNow": true,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "0417b23b-5484-40d8-a9d0-79c9f1d02fcc",
+        "name": "Công viên bờ sông Sài Gòn",
+        "category": "Địa danh",
+        "address": "",
+        "distance_m": 9851,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "3979317e-dbf1-4e21-b2f9-681b1c0eb5d1",
+        "name": "Công Viên Sala",
+        "category": "Công viên",
+        "address": "",
+        "distance_m": 9193,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000021",
+        "name": "Vincom Center Đồng Khởi",
+        "category": "Mua sắm",
+        "address": "72 Lê Thánh Tôn, Quận 1",
+        "distance_m": 9590,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "2858eeeb-13ce-4c69-97a7-9a017bb30df7",
+        "name": "Tạp Hóa Ngọc Hân",
+        "category": "Mua sắm",
+        "address": "5, Hồ Văn Tư",
+        "distance_m": 156,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000007",
+        "name": "Nhà hát Thành phố",
+        "category": "Văn hóa",
+        "address": "7 Công trường Lam Sơn, Quận 1",
+        "distance_m": 9767,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "chợ",
+    "group": "đa tâm",
+    "latitude": 10.746,
+    "longitude": 106.635,
+    "radius": 3000,
+    "candidates": [
+      {
+        "poi_id": "10000000-0000-0000-0000-000000000017",
+        "name": "Chợ Bình Tây",
+        "category": "Chợ",
+        "address": "57A Tháp Mười, Quận 6",
+        "distance_m": 2071,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "f17a60a5-791c-4cfe-a186-9b568768bb21",
+        "name": "Trường Trung học phổ thông Quốc Trí",
+        "category": "Giáo dục",
+        "address": "313, Đường Nguyễn Văn Luông",
+        "distance_m": 411,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "81731f0a-12e6-47f3-ad2c-0caeb5c4709b",
+        "name": "Trường Trung học cơ sở&Trung học phổ thông Dân Lập Đào Duy Anh",
+        "category": "Giáo dục",
+        "address": "355, Nguyễn Văn Luông",
+        "distance_m": 515,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "6cc63da0-0e11-4651-b74d-173d31ed91ca",
+        "name": "Chợ Chim Xanh",
+        "category": "Chợ",
+        "address": "",
+        "distance_m": 2654,
+        "openNow": null,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "b2544334-c6db-4f24-8725-70cfe2165016",
+        "name": "Phở Hùng",
+        "category": "Ăn uống",
+        "address": "Đường số 7",
+        "distance_m": 1561,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "4939f5cc-d489-40c0-a860-1a2edd0ccd67",
+        "name": "Techcombank",
+        "category": "Dịch vụ",
+        "address": "",
+        "distance_m": 394,
+        "openNow": true,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "215907ae-7cf3-4297-82b8-6d00e89a82fb",
+        "name": "Quán Hủ Tíu Chay",
+        "category": "Ăn uống",
+        "address": "",
+        "distance_m": 1191,
+        "openNow": null,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "613fc01f-a63d-4572-b772-cc61b9f359d3",
+        "name": "Trường Trung học phổ thông Trần Nhân Tông",
+        "category": "Giáo dục",
+        "address": "200, Đường Tân Hòa Đông",
+        "distance_m": 1999,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "e9722f9a-acd7-4b3a-ab14-29d797e09f2b",
+        "name": "Trường Trung học phổ thông Trần Quốc Tuấn",
+        "category": "Giáo dục",
+        "address": "236/10, Đường Thái Phiên",
+        "distance_m": 2163,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "69a8df0d-be3b-4be7-9452-29f05f95006f",
+        "name": "Cà Phê Boca",
+        "category": "Cà phê",
+        "address": "240/32, Nguyễn Văn Luông",
+        "distance_m": 115,
+        "openNow": false,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  },
+  {
+    "query": "siêu thị",
+    "group": "đa tâm",
+    "latitude": 10.8494,
+    "longitude": 106.7537,
+    "radius": 5000,
+    "candidates": [
+      {
+        "poi_id": "50593587-07a9-4beb-859b-678631d22798",
+        "name": "Quán Hiếu Ký Mì Gia",
+        "category": "Ăn uống",
+        "address": "15, Tô Ngọc Vân",
+        "distance_m": 210,
+        "openNow": null,
+        "serverRank": 0,
+        "grade": null
+      },
+      {
+        "poi_id": "d4d47db3-30c8-47b4-a979-9bcebd88d522",
+        "name": "Siêu thị Co.op Xtra Linh Xuân",
+        "category": "Mua sắm",
+        "address": "Linh Xuân",
+        "distance_m": 3192,
+        "openNow": null,
+        "serverRank": 1,
+        "grade": null
+      },
+      {
+        "poi_id": "094b43bf-be32-4b06-8c29-4669755c1ce9",
+        "name": "Trung tâm Thể dục Thể thao Quận Thủ Đức",
+        "category": "Thể thao",
+        "address": "26, Chương Dương",
+        "distance_m": 801,
+        "openNow": null,
+        "serverRank": 2,
+        "grade": null
+      },
+      {
+        "poi_id": "975ade04-e94d-490f-b79a-6d43abd8895f",
+        "name": "Cửa Hàng Thời Trang Robic",
+        "category": "Mua sắm",
+        "address": "163/50, Đặng Văn Bi",
+        "distance_m": 876,
+        "openNow": true,
+        "serverRank": 3,
+        "grade": null
+      },
+      {
+        "poi_id": "9bef87e7-2e9e-470c-b317-dd8a936a67bf",
+        "name": "The Coffee House",
+        "category": "Cà phê",
+        "address": "Võ Văn Ngân",
+        "distance_m": 764,
+        "openNow": null,
+        "serverRank": 4,
+        "grade": null
+      },
+      {
+        "poi_id": "e7d1e304-82e7-464e-a133-15ab3708c9c8",
+        "name": "Trường Trung học phổ thông Thủ Đức",
+        "category": "Văn hóa",
+        "address": "fg, Đặng Văn Bi",
+        "distance_m": 747,
+        "openNow": null,
+        "serverRank": 5,
+        "grade": null
+      },
+      {
+        "poi_id": "4b0d7135-4595-46ce-b8af-be20756b31e4",
+        "name": "The Aven",
+        "category": "Giải trí",
+        "address": "129, Đường Thống Nhất, Thủ Đức",
+        "distance_m": 1926,
+        "openNow": true,
+        "serverRank": 6,
+        "grade": null
+      },
+      {
+        "poi_id": "1b6999ce-839f-4aea-bf09-fc8b13cebaa4",
+        "name": "thien ngan",
+        "category": "Mua sắm",
+        "address": "15, Đường số 9",
+        "distance_m": 1357,
+        "openNow": null,
+        "serverRank": 7,
+        "grade": null
+      },
+      {
+        "poi_id": "2858eeeb-13ce-4c69-97a7-9a017bb30df7",
+        "name": "Tạp Hóa Ngọc Hân",
+        "category": "Mua sắm",
+        "address": "5, Hồ Văn Tư",
+        "distance_m": 156,
+        "openNow": null,
+        "serverRank": 8,
+        "grade": null
+      },
+      {
+        "poi_id": "11de656b-077f-4ac5-9840-52c88bbc18ce",
+        "name": "Trường Đại Học Kinh Tế - Luật",
+        "category": "Giáo dục",
+        "address": "Kha Vạn Cân",
+        "distance_m": 236,
+        "openNow": null,
+        "serverRank": 9,
+        "grade": null
+      }
+    ]
+  }
+]

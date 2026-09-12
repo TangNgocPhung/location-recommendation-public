@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" font-family="system-ui, sans-serif" font-size="13">
+<text x="450.0" y="28" text-anchor="middle" font-size="17" font-weight="600">nDCG@10 theo cấu hình truy xuất</text>
+<line x1="70" y1="330.0" x2="870" y2="330.0" stroke="#d8dee6" stroke-width="1"/>
+<text x="60" y="334.0" text-anchor="end" fill="#5b6673">0.00</text>
+<line x1="70" y1="260.0" x2="870" y2="260.0" stroke="#d8dee6" stroke-width="1"/>
+<text x="60" y="264.0" text-anchor="end" fill="#5b6673">0.16</text>
+<line x1="70" y1="190.0" x2="870" y2="190.0" stroke="#d8dee6" stroke-width="1"/>
+<text x="60" y="194.0" text-anchor="end" fill="#5b6673">0.32</text>
+<line x1="70" y1="120.0" x2="870" y2="120.0" stroke="#d8dee6" stroke-width="1"/>
+<text x="60" y="124.0" text-anchor="end" fill="#5b6673">0.48</text>
+<line x1="70" y1="50.0" x2="870" y2="50.0" stroke="#d8dee6" stroke-width="1"/>
+<text x="60" y="54.0" text-anchor="end" fill="#5b6673">0.64</text>
+<rect x="100.4" y="58.8" width="99.2" height="271.2" fill="#0f8a62" rx="3"/>
+<text x="150.0" y="51.8" text-anchor="middle" font-weight="600">0.620</text>
+<text x="150.0" y="350.0" text-anchor="middle" fill="#3d4753">A</text>
+<rect x="260.4" y="150.9" width="99.2" height="179.1" fill="#0f8a62" rx="3"/>
+<text x="310.0" y="143.9" text-anchor="middle" font-weight="600">0.410</text>
+<text x="310.0" y="350.0" text-anchor="middle" fill="#3d4753">B</text>
+<rect x="420.4" y="150.9" width="99.2" height="179.1" fill="#0f8a62" rx="3"/>
+<text x="470.0" y="143.9" text-anchor="middle" font-weight="600">0.410</text>
+<text x="470.0" y="350.0" text-anchor="middle" fill="#3d4753">C</text>
+<rect x="580.4" y="50.0" width="99.2" height="280.0" fill="#0f8a62" rx="3"/>
+<text x="630.0" y="43.0" text-anchor="middle" font-weight="600">0.641</text>
+<text x="630.0" y="350.0" text-anchor="middle" fill="#3d4753">D</text>
+<rect x="740.4" y="50.0" width="99.2" height="280.0" fill="#0f8a62" rx="3"/>
+<text x="790.0" y="43.0" text-anchor="middle" font-weight="600">0.641</text>
+<text x="790.0" y="350.0" text-anchor="middle" fill="#3d4753">E</text>
+</svg>
