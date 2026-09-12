@@ -4,15 +4,28 @@ from app.search import query as q
 def test_bm25_body_has_fuzzy_geo_and_category_filters() -> None:
     body = q.bm25_body("ca phe", 10.77, 106.70, 3000, "cafe", 50)
 
-    multi_match = body["query"]["bool"]["must"][0]["multi_match"]
-    assert multi_match["fuzziness"] == "AUTO"
-    assert "name^3" in multi_match["fields"]
+    should = body["query"]["bool"]["must"][0]["bool"]["should"]
+    folded_match = should[0]["multi_match"]
+    assert folded_match["fuzziness"] == "AUTO"
+    assert "name^3" in folded_match["fields"]
 
     filters = body["query"]["bool"]["filter"]
     assert {"term": {"category_label.raw": "cafe"}} in filters
     geo = [f for f in filters if "geo_distance" in f][0]["geo_distance"]
     assert geo["distance"] == "3000m"
     assert geo["location"] == {"lat": 10.77, "lon": 106.70}
+
+
+def test_bm25_body_strict_field_has_no_fuzziness() -> None:
+    """``.strict`` (giữ dấu thanh điệu) KHÔNG được fuzzy — nếu fuzzy thì "viện"
+    và "viên" (khác đúng 1 ký tự) sẽ lại khớp mờ, xoá tác dụng phân biệt dấu
+    thanh mà field này tồn tại để giải quyết (xem docstring `bm25_body`)."""
+    body = q.bm25_body("bệnh viện", 10.77, 106.70, 3000, None, 50)
+
+    should = body["query"]["bool"]["must"][0]["bool"]["should"]
+    strict_match = should[1]["multi_match"]
+    assert "fuzziness" not in strict_match
+    assert "name.strict^5" in strict_match["fields"]
 
 
 def test_bm25_body_without_category_has_only_geo_filter() -> None:

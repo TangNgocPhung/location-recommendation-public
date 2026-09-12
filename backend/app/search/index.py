@@ -20,6 +20,14 @@ INDEX_NAME = settings.opensearch_index
 # ``asciifolding`` bỏ dấu ("cà phê" -> "ca phe") nên cả truy vấn có dấu lẫn
 # không dấu đều khớp khi cùng đi qua analyzer này. ``vi_search`` thêm khả năng
 # tìm tiền tố ngắn cho gợi ý gõ dở.
+#
+# NHƯNG ``asciifolding`` bỏ CẢ dấu thanh điệu, không chỉ dấu gốc — đo được
+# thật (Phase 10, 2026-09-12): "viện" (bệnh viện) và "viên" (công viên) cùng
+# fold về token "vien"; "tấm" (cơm tấm) và "Tám" (tên riêng) cùng fold về
+# "tam". Hai từ khác nghĩa hoàn toàn bị BM25 coi là khớp nhau. ``vi_strict``
+# giữ NGUYÊN dấu thanh (chỉ lowercase, không asciifolding) để phân biệt được
+# các cặp này — dùng làm subfield boost cao hơn, KHÔNG thay thế ``vi_folded``:
+# vẫn cần ``vi_folded`` để giữ khả năng gõ không dấu ("ca phe" -> "Cà phê").
 _ANALYSIS = {
     "filter": {
         "vi_edge_ngram": {
@@ -40,6 +48,13 @@ _ANALYSIS = {
             "type": "custom",
             "tokenizer": "standard",
             "filter": ["lowercase", "asciifolding", "vi_edge_ngram"],
+        },
+        # Giữ dấu thanh điệu — chỉ lowercase. "bệnh viện" và "công viên" ra
+        # hai token khác nhau ("viện" != "viên"), thay vì cùng fold về "vien".
+        "vi_strict": {
+            "type": "custom",
+            "tokenizer": "standard",
+            "filter": ["lowercase"],
         },
     },
 }
@@ -64,16 +79,35 @@ def index_mappings() -> dict[str, Any]:
         "analyzer": "vi_folded",
         "fields": {
             "prefix": {"type": "text", "analyzer": "vi_folded_ngram", "search_analyzer": "vi_folded"},
+            "strict": {"type": "text", "analyzer": "vi_strict"},
         },
     }
     properties: dict[str, Any] = {
         "poi_id": {"type": "keyword"},
         "name": text_field,
         "normalized_name": {"type": "text", "analyzer": "vi_folded"},
-        "description": {"type": "text", "analyzer": "vi_folded"},
+        "description": {
+            "type": "text",
+            "analyzer": "vi_folded",
+            "fields": {"strict": {"type": "text", "analyzer": "vi_strict"}},
+        },
         "category": {"type": "keyword"},
-        "category_label": {"type": "text", "analyzer": "vi_folded", "fields": {"raw": {"type": "keyword"}}},
-        "tags": {"type": "text", "analyzer": "vi_folded", "fields": {"raw": {"type": "keyword"}}},
+        "category_label": {
+            "type": "text",
+            "analyzer": "vi_folded",
+            "fields": {
+                "raw": {"type": "keyword"},
+                "strict": {"type": "text", "analyzer": "vi_strict"},
+            },
+        },
+        "tags": {
+            "type": "text",
+            "analyzer": "vi_folded",
+            "fields": {
+                "raw": {"type": "keyword"},
+                "strict": {"type": "text", "analyzer": "vi_strict"},
+            },
+        },
         "brand": {"type": "text", "analyzer": "vi_folded"},
         "district": {"type": "keyword"},
         "price_level": {"type": "integer"},

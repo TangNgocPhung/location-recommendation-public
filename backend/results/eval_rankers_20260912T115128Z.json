@@ -1,0 +1,34 @@
+{
+  "cases": 3,
+  "k": 5,
+  "results": {
+    "linear": {
+      "ndcg": 0.384,
+      "mrr": 0.6667,
+      "map": 0.3889,
+      "precision": 0.2,
+      "recall": 0.4444,
+      "rankMsMean": 0.707,
+      "rankMsP95": 1.057,
+      "actuallyUsed": [
+        "linear"
+      ]
+    },
+    "ltr": {
+      "ndcg": 0.4108,
+      "mrr": 0.6667,
+      "map": 0.4444,
+      "precision": 0.2,
+      "recall": 0.4444,
+      "rankMsMean": 10.417,
+      "rankMsP95": 27.675,
+      "actuallyUsed": [
+        "ltr"
+      ]
+    },
+    "_retrieval": {
+      "msMean": 858.857,
+      "msP95": 1524.17
+    }
+  }
+}

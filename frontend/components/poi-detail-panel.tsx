@@ -183,6 +183,10 @@ export type PoiRouteSummary = {
   poiId: string;
   durationMinutes: number;
   distanceMeters: number;
+  // true khi tuyến được tính bằng đồ thị "car" thay cho "motorbike" (chưa có
+  // hồ sơ xe máy thật, xem app/directions.py MODES) — panel phải nói rõ điều
+  // này thay vì trình bày như tuyến xe máy đã đo đúng.
+  approximate: boolean;
 };
 
 /* ------------------------------------------------------------------ *
@@ -1075,7 +1079,8 @@ export function PoiDetailPanel(props: {
               {routeForThisPoi && (
                 <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
                   <Route className="size-3.5" aria-hidden />
-                  Theo đường thật: {formatMinutes(routeForThisPoi.durationMinutes)} ·{' '}
+                  {routeForThisPoi.approximate ? 'Tuyến ô tô (xấp xỉ)' : 'Theo đường thật'}:{' '}
+                  {formatMinutes(routeForThisPoi.durationMinutes)} ·{' '}
                   {formatDistance(routeForThisPoi.distanceMeters)}
                 </p>
               )}

@@ -90,6 +90,43 @@ def _fold_ndcg(model: Any, groups: list[Group], k: int) -> float:
     return float(np.mean(scores)) if scores else 0.0
 
 
+def write_model(booster: Any, path: Path) -> None:
+    """Ghi ``model.txt`` qua ``Path.write_text`` thay vì ``Booster.save_model``.
+
+    ``save_model`` gọi thẳng I/O C++ của LightGBM, và trên Windows hàm đó dùng
+    ``fopen`` theo bảng mã hệ thống (không phải API rộng ký tự) — đường dẫn có
+    ký tự ngoài ASCII (ví dụ thư mục dự án tên tiếng Việt có dấu) khiến nó thất
+    bại với lỗi mập mờ ``"Model file ... is not available for writes"``, dù
+    quyền ghi bình thường vẫn mở/ghi được file đó (đã kiểm chứng trực tiếp).
+    ``model_to_string()`` xuất ra đúng định dạng text giống hệt ``save_model``,
+    và ``Path.write_text`` của Python xử lý path Unicode đúng trên Windows."""
+    path.write_text(booster.model_to_string(), encoding="utf-8")
+
+
+def fit_groups(groups: list[Group], params: dict[str, Any]) -> Any:
+    """Fit MỘT booster trên đúng tập ``groups`` truyền vào — không tự tách gì
+    thêm. Tách ra khỏi ``train()`` để ``eval_holdout.py`` (Phase 9) tái dùng
+    đúng cấu hình LightGBM khi huấn luyện lại trên một lát cắt train riêng,
+    thay vì chép lại boilerplate ``lgb.Dataset``/``lgb.train``.
+
+    ``params`` phải đã gộp với ``DEFAULT_PARAMS`` và có ``num_boost_round`` —
+    xem cách ``train()`` chuẩn bị ``params`` bên dưới.
+    """
+    import lightgbm as lgb  # import muộn: chỉ lúc huấn luyện mới cần
+
+    params = dict(params)
+    rounds = int(params.pop("num_boost_round", NUM_BOOST_ROUND))
+    features, labels, sizes = _matrices(groups)
+    train_set = lgb.Dataset(
+        features,
+        label=labels,
+        group=sizes,
+        feature_name=list(FEATURE_NAMES),
+        free_raw_data=False,
+    )
+    return lgb.train(params, train_set, num_boost_round=rounds)
+
+
 def train(
     dataset: Dataset,
     k: int = 10,
@@ -102,8 +139,6 @@ def train(
     Trả về dict có khóa ``model`` (đối tượng LGBMRanker đã fit trên TOÀN BỘ dữ
     liệu) và các khóa số liệu. Việc ghi ra đĩa do ``save()`` đảm nhiệm.
     """
-    import lightgbm as lgb  # import muộn: chỉ script huấn luyện mới cần
-
     usable = dataset.usable_groups
     if not usable:
         raise ValueError(
@@ -112,19 +147,10 @@ def train(
         )
 
     params = {**DEFAULT_PARAMS, **(params or {})}
-    rounds = int(params.pop("num_boost_round", NUM_BOOST_ROUND))
     params["ndcg_eval_at"] = [k]
 
     def _fit(groups: list[Group]) -> Any:
-        features, labels, sizes = _matrices(groups)
-        train_set = lgb.Dataset(
-            features,
-            label=labels,
-            group=sizes,
-            feature_name=list(FEATURE_NAMES),
-            free_raw_data=False,
-        )
-        return lgb.train(params, train_set, num_boost_round=rounds)
+        return fit_groups(groups, params)
 
     rng = np.random.default_rng(seed)
     order = rng.permutation(len(usable))
@@ -173,7 +199,7 @@ def save(report: dict[str, Any], directory: Path) -> dict[str, Path]:
     model_path = directory / "model.txt"
     meta_path = directory / "model.meta.json"
 
-    report["model"].save_model(str(model_path))
+    write_model(report["model"], model_path)
     meta = {key: value for key, value in report.items() if key != "model"}
     meta["featureNames"] = list(FEATURE_NAMES)
     meta_path.write_text(

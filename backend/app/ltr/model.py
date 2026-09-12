@@ -71,7 +71,12 @@ def load(force: bool = False) -> Any | None:
         try:
             import lightgbm as lgb
 
-            booster = lgb.Booster(model_file=str(model_path))
+            # `model_file=` gọi thẳng fopen theo bảng mã hệ thống của LightGBM
+            # (không phải API rộng ký tự) — thất bại mập mờ trên Windows nếu
+            # đường dẫn có ký tự ngoài ASCII (đã đo được: thư mục dự án tên
+            # tiếng Việt có dấu). Tự đọc bằng Python (Unicode-safe) rồi nạp
+            # qua `model_str=` tránh hẳn lớp I/O đó — xem `ltr/train.write_model`.
+            booster = lgb.Booster(model_str=model_path.read_text(encoding="utf-8"))
         except Exception as error:  # noqa: BLE001 - thiếu lightgbm cũng phải rơi về tuyến tính
             logger.warning("Không nạp được mô hình LTR (%s) — dùng xếp hạng tuyến tính", error)
             return None

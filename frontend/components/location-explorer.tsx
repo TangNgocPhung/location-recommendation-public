@@ -269,6 +269,8 @@ type RouteStep = {
   name: string | null;
 };
 
+type TransportMode = 'car' | 'motorbike' | 'foot';
+
 type DirectionsResponse = {
   poiId: string;
   poiName: string;
@@ -280,6 +282,8 @@ type DirectionsResponse = {
     durationSeconds: number;
     steps: RouteStep[];
     cached: boolean;
+    mode: TransportMode;
+    approximate: boolean;
   } | null;
 };
 
@@ -292,7 +296,15 @@ type RoutePlan = {
   durationSeconds: number;
   steps: RouteStep[];
   cached: boolean;
+  mode: TransportMode;
+  approximate: boolean;
 };
+
+const TRANSPORT_MODES: { value: TransportMode; label: string; icon: string }[] = [
+  { value: 'motorbike', label: 'Xe máy', icon: '🏍️' },
+  { value: 'car', label: 'Ô tô', icon: '🚗' },
+  { value: 'foot', label: 'Đi bộ', icon: '🚶' },
+];
 
 function distanceInMeters(from: Position, to: Position) {
   const radius = 6_371_000;
@@ -447,6 +459,9 @@ export function LocationExplorer() {
   // tuyến: đang tính, không có đường đi, hay chưa dựng dữ liệu định tuyến.
   const [route, setRoute] = useState<RoutePlan | null>(null);
   const [routeStatus, setRouteStatus] = useState<'idle' | 'loading' | 'none' | 'off'>('idle');
+  // Mặc định "Xe máy" — phương tiện phổ biến nhất ở TP.HCM. Dùng lại đồ thị
+  // "car" (approximate) cho tới khi có hồ sơ Lua riêng cho xe máy (Phase 12.7).
+  const [transportMode, setTransportMode] = useState<TransportMode>('motorbike');
   const [showSteps, setShowSteps] = useState(false);
   const [parserStatus, setParserStatus] = useState('Sẵn sàng hiểu “gần Bến Thành”');
   const [gatewayStatus, setGatewayStatus] = useState('Chưa gửi yêu cầu');
@@ -535,7 +550,7 @@ export function LocationExplorer() {
       try {
         const url =
           `${API_BASE_URL}/api/v1/directions?from_lat=${position.latitude}` +
-          `&from_lng=${position.longitude}&to_poi_id=${poi.id}`;
+          `&from_lng=${position.longitude}&to_poi_id=${poi.id}&mode=${transportMode}`;
         const response = await fetch(url, { signal: controller.signal });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = (await response.json()) as DirectionsResponse;
@@ -554,6 +569,8 @@ export function LocationExplorer() {
           durationSeconds: data.route.durationSeconds,
           steps: data.route.steps ?? [],
           cached: Boolean(data.route.cached),
+          mode: data.route.mode,
+          approximate: data.route.approximate,
         });
         setRouteStatus('idle');
       } catch (error) {
@@ -564,7 +581,7 @@ export function LocationExplorer() {
     })();
 
     return () => controller.abort();
-  }, [selectedPoiId, pois, position]);
+  }, [selectedPoiId, pois, position, transportMode]);
 
   // Vẽ vành hexagon H3 của lần tìm kiếm gần nhất.
   useEffect(() => {
@@ -832,6 +849,7 @@ export function LocationExplorer() {
             poiId: route.poiId,
             durationMinutes: route.durationMinutes,
             distanceMeters: route.distanceMeters,
+            approximate: route.approximate,
           }
         : null,
     [route, detailPoiId],
@@ -1430,14 +1448,25 @@ export function LocationExplorer() {
     }
   }
 
+  // Google Maps dùng "travelmode" riêng, không khớp tên với TransportMode nội
+  // bộ. "two-wheeler" là chế độ xe máy/scooter THẬT của Google (có dữ liệu ở
+  // VN, khác hẳn "driving") — thử trước, nếu Google không hỗ trợ ở khu vực nào
+  // đó thì nó tự bỏ qua tham số lạ và rơi về driving, không tệ hơn hành vi cũ.
+  const GOOGLE_MAPS_TRAVEL_MODE: Record<TransportMode, string> = {
+    car: 'driving',
+    motorbike: 'two-wheeler',
+    foot: 'walking',
+  };
+
   function startNavigation(poi: Poi) {
     telemetry.capture({
       event_type: 'navigation_start',
       poi_id: poi.id,
-      metadata: { provider: 'google-maps' },
+      metadata: { provider: 'google-maps', mode: transportMode },
     });
+    const travelmode = GOOGLE_MAPS_TRAVEL_MODE[transportMode];
     window.open(
-      `https://www.google.com/maps/dir/?api=1&destination=${poi.latitude},${poi.longitude}`,
+      `https://www.google.com/maps/dir/?api=1&destination=${poi.latitude},${poi.longitude}&travelmode=${travelmode}`,
       '_blank',
       'noopener,noreferrer',
     );
@@ -1950,6 +1979,26 @@ export function LocationExplorer() {
                   Chỉ đường
                 </Button>
               </div>
+              {/* Chọn phương tiện (Phase 12.7) — mỗi phương tiện gọi một đồ thị
+                  OSRM khác nhau (car/foot có đồ thị riêng; motorbike dùng lại
+                  đồ thị car, đánh dấu approximate). Đổi lựa chọn tự kích hoạt
+                  lại effect tính tuyến ở trên (transportMode nằm trong deps). */}
+              <div className="mt-3 flex gap-1.5 border-t border-border pt-3">
+                {TRANSPORT_MODES.map((item) => (
+                  <button
+                    key={item.value}
+                    type="button"
+                    onClick={() => setTransportMode(item.value)}
+                    className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${
+                      transportMode === item.value
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border text-muted-foreground hover:bg-muted'
+                    }`}
+                  >
+                    {item.icon} {item.label}
+                  </button>
+                ))}
+              </div>
               {/* Tuyến đường thật từ OSRM tự dựng. Ba trạng thái còn lại đều nói
                   rõ VÌ SAO chưa có tuyến, thay vì để ô trống — người dùng không
                   phân biệt được "đang tính" với "hỏng" nếu cả hai đều là khoảng
@@ -1981,9 +2030,17 @@ export function LocationExplorer() {
                       </p>
                       {/* Nói rõ đây là ĐƯỜNG ĐI THẬT chứ không phải đường chim
                           bay — con số cũ (etaMinutes) tính bằng khoảng cách
-                          thẳng chia vận tốc cố định nên luôn lạc quan. */}
+                          thẳng chia vận tốc cố định nên luôn lạc quan. Với
+                          "motorbike" phải nói rõ đang XẤP XỈ bằng đồ thị ô tô —
+                          không có hồ sơ xe máy thật (Phase 12.7), im lặng ở
+                          đây là lừa người dùng rằng hệ thống đo đúng xe máy. */}
                       <p className="text-[11px] text-muted-foreground">
-                        Theo đường thật, hồ sơ ô tô{route.cached ? ' · từ cache' : ''}
+                        {route.approximate
+                          ? 'Tuyến ô tô (xấp xỉ cho xe máy)'
+                          : route.mode === 'foot'
+                            ? 'Theo đường thật, hồ sơ đi bộ'
+                            : 'Theo đường thật, hồ sơ ô tô'}
+                        {route.cached ? ' · từ cache' : ''}
                       </p>
                     </div>
                     {route.steps.length > 0 && (

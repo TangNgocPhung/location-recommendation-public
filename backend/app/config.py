@@ -81,6 +81,11 @@ class Settings(BaseSettings):
     # cấm dùng cho ứng dụng thật và có giới hạn tần suất, nên một đồ án phụ
     # thuộc vào nó sẽ hỏng đúng lúc bảo vệ nếu mạng chập hoặc bị chặn.
     osrm_url: str = ""
+    # Hồ sơ ĐI BỘ (Phase 12.7) — đồ thị OSRM RIÊNG (một osrm-routed chỉ phục vụ
+    # đúng một đồ thị/profile mỗi lần chạy). Rỗng thì "foot" không có tuyến
+    # (None), KHÔNG được lặng lẽ rơi về đồ thị "car" — hai đồ thị không tương
+    # thích network (đường ô tô có thể cấm người đi bộ và ngược lại).
+    osrm_foot_url: str = ""
     # Weather & Traffic Density Injection (Spatio-Temporal Enricher).
     #
     # Tắt được vì hai lý do thực tế: đo độ trễ sạch (thời tiết là một lần gọi

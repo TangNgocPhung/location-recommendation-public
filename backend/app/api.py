@@ -450,9 +450,13 @@ def get_directions(
     from_lat: float = Query(ge=-90, le=90),
     from_lng: float = Query(ge=-180, le=180),
     to_poi_id: str = Query(min_length=1, max_length=64),
-    profile: str = Query(default=directions.DEFAULT_PROFILE, max_length=16),
+    mode: str = Query(default=directions.DEFAULT_MODE, max_length=16),
 ) -> dict[str, Any]:
     """Tuyến đường thật từ vị trí người dùng tới một POI.
+
+    ``mode`` là "car" | "motorbike" | "foot" (xem ``directions.MODES``).
+    "motorbike" dùng lại đồ thị "car" (không có hồ sơ xe máy thật) — response
+    tự khai báo ``route.approximate = true`` trong trường hợp đó.
 
     Điểm đến nhận bằng ``to_poi_id`` chứ không nhận toạ độ: toạ độ đích lấy
     thẳng từ ``pois.location``. Nhận toạ độ do client gửi thì một lỗi phía giao
@@ -461,6 +465,11 @@ def get_directions(
     """
     if not geofence.is_uuid(to_poi_id):
         return JSONResponse(status_code=400, content={"detail": "to_poi_id phải là UUID"})
+    if mode not in directions.MODES:
+        return JSONResponse(
+            status_code=400,
+            content={"detail": f"mode phải là một trong {sorted(directions.MODES)}"},
+        )
 
     with psycopg.connect(DATABASE_URL) as connection:
         with connection.cursor() as cursor:
@@ -476,17 +485,18 @@ def get_directions(
         return JSONResponse(status_code=404, content={"detail": "Không có POI này"})
     name, to_lat, to_lng = row
 
-    result = directions.route(from_lat, from_lng, float(to_lat), float(to_lng), profile)
+    result = directions.route(from_lat, from_lng, float(to_lat), float(to_lng), mode)
     if result is None:
         # 200 kèm route rỗng chứ không phải 5xx: "chưa dựng OSRM" và "OSRM chết"
         # đều là trạng thái BÌNH THƯỜNG của hệ thống này, và giao diện cần phân
         # biệt chúng với một lỗi thật để còn rơi về deep-link.
+        osrm_url = getattr(settings, directions.MODES[mode]["osrm_url_attr"])
         return {
             "poiId": to_poi_id,
             "poiName": name,
             "destination": {"latitude": float(to_lat), "longitude": float(to_lng)},
             "route": None,
-            "reason": "osrm-unavailable" if not settings.osrm_url else "no-route",
+            "reason": "osrm-unavailable" if not osrm_url else "no-route",
         }
 
     return {

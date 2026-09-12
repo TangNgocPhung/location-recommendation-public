@@ -25,6 +25,7 @@ requirements và không đáng thêm chỉ để vẽ hai biểu đồ cột.
 
 import json
 import os
+import statistics
 import sys
 import time
 from datetime import datetime, timezone
@@ -49,6 +50,19 @@ EVAL_K = int(os.getenv("EVAL_K", "10"))
 JUDGMENTS_PATH = PROJECT_ROOT / "tests" / "fixtures" / "relevance_judgments.json"
 RESULTS_DIR = PROJECT_ROOT / "results"
 CANDIDATE_POOL = 100
+# Script này đo trên pipeline SỐNG (enrich_candidates/apply_trending_boost tính
+# lại recency/trending/popularity tại đúng thời điểm gọi), không phải feature
+# đã đóng băng như ranking_snapshots — nên một lần chạy duy nhất có thể lệch
+# nếu cửa sổ trending (15p/1h/24h) trong Redis vừa trôi đúng lúc đo (đã đo được
+# thật: cùng máy, cách nhau vài phút, nDCG bậc D lệch 0.41 -> 0.71). Lặp N lần
+# LIÊN TIẾP (không sinh traffic xen giữa) và báo mean±std thay vì một con số.
+DEFAULT_REPEATS = int(os.getenv("ABLATION_REPEATS", "5"))
+
+
+def _mean_std(values: list[float]) -> tuple[float, float]:
+    mean = statistics.fmean(values)
+    std = statistics.pstdev(values) if len(values) > 1 else 0.0
+    return round(mean, 4), round(std, 4)
 
 
 def _retrieve(case: dict, mode: str) -> list[dict]:
@@ -192,6 +206,7 @@ def _svg_bars(title: str, labels: list[str], values: list[float], path: Path) ->
 def main() -> None:
     cases = json.loads(JUDGMENTS_PATH.read_text(encoding="utf-8"))
     full = dict(ranking.DEFAULT_WEIGHTS)
+    repeats = DEFAULT_REPEATS
 
     # --- Bang 1: thang cau hinh cong don (Phase 8) ---
     #
@@ -211,33 +226,77 @@ def main() -> None:
         ("D", "+ Spatio-Temporal + du 9 tin hieu co trong so", "full", full, True, "linear"),
         ("E", "+ LTR (LightGBM LambdaMART)", "full", full, True, "ltr"),
     ]
+
+    # Gom theo LAP: trong CÙNG một lap, bậc D và các tín hiệu bị tắt được đo
+    # gần nhau về thời gian nhất có thể, nên delta = (tắt tín hiệu) - (bậc D
+    # CỦA CHÍNH LAP ĐÓ) — không phải trừ vào baseline trung bình của các lap
+    # khác — mới kiểm soát được phần trôi do trending/popularity sống thay đổi
+    # giữa các lap (xem ghi chú DEFAULT_REPEATS ở đầu file).
+    table1_runs: dict[str, list[dict]] = {key: [] for key, *_ in configs}
+    table2_ndcg: dict[str, list[float]] = {signal: [] for signal in full}
+    table2_delta: dict[str, list[float]] = {signal: [] for signal in full}
+
+    for lap in range(1, repeats + 1):
+        print("--- lap {}/{} ---".format(lap, repeats))
+        lap_d_ndcg = None
+        for key, description, mode, weights, enrich, ranker in configs:
+            metrics = _measure(cases, mode, weights, enrich, ranker)
+            table1_runs[key].append(metrics)
+            if key == "D":
+                lap_d_ndcg = metrics["ndcg"]
+            print(
+                "  {}  ndcg={:.4f}  mrr={:.4f}  recall={:.4f}  {:.1f}ms  {}".format(
+                    key, metrics["ndcg"], metrics["mrr"], metrics["recall"],
+                    metrics["latencyMs"], description,
+                )
+            )
+        for signal in full:
+            metrics = _measure(cases, "full", {**full, signal: 0.0}, True)
+            delta = round(metrics["ndcg"] - lap_d_ndcg, 4)
+            table2_ndcg[signal].append(metrics["ndcg"])
+            table2_delta[signal].append(delta)
+            print("  tắt {:11} ndcg={:.4f}  delta={:+.4f}".format(signal, metrics["ndcg"], delta))
+
     table1 = []
     for key, description, mode, weights, enrich, ranker in configs:
-        metrics = _measure(cases, mode, weights, enrich, ranker)
-        table1.append({"config": key, "description": description, **metrics})
-        print(
-            "{}  ndcg={:.4f}  mrr={:.4f}  recall={:.4f}  {:.1f}ms  {}".format(
-                key, metrics["ndcg"], metrics["mrr"], metrics["recall"],
-                metrics["latencyMs"], description,
-            )
+        runs = table1_runs[key]
+        ndcg_mean, ndcg_std = _mean_std([r["ndcg"] for r in runs])
+        mrr_mean, _ = _mean_std([r["mrr"] for r in runs])
+        map_mean, _ = _mean_std([r["map"] for r in runs])
+        precision_mean, _ = _mean_std([r["precision"] for r in runs])
+        recall_mean, _ = _mean_std([r["recall"] for r in runs])
+        latency_mean, _ = _mean_std([r["latencyMs"] for r in runs])
+        used_rankers = sorted(set().union(*(set(r["rankerUsed"]) for r in runs)))
+        table1.append(
+            {
+                "config": key,
+                "description": description,
+                "ndcgMean": ndcg_mean,
+                "ndcgStd": ndcg_std,
+                "mrrMean": mrr_mean,
+                "mapMean": map_mean,
+                "precisionMean": precision_mean,
+                "recallMean": recall_mean,
+                "latencyMsMean": latency_mean,
+                "rankerUsed": used_rankers,
+            }
         )
 
-    # --- Bảng 2: ablation từng tín hiệu ---
-    baseline = next(row for row in table1 if row["config"] == "D")["ndcg"]
     table2 = []
     for signal in full:
-        metrics = _measure(cases, "full", {**full, signal: 0.0}, True)
-        delta = round(metrics["ndcg"] - baseline, 4)
+        ndcg_mean, ndcg_std = _mean_std(table2_ndcg[signal])
+        delta_mean, delta_std = _mean_std(table2_delta[signal])
         table2.append(
             {
                 "signal": signal,
                 "weight": full[signal],
-                "ndcg_without": metrics["ndcg"],
-                "delta": delta,
+                "ndcgWithoutMean": ndcg_mean,
+                "ndcgWithoutStd": ndcg_std,
+                "deltaMean": delta_mean,
+                "deltaStd": delta_std,
             }
         )
-        print("tắt {:11} ndcg={:.4f}  delta={:+.4f}".format(signal, metrics["ndcg"], delta))
-    table2.sort(key=lambda row: row["delta"])
+    table2.sort(key=lambda row: row["deltaMean"])
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     RESULTS_DIR.mkdir(exist_ok=True)
@@ -245,7 +304,7 @@ def main() -> None:
         "measuredAt": stamp,
         "k": EVAL_K,
         "queries": len(cases),
-        "baselineNdcg": baseline,
+        "repeats": repeats,
         "configs": table1,
         "signalAblation": table2,
     }
@@ -256,30 +315,37 @@ def main() -> None:
     lines = [
         "# Ablation study — {}".format(stamp),
         "",
-        "Đo trên {} truy vấn ground truth, k = {}.".format(len(cases), EVAL_K),
+        "Đo trên {} truy vấn ground truth, k = {}, lặp {} lần liên tiếp (không "
+        "sinh traffic xen giữa) — số liệu dưới đây là mean ± std qua {} lần đo, "
+        "không phải một lần chạy đơn lẻ. Script này dùng pipeline SỐNG (không "
+        "phải feature đã snapshot như `eval_holdout.py`), nên vẫn có thể lệch "
+        "nếu so với một phiên đo khác cách xa về thời gian — xem ghi chú "
+        "`DEFAULT_REPEATS` trong `run_ablation.py`.".format(
+            len(cases), EVAL_K, repeats, repeats
+        ),
         "",
         "## Bảng 1 — So sánh cấu hình",
         "",
-        "| Bậc | Mô tả | nDCG@10 | MRR | MAP@10 | P@10 | Recall@10 | Độ trễ TB (ms) | p95 (ms) |",
-        "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+        "| Bậc | Mô tả | nDCG@10 (mean±std) | MRR | MAP@10 | P@10 | Recall@10 | Độ trễ TB (ms) |",
+        "|---|---|---|---:|---:|---:|---:|---:|",
     ]
     for row in table1:
         lines.append(
-            "| {} | {} | {:.4f} | {:.4f} | {:.4f} | {:.4f} | {:.4f} | {:.1f} | {:.1f} |".format(
-                row["config"], row["description"], row["ndcg"], row["mrr"],
-                row["map"], row["precision"], row["recall"],
-                row["latencyMs"], row["latencyP95Ms"],
+            "| {} | {} | {:.4f} ± {:.4f} | {:.4f} | {:.4f} | {:.4f} | {:.4f} | {:.1f} |".format(
+                row["config"], row["description"], row["ndcgMean"], row["ndcgStd"],
+                row["mrrMean"], row["mapMean"], row["precisionMean"], row["recallMean"],
+                row["latencyMsMean"],
             )
         )
     rung_e = next((row for row in table1 if row["config"] == "E"), None)
     if rung_e and rung_e.get("rankerUsed") != ["ltr"]:
         lines += [
             "",
-            "> **Bậc E KHÔNG chạy LambdaMART.** Bộ xếp hạng thực sự đã chạy: "
-            "`{}`. Thiếu `app/ltr/model.txt` nên hệ thống rơi về công thức tuyến "
-            "tính, tức bậc E và bậc D là cùng một thuật toán — chênh lệch giữa "
-            "hai dòng chỉ là nhiễu đo, không phải đóng góp của LTR.".format(
-                ", ".join(rung_e.get("rankerUsed") or [])
+            "> **Bậc E KHÔNG (luôn) chạy LambdaMART.** Bộ xếp hạng thực sự đã chạy "
+            "qua {} lần: `{}`. Nếu có lần rơi về `linear`, thiếu `app/ltr/model.txt` "
+            "khiến bậc E và D thành cùng một thuật toán ở lần đó — chênh lệch chỉ "
+            "là nhiễu đo, không phải đóng góp của LTR.".format(
+                repeats, ", ".join(rung_e.get("rankerUsed") or [])
             ),
         ]
 
@@ -287,16 +353,21 @@ def main() -> None:
         "",
         "## Bảng 2 — Đóng góp của từng tín hiệu",
         "",
-        "Δ là mức nDCG thay đổi khi TẮT tín hiệu đó. Δ càng âm, tín hiệu càng quan trọng.",
-        "Tín hiệu có Δ bằng 0 nghĩa là trọng số của nó hiện chưa có căn cứ thực nghiệm.",
+        "Δ là mức nDCG thay đổi khi TẮT tín hiệu đó, tính THEO CẶP trong cùng một "
+        "lần lặp (so với bậc D của chính lần đó) rồi mới lấy mean±std qua "
+        "{} lần — kiểm soát được phần trôi do trending/popularity sống thay đổi "
+        "giữa các lần lặp. Δ càng âm, tín hiệu càng quan trọng. Δ có std lớn gần "
+        "bằng |mean| nghĩa là chưa đủ tin cậy để kết luận tín hiệu đó có tác động "
+        "thật hay chỉ là nhiễu.".format(repeats),
         "",
-        "| Tín hiệu | Trọng số | nDCG khi tắt | Δ |",
-        "|---|---:|---:|---:|",
+        "| Tín hiệu | Trọng số | nDCG khi tắt (mean±std) | Δ (mean±std) |",
+        "|---|---:|---|---|",
     ]
     for row in table2:
         lines.append(
-            "| `{}` | {:.2f} | {:.4f} | {:+.4f} |".format(
-                row["signal"], row["weight"], row["ndcg_without"], row["delta"]
+            "| `{}` | {:.2f} | {:.4f} ± {:.4f} | {:+.4f} ± {:.4f} |".format(
+                row["signal"], row["weight"], row["ndcgWithoutMean"], row["ndcgWithoutStd"],
+                row["deltaMean"], row["deltaStd"],
             )
         )
     (RESULTS_DIR / "ablation_{}.md".format(stamp)).write_text(
@@ -304,18 +375,22 @@ def main() -> None:
     )
 
     _svg_bars(
-        "nDCG@{} theo cấu hình truy xuất".format(EVAL_K),
+        "nDCG@{} theo cấu hình truy xuất (mean, {} lần lặp)".format(EVAL_K, repeats),
         [row["config"] for row in table1],
-        [row["ndcg"] for row in table1],
+        [row["ndcgMean"] for row in table1],
         RESULTS_DIR / "ablation_{}_configs.svg".format(stamp),
     )
     _svg_bars(
-        "Mức nDCG@{} mất đi khi tắt từng tín hiệu".format(EVAL_K),
+        "Mức |Δ nDCG@{}| khi tắt từng tín hiệu (mean, {} lần lặp)".format(EVAL_K, repeats),
         [row["signal"] for row in table2],
-        [abs(row["delta"]) for row in table2],
+        [abs(row["deltaMean"]) for row in table2],
         RESULTS_DIR / "ablation_{}_signals.svg".format(stamp),
     )
-    print("\nđã ghi results/ablation_{}.json|.md và hai biểu đồ SVG".format(stamp))
+    print(
+        "\nđã ghi results/ablation_{}.json|.md và hai biểu đồ SVG ({} lần lặp)".format(
+            stamp, repeats
+        )
+    )
 
 
 if __name__ == "__main__":

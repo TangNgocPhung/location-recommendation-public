@@ -34,7 +34,21 @@ def bm25_body(
     size: int,
 ) -> dict[str, Any]:
     """Kênh văn bản: multi_match có fuzzy (chịu lỗi chính tả), khớp không dấu
-    nhờ analyzer ``vi_folded``, giới hạn theo bán kính và category."""
+    nhờ analyzer ``vi_folded``, giới hạn theo bán kính và category.
+
+    ``.strict`` (analyzer ``vi_strict``, giữ dấu thanh điệu) cộng thêm điểm
+    khi khớp CHÍNH XÁC dấu thanh — đo được thật (Phase 10, 2026-09-12):
+    asciifolding gộp nhầm "viện"/"viên" và "tấm"/"Tám" về cùng token, khiến
+    "Công viên..." thắng "Bệnh viện..." cho truy vấn "bệnh viện".
+
+    Tách thành HAI multi_match riêng trong ``should`` thay vì gộp chung một
+    multi_match: field ``.strict`` KHÔNG được đặt ``fuzziness`` — nếu gộp
+    chung, "AUTO" cho phép khoảng cách sửa 1 ký tự, và "viện" với "viên" chỉ
+    khác nhau đúng 1 ký tự (ệ/ê) nên fuzzy sẽ lại khớp mờ, xoá sạch tác dụng
+    phân biệt dấu thanh mà field này tồn tại để giải quyết. Hai clause cộng
+    điểm (không phải lấy max) nên candidate khớp cả hai được thưởng thêm,
+    còn candidate chỉ khớp nhờ fold vẫn giữ nguyên điểm cũ — không bị phạt,
+    chỉ không được thưởng."""
     filters = _category_filter(category) + [_geo_filter(latitude, longitude, radius_m)]
     return {
         "size": size,
@@ -43,19 +57,39 @@ def bm25_body(
             "bool": {
                 "must": [
                     {
-                        "multi_match": {
-                            "query": query_text,
-                            "type": "best_fields",
-                            "fields": [
-                                "name^3",
-                                "name.prefix^1.5",
-                                "category_label^2",
-                                "tags^1.5",
-                                "brand^1.5",
-                                "description",
+                        "bool": {
+                            "minimum_should_match": 1,
+                            "should": [
+                                {
+                                    "multi_match": {
+                                        "query": query_text,
+                                        "type": "best_fields",
+                                        "fields": [
+                                            "name^3",
+                                            "name.prefix^1.5",
+                                            "category_label^2",
+                                            "tags^1.5",
+                                            "brand^1.5",
+                                            "description",
+                                        ],
+                                        "fuzziness": "AUTO",
+                                        "operator": "or",
+                                    }
+                                },
+                                {
+                                    "multi_match": {
+                                        "query": query_text,
+                                        "type": "best_fields",
+                                        "fields": [
+                                            "name.strict^5",
+                                            "category_label.strict^3",
+                                            "tags.strict^2",
+                                            "description.strict^1.5",
+                                        ],
+                                        "operator": "or",
+                                    }
+                                },
                             ],
-                            "fuzziness": "AUTO",
-                            "operator": "or",
                         }
                     }
                 ],

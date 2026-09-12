@@ -1,0 +1,35 @@
+{
+  "k": 5,
+  "trainGroups": 795,
+  "testGroups": 199,
+  "results": {
+    "linear": {
+      "ndcg": 0.4485,
+      "mrr": 0.3982,
+      "map": 0.3856,
+      "precision": 0.1343,
+      "recall": 0.6195,
+      "rankMsMean": 0.831,
+      "actuallyUsed": [
+        "linear"
+      ]
+    },
+    "ltr": {
+      "ndcg": 0.4304,
+      "mrr": 0.3748,
+      "map": 0.362,
+      "precision": 0.1364,
+      "recall": 0.616,
+      "rankMsMean": 9.581,
+      "actuallyUsed": [
+        "ltr"
+      ]
+    },
+    "_meta": {
+      "testGroupsTotal": 199,
+      "testGroupsEvaluated": 198,
+      "skippedNoQuery": 1,
+      "retrievalMsMean": 416.65
+    }
+  }
+}

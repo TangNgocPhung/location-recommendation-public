@@ -17,6 +17,11 @@ x-backend-environment: &backend-environment
   OSM_BBOX: ${OSM_BBOX:-10.70,106.60,10.90,106.82}
   OSM_MAX_POIS: ${OSM_MAX_POIS:-3000}
   OSRM_URL: ${OSRM_URL:-http://osrm:5000}
+  # Hồ sơ đi bộ (Phase 12.7) — đồ thị + container OSRM RIÊNG. Rỗng thì
+  # directions.route(profile="foot") tự rơi về không có tuyến (None), không
+  # được lặng lẽ dùng nhầm đồ thị "car" — hai đồ thị KHÔNG tương thích, đường
+  # ô tô có thể đi qua chỗ người đi bộ không được phép, và ngược lại.
+  OSRM_FOOT_URL: ${OSRM_FOOT_URL:-http://osrm-foot:5000}
 
 services:
   database:
@@ -268,6 +273,30 @@ services:
         - bash
         - -c
         - "exec 3<>/dev/tcp/127.0.0.1/5000 && printf 'GET /route/v1/driving/106.7009,10.7757;106.7018,10.7784?overview=false HTTP/1.0\r\n\r\n' >&3 && grep -q '\"code\":\"Ok\"' <&3"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Hồ sơ ĐI BỘ (Phase 12.7) — đồ thị RIÊNG ("hcm-foot.osrm", dựng bằng
+  # scripts/build_osrm_foot.sh), vì một osrm-routed chỉ phục vụ đúng một đồ thị
+  # mỗi lần chạy — không thể "đổi profile lúc gọi API" trên cùng một file
+  # .osrm. Container "car" ở trên và container này chạy song song, hai cổng
+  # khác nhau; backend chọn container theo profile được yêu cầu.
+  osrm-foot:
+    image: osrm/osrm-backend:latest
+    command: ["osrm-routed", "--algorithm", "mld", "--max-matching-size", "-1", "/data/hcm-foot.osrm"]
+    volumes:
+      - ./osrm:/data:ro
+    ports:
+      - "${OSRM_FOOT_PORT:-5002}:5000"
+    restart: "no"
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -c
+        - "exec 3<>/dev/tcp/127.0.0.1/5000 && printf 'GET /route/v1/foot/106.7009,10.7757;106.7018,10.7784?overview=false HTTP/1.0\r\n\r\n' >&3 && grep -q '\"code\":\"Ok\"' <&3"
       interval: 15s
       timeout: 5s
       retries: 5

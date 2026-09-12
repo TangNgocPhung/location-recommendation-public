@@ -88,27 +88,27 @@ class FakeRedis:
 def test_khoa_cache_lam_tron_toa_do() -> None:
     """Không làm tròn thì GPS nhiễu vài mét là một lần tính tuyến mới, và cache
     không bao giờ trúng."""
-    a = directions._cache_key(10.77570001, 106.70090001, 10.7784, 106.7018, "driving")
-    b = directions._cache_key(10.77570009, 106.70090009, 10.7784, 106.7018, "driving")
+    a = directions._cache_key(10.77570001, 106.70090001, 10.7784, 106.7018, "car")
+    b = directions._cache_key(10.77570009, 106.70090009, 10.7784, 106.7018, "car")
     assert a == b
 
 
 def test_khoa_cache_phan_biet_hai_diem_cach_xa() -> None:
-    a = directions._cache_key(10.7757, 106.7009, 10.7784, 106.7018, "driving")
-    b = directions._cache_key(10.8700, 106.7800, 10.7784, 106.7018, "driving")
+    a = directions._cache_key(10.7757, 106.7009, 10.7784, 106.7018, "car")
+    b = directions._cache_key(10.8700, 106.7800, 10.7784, 106.7018, "car")
     assert a != b
 
 
 def test_khoa_cache_phan_biet_theo_ho_so_di_chuyen() -> None:
-    a = directions._cache_key(10.7757, 106.7009, 10.7784, 106.7018, "driving")
-    b = directions._cache_key(10.7757, 106.7009, 10.7784, 106.7018, "cycling")
+    a = directions._cache_key(10.7757, 106.7009, 10.7784, 106.7018, "car")
+    b = directions._cache_key(10.7757, 106.7009, 10.7784, 106.7018, "foot")
     assert a != b
 
 
 def test_khoa_cache_khong_doi_xung() -> None:
     """Đi A→B và B→A có thể khác nhau (đường một chiều), nên khóa phải khác."""
-    a = directions._cache_key(10.7757, 106.7009, 10.7784, 106.7018, "driving")
-    b = directions._cache_key(10.7784, 106.7018, 10.7757, 106.7009, "driving")
+    a = directions._cache_key(10.7757, 106.7009, 10.7784, 106.7018, "car")
+    b = directions._cache_key(10.7784, 106.7018, 10.7757, 106.7009, "car")
     assert a != b
 
 
@@ -138,7 +138,7 @@ def test_url_dat_kinh_do_truoc_vi_do(monkeypatch) -> None:
     monkeypatch.setattr(directions.urllib.request, "urlopen", fake_urlopen)
     monkeypatch.setattr(directions.json, "load", lambda f: json.loads(f.read()))
 
-    directions._fetch_route(10.7757, 106.7009, 10.7784, 106.7018, "driving")
+    directions._fetch_route(10.7757, 106.7009, 10.7784, 106.7018, "car")
 
     # Kinh độ TP.HCM ~106, vĩ độ ~10 — cặp đầu tiên phải là 106.x,10.x
     assert "106.700900,10.775700;106.701800,10.778400" in captured["url"]
@@ -146,31 +146,41 @@ def test_url_dat_kinh_do_truoc_vi_do(monkeypatch) -> None:
 
 def test_khong_goi_gi_khi_chua_cau_hinh_osrm(monkeypatch) -> None:
     monkeypatch.setattr(settings, "osrm_url", "", raising=False)
-    assert directions._fetch_route(10.7757, 106.7009, 10.7784, 106.7018, "driving") is None
+    assert directions._fetch_route(10.7757, 106.7009, 10.7784, 106.7018, "car") is None
 
 
 # --- Định hình kết quả --------------------------------------------------------
 
 
 def test_doc_dung_khoang_cach_va_thoi_gian() -> None:
-    shaped = directions._shape_response(OSRM_OK)
+    shaped = directions._shape_response(OSRM_OK, "car", False)
     assert shaped["distanceMeters"] == 465.2
     assert shaped["durationSeconds"] == 68.6
     assert shaped["durationMinutes"] == 1
     assert shaped["geometry"]["type"] == "LineString"
+    assert shaped["mode"] == "car"
+    assert shaped["approximate"] is False
+
+
+def test_approximate_duoc_giu_nguyen_cho_motorbike() -> None:
+    """"motorbike" dùng lại đồ thị "car" — response PHẢI tự khai báo
+    approximate=True, không được để tầng gọi lầm tưởng đây là tuyến xe máy thật."""
+    shaped = directions._shape_response(OSRM_OK, "motorbike", True)
+    assert shaped["mode"] == "motorbike"
+    assert shaped["approximate"] is True
 
 
 def test_thoi_gian_lam_tron_len_toi_thieu_mot_phut() -> None:
     """0 phút trên giao diện đọc như 'đã tới nơi'."""
     payload = json.loads(json.dumps(OSRM_OK))
     payload["routes"][0]["duration"] = 12.0
-    assert directions._shape_response(payload)["durationMinutes"] == 1
+    assert directions._shape_response(payload, "car", False)["durationMinutes"] == 1
 
 
 def test_bo_cac_buoc_re_vun() -> None:
     """OSRM trả cả bước dài 2 m ở giao lộ. Hiện hết thì danh sách dài gấp ba mà
     không thêm thông tin nào."""
-    steps = directions._shape_response(OSRM_OK)["steps"]
+    steps = directions._shape_response(OSRM_OK, "car", False)["steps"]
     assert all(
         s["distanceMeters"] >= directions.MIN_STEP_DISTANCE_METERS or s["text"] == "Tới nơi"
         for s in steps
@@ -179,14 +189,14 @@ def test_bo_cac_buoc_re_vun() -> None:
 
 def test_giu_lai_buoc_dau_va_buoc_cuoi_du_ngan() -> None:
     """'Tới nơi' dài 0 m nhưng là bước quan trọng nhất của danh sách."""
-    texts = [s["text"] for s in directions._shape_response(OSRM_OK)["steps"]]
+    texts = [s["text"] for s in directions._shape_response(OSRM_OK, "car", False)["steps"]]
     assert texts[0].startswith("Bắt đầu đi")
     assert texts[-1] == "Tới nơi"
 
 
 def test_khong_co_tuyen_thi_tra_none() -> None:
-    assert directions._shape_response({"code": "Ok", "routes": []}) is None
-    assert directions._shape_response({}) is None
+    assert directions._shape_response({"code": "Ok", "routes": []}, "car", False) is None
+    assert directions._shape_response({}, "car", False) is None
 
 
 def test_hinh_hoc_sai_kieu_thi_tra_none() -> None:
@@ -194,7 +204,7 @@ def test_hinh_hoc_sai_kieu_thi_tra_none() -> None:
     đồ thành rác chứ không báo lỗi."""
     payload = json.loads(json.dumps(OSRM_OK))
     payload["routes"][0]["geometry"] = "yxe@_qhbB"
-    assert directions._shape_response(payload) is None
+    assert directions._shape_response(payload, "car", False) is None
 
 
 # --- Câu hướng dẫn tiếng Việt --------------------------------------------------
@@ -238,7 +248,7 @@ def test_cache_trung_thi_khong_goi_osrm(monkeypatch) -> None:
         raise AssertionError("cache trúng mà vẫn gọi OSRM")
 
     monkeypatch.setattr(directions, "_fetch_route", khong_duoc_goi)
-    shaped = directions._shape_response(OSRM_OK)
+    shaped = directions._shape_response(OSRM_OK, "car", False)
     client = FakeRedis(json.dumps(shaped, ensure_ascii=False))
 
     result = directions.route(10.7757, 106.7009, 10.7784, 106.7018, client=client)
@@ -249,7 +259,7 @@ def test_cache_trung_thi_khong_goi_osrm(monkeypatch) -> None:
 
 def test_goi_xong_thi_ghi_cache_va_danh_dau_khong_phai_cache(monkeypatch) -> None:
     monkeypatch.setattr(
-        directions, "_fetch_route", lambda *a, **k: directions._shape_response(OSRM_OK)
+        directions, "_fetch_route", lambda *a, **k: directions._shape_response(OSRM_OK, "car", False)
     )
     client = FakeRedis(None)
 
@@ -263,7 +273,7 @@ def test_goi_xong_thi_ghi_cache_va_danh_dau_khong_phai_cache(monkeypatch) -> Non
 def test_cache_giu_nguyen_tieng_viet_co_dau(monkeypatch) -> None:
     """ensure_ascii=False. Escape thì tên đường đọc ra dạng \\u1ec7."""
     monkeypatch.setattr(
-        directions, "_fetch_route", lambda *a, **k: directions._shape_response(OSRM_OK)
+        directions, "_fetch_route", lambda *a, **k: directions._shape_response(OSRM_OK, "car", False)
     )
     client = FakeRedis(None)
 

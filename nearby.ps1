@@ -26,7 +26,7 @@
 
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('up', 'down', 'status', 'train', 'eval', 'ablation', 'audit', 'labels', 'ratings', 'test', 'logs')]
+    [ValidateSet('up', 'down', 'status', 'train', 'eval', 'eval-holdout', 'ablation', 'audit', 'labels', 'ratings', 'test', 'logs')]
     [string]$Command = 'status',
 
     # Tham so truyen thang cho script Python ben trong, vi du:
@@ -128,12 +128,51 @@ UNION ALL SELECT 'nhom request co click', COUNT(DISTINCT metadata->>'request_id'
         #   .\nearby.ps1 train --source both
         $argv = @('python', 'scripts/train_ltr.py')
         if ($Rest -and $Rest.Count -gt 0) { $argv += $Rest } else { $argv += @('--source', 'judgment') }
+
+        # Container "backend" (service dang chay that) KHONG mount code song —
+        # no dung image da build san (xem docker-compose.yml, khong co
+        # 'volumes:' o service backend). Neu train ra model.txt moi ma khong
+        # rebuild lai image, production van phuc vu model CU mot cach im lang
+        # — day la loi da gap that su (xem Phase 8): API tra ranker=ltr nhung
+        # thuc chat van la model train tu vai chuc dong du lieu cu.
+        $modelPath = Join-Path $Root 'backend/app/ltr/model.txt'
+        $before = if (Test-Path $modelPath) { (Get-Item $modelPath).LastWriteTimeUtc } else { $null }
+
         Invoke-InBackend -CommandArgs $argv
+
+        $after = if (Test-Path $modelPath) { (Get-Item $modelPath).LastWriteTimeUtc } else { $null }
+        $modelUpdated = ($null -ne $after) -and ($after -ne $before)
+
+        if ($modelUpdated) {
+            Write-Host ''
+            Write-Host 'Model moi da ghi vao backend/app/ltr/model.txt.' -ForegroundColor Green
+            Write-Host 'Container "backend" dang chay dung IMAGE CU, chua thay model nay.' -ForegroundColor Yellow
+            $answer = Read-Host 'Rebuild + restart backend de dua model moi vao production ngay? [y/N]'
+            if ($answer -match '^[Yy]') {
+                Write-Host '== Rebuild backend ==' -ForegroundColor Cyan
+                & docker compose -p $Project build backend
+                if ($LASTEXITCODE -ne 0) { throw "Build that bai voi ma $LASTEXITCODE" }
+                Write-Host '== Restart backend ==' -ForegroundColor Cyan
+                & docker compose -p $Project up -d backend
+                Write-Host 'Xong. Kiem tra: http://localhost:8000/api/v1/ltr/status' -ForegroundColor Green
+            } else {
+                Write-Host 'Bo qua. Production van dung model CU cho toi khi ban build lai backend.' -ForegroundColor DarkGray
+            }
+        }
     }
 
     'eval' {
         $argv = @('python', 'scripts/eval_rankers.py')
         if ($Rest -and $Rest.Count -gt 0) { $argv += $Rest } else { $argv += @('--k', '10') }
+        Invoke-InBackend -CommandArgs $argv
+    }
+
+    'eval-holdout' {
+        # Phase 9 — huan luyen model TAM chi tren phan train, danh gia tren
+        # nhom qid CHUA TUNG thay. Khac 'eval': khong dung app/ltr/model.txt
+        # production, khong dung 3 truy van judgment lam toan bo test set.
+        $argv = @('python', 'scripts/eval_holdout.py')
+        if ($Rest -and $Rest.Count -gt 0) { $argv += $Rest } else { $argv += @('--k', '5') }
         Invoke-InBackend -CommandArgs $argv
     }
 
