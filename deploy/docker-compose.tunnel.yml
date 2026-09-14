@@ -14,6 +14,15 @@ services:
       NEXT_PUBLIC_API_URL: ${PUBLIC_URL:?PUBLIC_URL must be set}
       VITE_API_URL: ${PUBLIC_URL:?PUBLIC_URL must be set}
 
+      # Tắt style vector MapTiler cho bản demo qua tunnel. Khóa MapTiler bị
+      # giới hạn theo origin, mà URL trycloudflare.com là NGẪU NHIÊN mỗi lần
+      # chạy nên không thể đăng ký trước — kết quả là style.json trả 403 và
+      # bản đồ TRẮNG TRƠN (maplibre không tự lùi khi style lỗi, chỉ lùi khi
+      # biến rỗng). Chuỗi rỗng đưa location-explorer.tsx về raster
+      # OpenStreetMap: không cần key, có đủ đường phố TP.HCM.
+      VITE_MAP_STYLE_URL: ""
+      NEXT_PUBLIC_MAP_STYLE_URL: ""
+
   backend:
     environment:
       # Giữ cả localhost để vẫn mở được http://localhost:8081 trên máy này.
