@@ -38,7 +38,12 @@ fi
 
 echo "== 1. Mở Cloudflare Tunnel tới gateway =="
 docker rm -f "$TUNNEL_NAME" >/dev/null 2>&1
-docker run -d --name "$TUNNEL_NAME" --network "$NETWORK" --restart unless-stopped \
+# CỐ Ý không đặt --restart: mỗi lần cloudflared khởi động lại, Cloudflare cấp một
+# URL NGẪU NHIÊN KHÁC. Nếu container tự dựng lại (ví dụ sau khi Docker khởi động
+# lại) thì URL đổi trong khi bundle frontend vẫn nhúng URL cũ — site hỏng lặng lẽ
+# và link đã gửi cho người khác thì chết. Thà để tunnel nằm im: chạy lại script
+# sẽ dựng lại frontend theo URL mới.
+docker run -d --name "$TUNNEL_NAME" --network "$NETWORK" \
   cloudflare/cloudflared:latest tunnel --no-autoupdate --url http://gateway:8080 >/dev/null || {
     echo "LỖI: không khởi động được cloudflared." >&2; exit 1; }
 
