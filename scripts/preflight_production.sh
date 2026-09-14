@@ -41,12 +41,28 @@ done
 echo
 echo "== 2. Kiến trúc máy =="
 arch="$(uname -m)"
-if [ "$arch" = "aarch64" ] || [ "$arch" = "arm64" ]; then
-  ok "arm64 ($arch) — đúng loại máy cho lớp phủ prod"
-else
-  note "máy này là $arch, không phải arm64. Lớp phủ prod thay image sang bản arm64;"
-  note "chạy trên amd64 vẫn được nhưng image OSRM phải dựng lại cho amd64."
-fi
+osrm_declared="$(grep -E '^OSRM_IMAGE=' "$ENV_FILE" | head -1 | cut -d= -f2-)"
+# Lớp phủ prod chạy được trên CẢ HAI kiến trúc; thứ phải khớp là OSRM_IMAGE, vì
+# đó là image duy nhất không có sẵn bản đa kiến trúc.
+case "$arch" in
+  aarch64|arm64)
+    if printf '%s' "$osrm_declared" | grep -q '^osrm/osrm-backend'; then
+      bad "máy arm64 nhưng OSRM_IMAGE=$osrm_declared là image CHỈ CÓ amd64"
+      bad "  -> dựng bản arm64: bash deploy/build-osrm-image-arm64.sh"
+    else
+      ok "arm64 ($arch) + OSRM_IMAGE riêng — khớp"
+    fi
+    ;;
+  x86_64|amd64)
+    if printf '%s' "$osrm_declared" | grep -q 'arm64'; then
+      bad "máy amd64 nhưng OSRM_IMAGE=$osrm_declared là bản arm64"
+      bad "  -> đổi thành osrm/osrm-backend:latest (khớp sẵn đồ thị v5.26.0 trong osrm/)"
+    else
+      ok "amd64 ($arch) + OSRM_IMAGE=$osrm_declared — khớp"
+    fi
+    ;;
+  *) note "kiến trúc lạ: $arch" ;;
+esac
 
 echo
 echo "== 3. Cổng phơi ra ngoài =="
