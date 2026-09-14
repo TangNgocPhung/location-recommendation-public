@@ -1,0 +1,88 @@
+# Lớp phủ production cho Oracle Cloud Ampere A1 (arm64).
+#
+#   docker compose --env-file config/production.env \
+#     -f docker-compose.yml -f deploy/docker-compose.prod.yml up -d
+#
+# Chỉ chứa những gì KHÁC so với docker-compose.yml. Ba nhóm khác biệt:
+#
+# 1. ẢNH arm64. `postgis/postgis` và `osrm/osrm-backend` chỉ có bản amd64 (đã
+#    kiểm chứng bằng Registry API), nên phải thay.
+# 2. TLS. Caddy đứng trước gateway, tự xin chứng chỉ Let's Encrypt.
+# 3. KHÔNG PHƠI CỔNG RA INTERNET. Việc này làm bằng biến môi trường trong
+#    config/production.env (POSTGRES_PORT=127.0.0.1:5432, ...) chứ không phải ở
+#    đây: danh sách `ports` khi gộp nhiều file compose là NỐI THÊM chứ không
+#    thay thế, nên viết lại `ports` ở lớp phủ sẽ giữ nguyên cả dòng phơi
+#    0.0.0.0 của file gốc — tức là mở Postgres và Neo4j ra internet mà tưởng đã
+#    đóng.
+
+services:
+  database:
+    # Bản build cộng đồng multi-arch. `postgis/postgis:16-3.4` chính thức là
+    # manifest v2 đơn kiến trúc amd64 — trên Ampere A1 sẽ chết "exec format
+    # error". Cùng PostgreSQL 16 + PostGIS 3.4 nên migration không đổi.
+    image: imresamu/postgis:16-3.4
+    restart: unless-stopped
+
+  redis:
+    restart: unless-stopped
+
+  opensearch:
+    restart: unless-stopped
+
+  neo4j:
+    restart: unless-stopped
+
+  backend:
+    restart: unless-stopped
+
+  frontend:
+    restart: unless-stopped
+    environment:
+      # Gateway phục vụ frontend ở "/" và backend ở "/api/" trên CÙNG một
+      # origin, nên URL API chính là URL công khai của site. Giá trị gốc trong
+      # docker-compose.yml là http://localhost:8081 — đúng cho máy dev, sai
+      # hoàn toàn khi chạy thật vì trình duyệt của người dùng sẽ gọi về
+      # localhost CỦA HỌ.
+      NEXT_PUBLIC_API_URL: ${PUBLIC_URL:?PUBLIC_URL must be set}
+      VITE_API_URL: ${PUBLIC_URL:?PUBLIC_URL must be set}
+
+  gateway:
+    restart: unless-stopped
+
+  osrm:
+    # Dựng bằng deploy/build-osrm-image-arm64.sh. KHÔNG có bản arm64 trên
+    # Docker Hub cho bất kỳ tag nào.
+    image: ${OSRM_IMAGE:?OSRM_IMAGE must be set}
+    restart: unless-stopped
+
+  osrm-foot:
+    image: ${OSRM_IMAGE:?OSRM_IMAGE must be set}
+    restart: unless-stopped
+
+  osrm-motorbike:
+    image: ${OSRM_IMAGE:?OSRM_IMAGE must be set}
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Đường dẫn tương đối trong file compose được giải theo THƯ MỤC DỰ ÁN
+      # (nơi chứa docker-compose.yml gốc), không theo thư mục của file lớp phủ
+      # này. Nên là ./deploy/... chứ không phải ../deploy/...
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - nearby-caddy-data:/data
+      - nearby-caddy-config:/config
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:?PUBLIC_HOST must be set}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    depends_on:
+      gateway:
+        condition: service_healthy
+
+volumes:
+  nearby-caddy-data:
+  nearby-caddy-config:

@@ -12,6 +12,12 @@ x-backend-environment: &backend-environment
   NEO4J_PASSWORD: ${NEO4J_PASSWORD:-nearby_graph_dev}
   EVENT_STREAM: ${EVENT_STREAM:-nearby:events:v1}
   RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-120}
+  # Số proxy TIN CẬY đứng trước API. Anchor này là TOÀN BỘ môi trường của
+  # backend, nên thiếu dòng này thì TRUSTED_PROXY_HOPS trong config/*.env
+  # không bao giờ tới được container: settings.trusted_proxy_hops giữ mặc
+  # định 0, client_ip() trả về IP của nginx, và MỌI người dùng chia chung một
+  # hạn mức RATE_LIMIT_PER_MINUTE. Dev = 1 (chỉ nginx), prod = 2 (Caddy+nginx).
+  TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS:-0}
   ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?ALLOWED_ORIGINS must be set}
   OVERPASS_URL: ${OVERPASS_URL:-https://overpass-api.de/api/interpreter}
   OSM_BBOX: ${OSM_BBOX:-10.70,106.60,10.90,106.82}

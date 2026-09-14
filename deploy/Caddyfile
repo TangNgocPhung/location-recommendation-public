@@ -1,0 +1,25 @@
+# TLS tự động cho Nearby. Caddy xin và gia hạn chứng chỉ Let's Encrypt, rồi
+# chuyển tiếp mọi thứ cho gateway nginx — nginx vẫn giữ nguyên vai trò định
+# tuyến /api/ sang backend và / sang frontend, Caddy chỉ lo HTTPS.
+#
+# PUBLIC_HOST đến từ config/production.env. Chưa có tên miền riêng thì dùng
+# sslip.io: một tên như 152-67-1-2.sslip.io tự phân giải về 152.67.1.2, và
+# Let's Encrypt cấp chứng chỉ cho nó bình thường — không tốn tiền mua domain.
+
+{
+	# Chưa đặt ACME_EMAIL thì Caddy vẫn xin được chứng chỉ, chỉ là không nhận
+	# email cảnh báo sắp hết hạn.
+	email {$ACME_EMAIL}
+}
+
+{$PUBLIC_HOST} {
+	encode gzip zstd
+
+	# Caddy NỐI THÊM IP của peer vào X-Forwarded-For (không ghi đè), rồi nginx
+	# nối thêm IP của Caddy bằng $proxy_add_x_forwarded_for. Backend do đó thấy
+	# chuỗi [client, caddy] và phải đặt TRUSTED_PROXY_HOPS=2 để lấy đúng phần
+	# tử client — xem app/api.py:client_ip và ghi chú trong config.py.
+	reverse_proxy gateway:8080 {
+		header_up X-Forwarded-Proto {scheme}
+	}
+}

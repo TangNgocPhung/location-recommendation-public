@@ -27,7 +27,7 @@ SOURCE_URL="${OSRM_SOURCE_URL:-https://download.geofabrik.de/asia/vietnam-latest
 # ra là CẬN TRÊN cho xe máy. Muốn sát hơn thì cần một hồ sơ Lua riêng; phải ghi
 # rõ điều này trong báo cáo thay vì để người đọc tưởng đó là thời gian xe máy.
 PROFILE="${OSRM_PROFILE:-/opt/car.lua}"
-IMAGE="osrm/osrm-backend:latest"
+IMAGE="${OSRM_IMAGE:-osrm/osrm-backend:latest}"
 
 mkdir -p "$DATA_DIR"
 cd "$DATA_DIR"

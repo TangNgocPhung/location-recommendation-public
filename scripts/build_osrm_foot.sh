@@ -15,7 +15,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DATA_DIR="$ROOT/osrm"
-IMAGE="osrm/osrm-backend:latest"
+IMAGE="${OSRM_IMAGE:-osrm/osrm-backend:latest}"
 PROFILE="/opt/foot.lua"
 
 cd "$DATA_DIR"
