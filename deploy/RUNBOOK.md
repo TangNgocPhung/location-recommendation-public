@@ -21,13 +21,18 @@ phơi ra internet.
 
 ## 0. Thứ bạn phải tự làm (tôi không làm thay được)
 
-1. **Tạo tài khoản Oracle Cloud** và dựng một máy Ampere A1 (Always Free: 4 vCPU
-   / 24 GB RAM / 200 GB). Việc này cần định danh và thẻ của bạn.
+1. **Tạo tài khoản Oracle Cloud** và dựng một máy Ampere A1. Hạn mức Always Free
+   bị Oracle cắt một nửa từ 15/06/2026, không thông báo: nay là **2 OCPU / 12 GB
+   RAM** (trước là 4 OCPU / 24 GB). 12 GB vẫn dư — stack đo được dùng ~3,6 GB lúc
+   rảnh — nhưng 2 nhân làm việc biên dịch OSRM từ nguồn lâu hơn đáng kể. Việc
+   tạo tài khoản cần số điện thoại và thẻ của bạn (thẻ chỉ để xác minh).
 2. Chọn ảnh **Ubuntu 24.04 (aarch64)**.
 3. Lưu khóa SSH khi tạo máy — Oracle chỉ cho tải một lần.
 
-RAM 24 GB là dư: OpenSearch giới hạn 512 MB heap, Neo4j 512 MB, phần còn lại cho
-Postgres và ba tiến trình OSRM (mỗi đồ thị mmap ~150 MB).
+Mức dùng thật, đo bằng `docker stats` trên máy dev khi stack đứng yên: tổng
+**~3,6 GB** — OpenSearch 1,4 GB, Neo4j 527 MB, ba tiến trình OSRM ~1,2 GB, còn lại
+là Postgres, backend, frontend, gateway. Cộng thêm lúc build image và bộ nhớ đệm
+cho 2,6 GB đồ thị mmap thì 8 GB là mức an toàn, 4 GB sẽ chật.
 
 ### Mở cổng 80/443 — phải làm ở HAI nơi
 
