@@ -204,6 +204,20 @@ curl -s -G https://<PUBLIC_HOST>/api/v1/recommendations \
 hoặc `28`, image backend đã dựng từ mã cũ — `$COMPOSE build backend` rồi
 `$COMPOSE up -d --no-deps backend`, sau đó chạy lại `search-index`.
 
+**Kiểm chỉ mục có khớp mã không** — chỉ mục OpenSearch tồn tại độc lập với mã
+và KHÔNG tự cập nhật khi mã đổi:
+
+```bash
+curl -s http://127.0.0.1:9200/nearby-pois/_mapping | grep -o '"strict"' | head -1
+```
+
+Không in ra gì nghĩa là chỉ mục dựng từ mã cũ, thiếu subfield `.strict` giữ dấu
+thanh. Hậu quả IM LẶNG: OpenSearch bỏ qua field chưa map trong `multi_match`,
+nên mệnh đề `name.strict^5` của `app/search/query.py` không báo lỗi mà chỉ đơn
+giản không tính điểm — BM25 rơi hết về field đã bỏ dấu, nơi "viện" và "viên"
+cùng là token `vien`, và tìm "bệnh viện" ra công viên đứng đầu. Sửa:
+`$COMPOSE build search-index` rồi `$COMPOSE --profile data run --rm search-index`.
+
 Kiểm định tuyến thật (không phải deep-link Google Maps) — trong UI bấm một địa
 điểm rồi bấm **Chỉ đường**; phải hiện quãng đường và thời gian, và bản đồ vẽ
 tuyến. Thiếu đồ thị thì backend lặng lẽ lùi về deep-link.
