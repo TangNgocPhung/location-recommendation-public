@@ -149,6 +149,70 @@ def test_khong_goi_gi_khi_chua_cau_hinh_osrm(monkeypatch) -> None:
     assert directions._fetch_route(10.7757, 106.7009, 10.7784, 106.7018, "car") is None
 
 
+def _bat_url(monkeypatch) -> dict:
+    """Chặn urlopen, trả về dict sẽ chứa URL mà _fetch_route thực sự gọi."""
+    captured: dict = {}
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def read(self):
+            return json.dumps(OSRM_OK).encode()
+
+    def fake_urlopen(url, timeout=None):
+        captured["url"] = url
+        return FakeResponse()
+
+    monkeypatch.setattr(directions.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(directions.json, "load", lambda f: json.loads(f.read()))
+    return captured
+
+
+def test_xe_may_dung_do_thi_rieng_va_khong_con_xap_xi(monkeypatch) -> None:
+    """Có đồ thị xe máy thật (osrm/motorbike.lua) thì phải gọi ĐÚNG container
+    đó, và response không được tự hạ mình xuống `approximate`."""
+    captured = _bat_url(monkeypatch)
+    monkeypatch.setattr(settings, "osrm_url", "http://osrm:5000", raising=False)
+    monkeypatch.setattr(
+        settings, "osrm_motorbike_url", "http://osrm-motorbike:5000", raising=False
+    )
+
+    ket_qua = directions._fetch_route(10.7757, 106.7009, 10.7784, 106.7018, "motorbike")
+
+    assert captured["url"].startswith("http://osrm-motorbike:5000/")
+    assert ket_qua is not None
+    assert ket_qua["approximate"] is False
+
+
+def test_chua_dung_do_thi_xe_may_thi_lui_ve_o_to_va_danh_dau_xap_xi(monkeypatch) -> None:
+    """Máy chưa chạy scripts/build_osrm_motorbike.sh KHÔNG được mất nút chỉ
+    đường xe máy — thêm tính năng mà làm mất tính năng cũ là một bước lùi.
+
+    Nhưng tuyến lúc đó tính bằng đồ thị Ô TÔ, nên BẮT BUỘC khai
+    `approximate: true` dù hồ sơ "motorbike" khai approximate=False: đây đúng
+    là chỗ dễ hỏng im lặng nhất của nhánh fallback.
+    """
+    captured = _bat_url(monkeypatch)
+    monkeypatch.setattr(settings, "osrm_url", "http://osrm:5000", raising=False)
+    monkeypatch.setattr(settings, "osrm_motorbike_url", "", raising=False)
+
+    ket_qua = directions._fetch_route(10.7757, 106.7009, 10.7784, 106.7018, "motorbike")
+
+    assert captured["url"].startswith("http://osrm:5000/")
+    assert ket_qua is not None
+    assert ket_qua["approximate"] is True
+
+
+def test_khong_co_do_thi_nao_thi_tra_none(monkeypatch) -> None:
+    monkeypatch.setattr(settings, "osrm_url", "", raising=False)
+    monkeypatch.setattr(settings, "osrm_motorbike_url", "", raising=False)
+    assert directions._fetch_route(10.7757, 106.7009, 10.7784, 106.7018, "motorbike") is None
+
+
 # --- Định hình kết quả --------------------------------------------------------
 
 
@@ -163,8 +227,10 @@ def test_doc_dung_khoang_cach_va_thoi_gian() -> None:
 
 
 def test_approximate_duoc_giu_nguyen_cho_motorbike() -> None:
-    """"motorbike" dùng lại đồ thị "car" — response PHẢI tự khai báo
-    approximate=True, không được để tầng gọi lầm tưởng đây là tuyến xe máy thật."""
+    """Khi rơi vào nhánh fallback (chưa dựng đồ thị xe máy, xem
+    `test_chua_dung_do_thi_xe_may_thi_lui_ve_o_to_va_danh_dau_xap_xi`), tuyến
+    tính bằng đồ thị "car" nên response PHẢI tự khai báo approximate=True —
+    không được để tầng gọi lầm tưởng đây là tuyến xe máy thật."""
     shaped = directions._shape_response(OSRM_OK, "motorbike", True)
     assert shaped["mode"] == "motorbike"
     assert shaped["approximate"] is True

@@ -1,6 +1,13 @@
 'use client';
 
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Bell,
   BellRing,
@@ -15,7 +22,9 @@ import {
   ExternalLink,
   Footprints,
   Globe,
+  LoaderCircle,
   MapPin,
+  MessageSquareText,
   Navigation,
   Phone,
   Route,
@@ -75,7 +84,9 @@ export type PoiWeekHour = {
 
 /** Khoá là chuỗi '1'..'5'. Để Partial vì chỉ cần backend quên một mức là cả
  *  biểu đồ vỡ; đọc bằng `?? 0` an toàn hơn tin vào hợp đồng. */
-export type PoiRatingHistogram = Partial<Record<'1' | '2' | '3' | '4' | '5', number>>;
+export type PoiRatingHistogram = Partial<
+  Record<'1' | '2' | '3' | '4' | '5', number>
+>;
 
 export type PoiReviewSummary = {
   count: number;
@@ -282,7 +293,9 @@ function humanizeToken(token: string): string {
 
 type AmenityChip = { key: string; label: string; negative: boolean };
 
-function toAmenityChips(amenities: Record<string, unknown> | null | undefined): AmenityChip[] {
+function toAmenityChips(
+  amenities: Record<string, unknown> | null | undefined,
+): AmenityChip[] {
   if (!amenities) return [];
   const chips: AmenityChip[] = [];
   for (const [key, rawValue] of Object.entries(amenities)) {
@@ -296,7 +309,11 @@ function toAmenityChips(amenities: Record<string, unknown> | null | undefined): 
     // Giữ nguyên giá trị lạ thay vì bỏ đi: thà hiện "toilets: 35" khó hiểu còn
     // hơn im lặng nuốt mất một dữ kiện có trong DB.
     const valueLabel = AMENITY_VALUES[value] ?? humanizeToken(value);
-    chips.push({ key, label: `${label}: ${valueLabel}`, negative: value === 'no' });
+    chips.push({
+      key,
+      label: `${label}: ${valueLabel}`,
+      negative: value === 'no',
+    });
   }
   return chips;
 }
@@ -305,7 +322,13 @@ function toAmenityChips(amenities: Record<string, unknown> | null | undefined): 
  * Mảnh giao diện dùng lại
  * ------------------------------------------------------------------ */
 
-function StarRow({ value, size = 'sm' }: { value: number; size?: 'sm' | 'lg' }) {
+function StarRow({
+  value,
+  size = 'sm',
+}: {
+  value: number;
+  size?: 'sm' | 'lg';
+}) {
   const iconClass = size === 'lg' ? 'size-5' : 'size-3.5';
   return (
     <span className="flex items-center gap-px" aria-hidden>
@@ -319,7 +342,9 @@ function StarRow({ value, size = 'sm' }: { value: number; size?: 'sm' | 'lg' }) 
                 className="absolute inset-y-0 left-0 overflow-hidden"
                 style={{ width: `${fill * 100}%` }}
               >
-                <Star className={cn(iconClass, 'fill-amber-400 text-amber-400')} />
+                <Star
+                  className={cn(iconClass, 'fill-amber-400 text-amber-400')}
+                />
               </span>
             )}
           </span>
@@ -329,12 +354,20 @@ function StarRow({ value, size = 'sm' }: { value: number; size?: 'sm' | 'lg' }) 
   );
 }
 
-function OpeningBadge({ status }: { status: PoiOpeningStatus | null | undefined }) {
+function OpeningBadge({
+  status,
+}: {
+  status: PoiOpeningStatus | null | undefined;
+}) {
   // openNow === null nghĩa là KHÔNG BIẾT (không có giờ mở cửa, hoặc chuỗi
   // opening_hours không đọc được). Im lặng đúng hơn là đoán bừa "Đóng cửa".
   if (!status || status.openNow == null) return null;
 
-  if (status.openNow && status.closesInMinutes != null && status.closesInMinutes <= 45) {
+  if (
+    status.openNow &&
+    status.closesInMinutes != null &&
+    status.closesInMinutes <= 45
+  ) {
     // Ngưỡng 45 phút lấy đúng theo thẻ kết quả trong location-explorer để hai
     // chỗ không nói ngược nhau về cùng một địa điểm.
     return (
@@ -413,7 +446,12 @@ function ActionButton({
     );
   }
   return (
-    <button type="button" onClick={onClick} aria-label={ariaLabel} className={wrapper}>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={ariaLabel}
+      className={wrapper}
+    >
       {body}
     </button>
   );
@@ -428,13 +466,22 @@ function InfoRow({
 }) {
   return (
     <div className="flex gap-3 px-4 py-3">
-      <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
+      <Icon
+        className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+        aria-hidden
+      />
       <div className="min-w-0 flex-1 text-sm">{children}</div>
     </div>
   );
 }
 
-function PhotoCaption({ photo, className }: { photo: PoiPhoto; className?: string }) {
+function PhotoCaption({
+  photo,
+  className,
+}: {
+  photo: PoiPhoto;
+  className?: string;
+}) {
   const isPlace = photo.confidence === 'place';
   return (
     <div className={cn('space-y-0.5 text-[11px] leading-snug', className)}>
@@ -443,12 +490,18 @@ function PhotoCaption({ photo, className }: { photo: PoiPhoto; className?: strin
           tính. */}
       <p
         data-tone={isPlace ? 'normal' : 'warn'}
-        className={isPlace ? 'text-muted-foreground' : 'font-medium text-amber-700 dark:text-amber-400'}
+        className={
+          isPlace
+            ? 'text-muted-foreground'
+            : 'font-medium text-amber-700 dark:text-amber-400'
+        }
       >
         {isPlace
           ? 'Ảnh của địa điểm · Wikimedia Commons'
           : `Ảnh khu vực${
-              photo.distanceMeters != null ? ` · cách ${Math.round(photo.distanceMeters)} m` : ''
+              photo.distanceMeters != null
+                ? ` · cách ${Math.round(photo.distanceMeters)} m`
+                : ''
             } · không phải ảnh của địa điểm này`}
       </p>
       {/* Ghi công + giấy phép là ĐIỀU KIỆN của giấy phép CC, không phải phần
@@ -483,10 +536,16 @@ export function PoiDetailPanel(props: {
   /** tuyến OSRM tới POI này, do trang cha tính sẵn — hiển thị nếu poiId khớp */
   routeSummary: PoiRouteSummary | null;
   isGeofenced: boolean;
+  apiBaseUrl: string;
+  sessionId: string;
   onClose: () => void;
   onDirections: () => void;
   onToggleGeofence: () => void;
   onSelectSimilar: (poiId: string) => void;
+  onReviewSubmitted: (summary: {
+    ratingMean: number | null;
+    ratingCount: number;
+  }) => void;
 }) {
   const {
     detail,
@@ -495,17 +554,30 @@ export function PoiDetailPanel(props: {
     error,
     routeSummary,
     isGeofenced,
+    apiBaseUrl,
+    sessionId,
     onClose,
     onDirections,
     onToggleGeofence,
     onSelectSimilar,
+    onReviewSubmitted,
   } = props;
 
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [hoursOpen, setHoursOpen] = useState(false);
-  const [copyState, setCopyState] = useState<'idle' | 'done' | 'failed'>('idle');
+  const [copyState, setCopyState] = useState<'idle' | 'done' | 'failed'>(
+    'idle',
+  );
   const [scrolled, setScrolled] = useState(false);
   const [brokenIds, setBrokenIds] = useState<string[]>([]);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewAuthor, setReviewAuthor] = useState('');
+  const [reviewTitle, setReviewTitle] = useState('');
+  const [reviewBody, setReviewBody] = useState('');
+  const [reviewState, setReviewState] = useState<
+    'loading' | 'idle' | 'saving' | 'saved' | 'error'
+  >('idle');
+  const [reviewMessage, setReviewMessage] = useState('');
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lightboxRef = useRef<HTMLDivElement>(null);
 
@@ -513,7 +585,8 @@ export function PoiDetailPanel(props: {
   // ghi). Để nguyên thì trình duyệt vẽ icon ảnh vỡ ngay giữa thẻ chi tiết. Lọc
   // ra khỏi danh sách rồi rơi về ảnh bìa sinh sẵn thì trung thực hơn hẳn.
   const photoList = useMemo(
-    () => (photos?.photos ?? []).filter((photo) => !brokenIds.includes(photo.id)),
+    () =>
+      (photos?.photos ?? []).filter((photo) => !brokenIds.includes(photo.id)),
     [photos, brokenIds],
   );
   const poiId = detail?.id ?? null;
@@ -547,6 +620,46 @@ export function PoiDetailPanel(props: {
     setScrolled(false);
     setBrokenIds([]);
   }, [poiId]);
+
+  // Một phiên chỉ có một đánh giá cho mỗi địa điểm. Khi mở lại panel, nạp đánh
+  // giá cũ vào form để người dùng sửa thay vì vô tình tạo nhiều bản sao.
+  useEffect(() => {
+    if (!poiId || !sessionId) return;
+    const controller = new AbortController();
+    void (async () => {
+      setReviewState('loading');
+      try {
+        const response = await fetch(
+          `${apiBaseUrl}/api/v1/pois/${poiId}/reviews/me`,
+          {
+            headers: { 'X-Session-ID': sessionId },
+            signal: controller.signal,
+          },
+        );
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const { review } = (await response.json()) as {
+          review: {
+            rating: number;
+            authorName: string | null;
+            title: string | null;
+            body: string;
+          } | null;
+        };
+        if (controller.signal.aborted) return;
+        if (review) {
+          setReviewRating(review.rating);
+          setReviewAuthor(review.authorName ?? '');
+          setReviewTitle(review.title ?? '');
+          setReviewBody(review.body ?? '');
+        }
+        setReviewState('idle');
+      } catch (caught) {
+        if ((caught as Error)?.name === 'AbortError') return;
+        setReviewState('idle');
+      }
+    })();
+    return () => controller.abort();
+  }, [apiBaseUrl, poiId, sessionId]);
 
   useEffect(() => {
     return () => {
@@ -607,7 +720,9 @@ export function PoiDetailPanel(props: {
         // sau khi Tab hết cả panel.
         const root = lightboxRef.current;
         if (!root) return;
-        const stops = root.querySelectorAll<HTMLElement>('button:not([tabindex="-1"]), a[href]');
+        const stops = root.querySelectorAll<HTMLElement>(
+          'button:not([tabindex="-1"]), a[href]',
+        );
         if (stops.length === 0) return;
         const first = stops[0];
         const last = stops[stops.length - 1];
@@ -624,7 +739,9 @@ export function PoiDetailPanel(props: {
       if (event.key === 'ArrowRight') {
         setLightboxIndex((lightboxAt + 1) % photoList.length);
       } else if (event.key === 'ArrowLeft') {
-        setLightboxIndex((lightboxAt - 1 + photoList.length) % photoList.length);
+        setLightboxIndex(
+          (lightboxAt - 1 + photoList.length) % photoList.length,
+        );
       }
     }
     window.addEventListener('keydown', onKeyDown);
@@ -652,7 +769,8 @@ export function PoiDetailPanel(props: {
     // clipboard chỉ tồn tại trong ngữ cảnh bảo mật (https hoặc localhost). Khi
     // mở qua IP LAN để demo trên điện thoại thì nó là undefined — phải nói thật
     // là không chép được chứ không hiện "Đã chép" rồi để người ta dán ra rỗng.
-    const writer = link && navigator.clipboard?.writeText?.bind(navigator.clipboard);
+    const writer =
+      link && navigator.clipboard?.writeText?.bind(navigator.clipboard);
     if (!writer) {
       setCopyState('failed');
       copyTimer.current = setTimeout(() => setCopyState('idle'), 2000);
@@ -665,6 +783,64 @@ export function PoiDetailPanel(props: {
         copyTimer.current = setTimeout(() => setCopyState('idle'), 2000);
       });
   }, [detail]);
+
+  async function handleReviewSubmit(event: { preventDefault(): void }) {
+    event.preventDefault();
+    if (!detail || !sessionId || reviewState === 'saving') return;
+    if (reviewRating < 1 || reviewRating > 5) {
+      setReviewState('error');
+      setReviewMessage('Hãy chọn số sao trước khi gửi đánh giá.');
+      return;
+    }
+    setReviewState('saving');
+    setReviewMessage('');
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/api/v1/pois/${detail.id}/reviews`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Session-ID': sessionId,
+          },
+          body: JSON.stringify({
+            rating: reviewRating,
+            author_name: reviewAuthor.trim() || null,
+            title: reviewTitle.trim() || null,
+            body: reviewBody.trim() || null,
+          }),
+        },
+      );
+      if (!response.ok) {
+        let message = `Máy chủ trả lỗi ${response.status}`;
+        try {
+          const payload = (await response.json()) as { detail?: unknown };
+          if (typeof payload.detail === 'string') message = payload.detail;
+        } catch {
+          // Giữ thông báo theo mã HTTP khi proxy trả về nội dung không phải JSON.
+        }
+        throw new Error(message);
+      }
+      const result = (await response.json()) as {
+        updated: boolean;
+        ratingMean: number | null;
+        ratingCount: number;
+      };
+      setReviewState('saved');
+      setReviewMessage(
+        result.updated
+          ? 'Đã cập nhật đánh giá của bạn.'
+          : 'Cảm ơn bạn đã đánh giá!',
+      );
+      onReviewSubmitted(result);
+    } catch (caught) {
+      setReviewState('error');
+      setReviewMessage(
+        (caught as Error)?.message ||
+          'Không gửi được đánh giá. Vui lòng thử lại.',
+      );
+    }
+  }
 
   const header = (
     <div
@@ -714,7 +890,9 @@ export function PoiDetailPanel(props: {
     return shell(
       <div className="px-4 pb-6 pt-16">
         <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm">
-          <p className="font-medium text-destructive">Không tải được chi tiết địa điểm</p>
+          <p className="font-medium text-destructive">
+            Không tải được chi tiết địa điểm
+          </p>
           <p className="mt-1 text-muted-foreground">{error}</p>
         </div>
       </div>,
@@ -740,7 +918,9 @@ export function PoiDetailPanel(props: {
             </div>
           </>
         ) : (
-          <p className="px-4 pt-6 text-sm text-muted-foreground">Chưa chọn địa điểm nào.</p>
+          <p className="px-4 pt-6 text-sm text-muted-foreground">
+            Chưa chọn địa điểm nào.
+          </p>
         )}
       </div>,
     );
@@ -759,14 +939,17 @@ export function PoiDetailPanel(props: {
   // khác nguồn với trung bình tính từ bảng `poi_reviews`. Trộn hai nguồn vào một
   // con số rồi đặt dưới biểu đồ histogram của poi_reviews là nói sai về dữ liệu.
   const averageRating = detail.reviewSummary?.average ?? null;
-  const routeForThisPoi = routeSummary && routeSummary.poiId === detail.id ? routeSummary : null;
+  const routeForThisPoi =
+    routeSummary && routeSummary.poiId === detail.id ? routeSummary : null;
 
   // Cờ `unknown` của backend gộp hai chuyện khác hẳn nhau: OSM KHÔNG CÓ thẻ giờ
   // (parseStatus 'missing', 2.505/3.010 POI) và CÓ chuỗi nhưng bộ đọc chịu thua
   // ('unsupported', 25 POI). Nói "Chưa đọc được giờ" cho cả hai là tự nhận lỗi
   // thay cho dữ liệu thiếu, và giấu mất đúng 25 ca mà bộ đọc cần sửa thật.
   const unknownHoursText =
-    detail.openingHours?.parseStatus === 'missing' ? 'Chưa có giờ mở cửa' : 'Chưa đọc được giờ';
+    detail.openingHours?.parseStatus === 'missing'
+      ? 'Chưa có giờ mở cửa'
+      : 'Chưa đọc được giờ';
 
   const todayText = detail.openingHours?.alwaysOpen
     ? 'Mở cả ngày (24/7)'
@@ -774,7 +957,9 @@ export function PoiDetailPanel(props: {
       ? unknownHoursText
       : today.closed
         ? 'Hôm nay đóng cửa'
-        : (today.intervals ?? []).map((slot) => `${slot.opens} – ${slot.closes}`).join(', ');
+        : (today.intervals ?? [])
+            .map((slot) => `${slot.opens} – ${slot.closes}`)
+            .join(', ');
 
   return (
     <>
@@ -872,7 +1057,9 @@ export function PoiDetailPanel(props: {
           {/* b. TÊN + XẾP HẠNG ------------------------------------------- */}
           <div className="px-4 pt-4">
             <div className="flex items-start gap-2">
-              <h2 className="min-w-0 flex-1 text-2xl font-bold leading-tight">{detail.name}</h2>
+              <h2 className="min-w-0 flex-1 text-2xl font-bold leading-tight">
+                {detail.name}
+              </h2>
               {detail.sponsored && (
                 <Badge variant="secondary" className="mt-1 shrink-0">
                   Tài trợ
@@ -889,11 +1076,15 @@ export function PoiDetailPanel(props: {
                     {detail.rating.toFixed(1)}
                   </span>
                   <StarRow value={detail.rating} />
-                  <span className="text-muted-foreground">({detail.reviewCount} đánh giá)</span>
+                  <span className="text-muted-foreground">
+                    ({detail.reviewCount} đánh giá)
+                  </span>
                 </>
               )}
               <span className="text-muted-foreground">·</span>
-              <span className="text-muted-foreground">{detail.categoryLabel}</span>
+              <span className="text-muted-foreground">
+                {detail.categoryLabel}
+              </span>
               {detail.priceLevel > 0 && (
                 <>
                   <span className="text-muted-foreground">·</span>
@@ -917,7 +1108,9 @@ export function PoiDetailPanel(props: {
             </div>
 
             {detail.description && (
-              <p className="mt-2 text-sm text-muted-foreground">{detail.description}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {detail.description}
+              </p>
             )}
           </div>
 
@@ -1018,17 +1211,24 @@ export function PoiDetailPanel(props: {
                         <tr
                           key={day.weekday}
                           className={
-                            day.isToday ? 'font-semibold text-foreground' : 'text-muted-foreground'
+                            day.isToday
+                              ? 'font-semibold text-foreground'
+                              : 'text-muted-foreground'
                           }
                         >
-                          <td className="whitespace-nowrap py-1 pr-4 align-top">{day.label}</td>
+                          <td className="whitespace-nowrap py-1 pr-4 align-top">
+                            {day.label}
+                          </td>
                           <td className="py-1 align-top">
                             {day.unknown
                               ? unknownHoursText
                               : day.closed
                                 ? 'Đóng cửa'
                                 : (day.intervals ?? [])
-                                    .map((slot) => `${slot.opens} – ${slot.closes}`)
+                                    .map(
+                                      (slot) =>
+                                        `${slot.opens} – ${slot.closes}`,
+                                    )
                                     .join(', ')}
                           </td>
                         </tr>
@@ -1049,7 +1249,9 @@ export function PoiDetailPanel(props: {
 
             <InfoRow icon={Navigation}>
               {detail.distanceMeters != null && (
-                <p className="font-medium">{formatDistance(detail.distanceMeters)}</p>
+                <p className="font-medium">
+                  {formatDistance(detail.distanceMeters)}
+                </p>
               )}
               {detail.etaMinutes ? (
                 <>
@@ -1079,8 +1281,10 @@ export function PoiDetailPanel(props: {
               {routeForThisPoi && (
                 <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
                   <Route className="size-3.5" aria-hidden />
-                  {routeForThisPoi.approximate ? 'Tuyến ô tô (xấp xỉ)' : 'Theo đường thật'}:{' '}
-                  {formatMinutes(routeForThisPoi.durationMinutes)} ·{' '}
+                  {routeForThisPoi.approximate
+                    ? 'Tuyến ô tô (xấp xỉ)'
+                    : 'Theo đường thật'}
+                  : {formatMinutes(routeForThisPoi.durationMinutes)} ·{' '}
                   {formatDistance(routeForThisPoi.distanceMeters)}
                 </p>
               )}
@@ -1088,7 +1292,10 @@ export function PoiDetailPanel(props: {
 
             {detail.phone && (
               <InfoRow icon={Phone}>
-                <a href={`tel:${detail.phone.replace(/\s+/g, '')}`} className="hover:underline">
+                <a
+                  href={`tel:${detail.phone.replace(/\s+/g, '')}`}
+                  className="hover:underline"
+                >
                   {detail.phone}
                 </a>
               </InfoRow>
@@ -1144,6 +1351,146 @@ export function PoiDetailPanel(props: {
           {/* e. ĐÁNH GIÁ -------------------------------------------------- */}
           <section className="px-4 py-4">
             <h3 className="text-base font-semibold">Đánh giá</h3>
+            <form
+              onSubmit={handleReviewSubmit}
+              className="mt-3 rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 via-white to-orange-50 p-4 shadow-sm dark:border-amber-500/20 dark:from-amber-500/10 dark:via-card dark:to-orange-500/5"
+            >
+              <div className="flex items-start gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-amber-400 text-amber-950 shadow-sm">
+                  <MessageSquareText className="size-5" aria-hidden />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold">Trải nghiệm của bạn thế nào?</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Đánh giá của bạn giúp mọi người chọn địa điểm phù hợp hơn.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <fieldset className="flex items-center gap-1">
+                  <legend className="sr-only">Chọn số sao</legend>
+                  {[1, 2, 3, 4, 5].map((value) => {
+                    const active = value <= reviewRating;
+                    return (
+                      <label
+                        key={value}
+                        className="group relative grid size-10 cursor-pointer place-items-center rounded-xl transition-all hover:-translate-y-0.5 hover:bg-amber-100 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-amber-400/40 dark:hover:bg-amber-500/15"
+                      >
+                        <input
+                          type="radio"
+                          name="rating"
+                          value={value}
+                          checked={reviewRating === value}
+                          aria-label={`${value} sao`}
+                          onChange={() => {
+                            setReviewRating(value);
+                            setReviewState('idle');
+                            setReviewMessage('');
+                          }}
+                          className="sr-only"
+                        />
+                        <Star
+                          className={cn(
+                            'size-7 transition-all',
+                            active
+                              ? 'scale-110 fill-amber-400 text-amber-500'
+                              : 'text-muted-foreground/35 group-hover:text-amber-400',
+                          )}
+                          aria-hidden
+                        />
+                      </label>
+                    );
+                  })}
+                  <span className="ml-2 text-sm font-medium text-amber-700 dark:text-amber-300">
+                    {reviewRating > 0
+                      ? ['Rất tệ', 'Chưa tốt', 'Ổn', 'Rất tốt', 'Tuyệt vời'][
+                          reviewRating - 1
+                        ]
+                      : 'Chọn số sao'}
+                  </span>
+                </fieldset>
+              </div>
+
+              <div className="mt-4 grid gap-3">
+                <label className="grid gap-1.5 text-xs font-medium">
+                  Tên hiển thị{' '}
+                  <span className="font-normal text-muted-foreground">
+                    (không bắt buộc)
+                  </span>
+                  <input
+                    value={reviewAuthor}
+                    onChange={(event) => setReviewAuthor(event.target.value)}
+                    maxLength={80}
+                    placeholder="Ví dụ: Minh Anh"
+                    className="h-10 rounded-xl border border-input bg-white/80 px-3 text-sm font-normal outline-none transition-shadow placeholder:text-muted-foreground focus:ring-3 focus:ring-ring/25 dark:bg-background/70"
+                  />
+                </label>
+                <label className="grid gap-1.5 text-xs font-medium">
+                  Tiêu đề{' '}
+                  <span className="font-normal text-muted-foreground">
+                    (không bắt buộc)
+                  </span>
+                  <input
+                    value={reviewTitle}
+                    onChange={(event) => setReviewTitle(event.target.value)}
+                    maxLength={160}
+                    placeholder="Điều bạn ấn tượng nhất"
+                    className="h-10 rounded-xl border border-input bg-white/80 px-3 text-sm font-normal outline-none transition-shadow placeholder:text-muted-foreground focus:ring-3 focus:ring-ring/25 dark:bg-background/70"
+                  />
+                </label>
+                <label className="grid gap-1.5 text-xs font-medium">
+                  Chia sẻ thêm{' '}
+                  <span className="font-normal text-muted-foreground">
+                    (không bắt buộc)
+                  </span>
+                  <textarea
+                    value={reviewBody}
+                    onChange={(event) => setReviewBody(event.target.value)}
+                    maxLength={2000}
+                    rows={3}
+                    placeholder="Không gian, dịch vụ, món ăn, giá cả…"
+                    className="resize-y rounded-xl border border-input bg-white/80 px-3 py-2.5 text-sm font-normal outline-none transition-shadow placeholder:text-muted-foreground focus:ring-3 focus:ring-ring/25 dark:bg-background/70"
+                  />
+                </label>
+              </div>
+
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <output
+                  className={cn(
+                    'min-w-0 text-xs',
+                    reviewState === 'error'
+                      ? 'text-destructive'
+                      : reviewState === 'saved'
+                        ? 'font-medium text-emerald-700 dark:text-emerald-300'
+                        : 'text-muted-foreground',
+                  )}
+                >
+                  {reviewState === 'loading'
+                    ? 'Đang tải đánh giá của bạn…'
+                    : reviewMessage}
+                </output>
+                <button
+                  type="submit"
+                  disabled={
+                    !sessionId ||
+                    reviewState === 'saving' ||
+                    reviewState === 'loading'
+                  }
+                  className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-amber-400 px-4 text-sm font-semibold text-amber-950 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-amber-300 hover:shadow-md disabled:pointer-events-none disabled:opacity-50"
+                >
+                  {reviewState === 'saving' && (
+                    <LoaderCircle className="size-4 animate-spin" aria-hidden />
+                  )}
+                  {reviewState === 'saving'
+                    ? 'Đang gửi…'
+                    : reviewRating > 0
+                      ? 'Lưu đánh giá'
+                      : 'Chọn sao để gửi'}
+                </button>
+              </div>
+            </form>
+
             {/* Hai con số ở đây ĐO HAI THỨ KHÁC NHAU nên không hề mâu thuẫn —
                 cái sai là dán cạnh nhau mà không khai nguồn. `reviewSummary.count`
                 đếm bài viết thật trong bảng `poi_reviews` (hiện RỖNG hoàn toàn),
@@ -1178,15 +1525,24 @@ export function PoiDetailPanel(props: {
                     {(['5', '4', '3', '2', '1'] as const).map((key) => {
                       const count = histogram[key] ?? 0;
                       return (
-                        <div key={key} className="flex items-center gap-2 text-xs">
-                          <span className="w-3 text-right text-muted-foreground">{key}</span>
+                        <div
+                          key={key}
+                          className="flex items-center gap-2 text-xs"
+                        >
+                          <span className="w-3 text-right text-muted-foreground">
+                            {key}
+                          </span>
                           <span className="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-muted">
                             <span
                               className="block h-full rounded-full bg-amber-400"
-                              style={{ width: `${(count / histogramMax) * 100}%` }}
+                              style={{
+                                width: `${(count / histogramMax) * 100}%`,
+                              }}
                             />
                           </span>
-                          <span className="w-6 text-right text-muted-foreground">{count}</span>
+                          <span className="w-6 text-right text-muted-foreground">
+                            {count}
+                          </span>
                         </div>
                       );
                     })}
@@ -1195,10 +1551,16 @@ export function PoiDetailPanel(props: {
 
                 <ul className="mt-4 space-y-4">
                   {(detail.reviews ?? []).map((review) => (
-                    <li key={review.id} className="border-t border-border pt-3 first:border-0 first:pt-0">
+                    <li
+                      key={review.id}
+                      className="border-t border-border pt-3 first:border-0 first:pt-0"
+                    >
                       <div className="flex items-center gap-2">
                         <span className="grid size-8 shrink-0 place-items-center rounded-full bg-emerald-50 text-xs font-bold text-primary dark:bg-emerald-500/15">
-                          {(review.authorName ?? '?').trim().charAt(0).toLocaleUpperCase('vi-VN')}
+                          {(review.authorName ?? '?')
+                            .trim()
+                            .charAt(0)
+                            .toLocaleUpperCase('vi-VN')}
                         </span>
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium">
@@ -1206,15 +1568,25 @@ export function PoiDetailPanel(props: {
                           </p>
                           <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                             <StarRow value={review.rating} />
-                            <span>{formatDate(review.createdAt, detail.timezone)}</span>
+                            <span>
+                              {formatDate(review.createdAt, detail.timezone)}
+                            </span>
                           </div>
                         </div>
                       </div>
-                      {review.title && <p className="mt-2 text-sm font-medium">{review.title}</p>}
-                      <p className="mt-1 text-sm text-muted-foreground">{review.body}</p>
+                      {review.title && (
+                        <p className="mt-2 text-sm font-medium">
+                          {review.title}
+                        </p>
+                      )}
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {review.body}
+                      </p>
                       <p className="mt-1 text-[11px] text-muted-foreground">
                         Nguồn: {review.source}
-                        {review.helpfulCount > 0 ? ` · ${review.helpfulCount} người thấy hữu ích` : ''}
+                        {review.helpfulCount > 0
+                          ? ` · ${review.helpfulCount} người thấy hữu ích`
+                          : ''}
                       </p>
                     </li>
                   ))}
@@ -1245,19 +1617,31 @@ export function PoiDetailPanel(props: {
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-medium">{item.name}</p>
-                          <p className="truncate text-xs text-muted-foreground">{item.address}</p>
+                          <p className="truncate text-sm font-medium">
+                            {item.name}
+                          </p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {item.address}
+                          </p>
                         </div>
-                        <Badge variant="outline" className="shrink-0 bg-white dark:bg-card">
+                        <Badge
+                          variant="outline"
+                          className="shrink-0 bg-white dark:bg-card"
+                        >
                           {item.categoryLabel}
                         </Badge>
                       </div>
                       <div className="mt-2 flex items-center gap-3 text-xs">
                         {item.rating == null ? (
-                          <span className="text-muted-foreground">Chưa có đánh giá</span>
+                          <span className="text-muted-foreground">
+                            Chưa có đánh giá
+                          </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400">
-                            <Star className="size-3.5 fill-current" aria-hidden />
+                            <Star
+                              className="size-3.5 fill-current"
+                              aria-hidden
+                            />
                             {item.rating.toFixed(1)}
                             <span className="font-normal text-muted-foreground">
                               ({item.reviewCount})
@@ -1270,7 +1654,9 @@ export function PoiDetailPanel(props: {
                         </span>
                       </div>
                       {item.reason && (
-                        <p className="mt-1 text-[11px] text-muted-foreground">{item.reason}</p>
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          {item.reason}
+                        </p>
                       )}
                     </button>
                   ))}
@@ -1284,7 +1670,10 @@ export function PoiDetailPanel(props: {
           <details className="group px-4 py-4 text-sm">
             <summary className="cursor-pointer list-none font-medium text-muted-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
               <span className="inline-flex items-center gap-1">
-                <ChevronRight className="size-4 transition-transform group-open:rotate-90" aria-hidden />
+                <ChevronRight
+                  className="size-4 transition-transform group-open:rotate-90"
+                  aria-hidden
+                />
                 Nguồn dữ liệu
               </span>
             </summary>
@@ -1292,7 +1681,9 @@ export function PoiDetailPanel(props: {
               <dt>source</dt>
               <dd className="break-all">{detail.provenance?.source ?? '—'}</dd>
               <dt>sourceId</dt>
-              <dd className="break-all">{detail.provenance?.sourceId ?? '—'}</dd>
+              <dd className="break-all">
+                {detail.provenance?.sourceId ?? '—'}
+              </dd>
               <dt>toạ độ</dt>
               <dd>
                 {detail.latitude.toFixed(6)}, {detail.longitude.toFixed(6)}
@@ -1304,13 +1695,21 @@ export function PoiDetailPanel(props: {
               <dt>H3 r9</dt>
               <dd className="break-all">{detail.provenance?.h3?.r9 ?? '—'}</dd>
               <dt>updatedAt</dt>
-              <dd className="break-all">{detail.provenance?.updatedAt ?? '—'}</dd>
+              <dd className="break-all">
+                {detail.provenance?.updatedAt ?? '—'}
+              </dd>
               <dt>embedding</dt>
-              <dd className="break-all">{detail.provenance?.embeddingModel ?? 'chưa nhúng'}</dd>
+              <dd className="break-all">
+                {detail.provenance?.embeddingModel ?? 'chưa nhúng'}
+              </dd>
               <dt>popularity</dt>
               <dd>
-                {Number.isFinite(detail.popularityScore) ? detail.popularityScore.toFixed(3) : '—'} · 15p {detail.popularityWindows?.w15 ?? 0}{' '}
-                · 1h {detail.popularityWindows?.w1h ?? 0} · 24h {detail.popularityWindows?.w24h ?? 0}
+                {Number.isFinite(detail.popularityScore)
+                  ? detail.popularityScore.toFixed(3)
+                  : '—'}{' '}
+                · 15p {detail.popularityWindows?.w15 ?? 0} · 1h{' '}
+                {detail.popularityWindows?.w1h ?? 0} · 24h{' '}
+                {detail.popularityWindows?.w24h ?? 0}
               </dd>
             </dl>
             {photos?.fetchedAt && (
@@ -1359,7 +1758,9 @@ export function PoiDetailPanel(props: {
                 type="button"
                 aria-label="Ảnh trước"
                 onClick={() =>
-                  setLightboxIndex((lightboxAt - 1 + photoList.length) % photoList.length)
+                  setLightboxIndex(
+                    (lightboxAt - 1 + photoList.length) % photoList.length,
+                  )
                 }
                 className="absolute left-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-white hover:bg-white/25"
               >
@@ -1368,7 +1769,9 @@ export function PoiDetailPanel(props: {
               <button
                 type="button"
                 aria-label="Ảnh kế tiếp"
-                onClick={() => setLightboxIndex((lightboxAt + 1) % photoList.length)}
+                onClick={() =>
+                  setLightboxIndex((lightboxAt + 1) % photoList.length)
+                }
                 className="absolute right-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-white hover:bg-white/25"
               >
                 <ChevronRight className="size-5" />

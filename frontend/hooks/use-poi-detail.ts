@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { PoiDetail, PoiPhotos } from '@/components/poi-detail-panel';
 
@@ -10,7 +10,8 @@ type Position = { latitude: number; longitude: number };
 // hard-code mang id dạng 'poi-001'. Gọi /api/v1/pois/poi-001 chỉ nhận về 400
 // "poi_id phải là UUID" — một vệt đỏ trong console và một thẻ báo lỗi đập vào
 // mặt người dùng, đổi lấy một câu trả lời đã biết trước.
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 async function readErrorDetail(response: Response): Promise<string> {
   // Backend trả lỗi bằng JSONResponse với khoá "detail" tiếng Việt. Hiện đúng
@@ -18,7 +19,8 @@ async function readErrorDetail(response: Response): Promise<string> {
   // người dùng biết họ nên làm gì tiếp.
   try {
     const body = (await response.json()) as { detail?: unknown };
-    if (typeof body.detail === 'string' && body.detail.length > 0) return body.detail;
+    if (typeof body.detail === 'string' && body.detail.length > 0)
+      return body.detail;
   } catch {
     // Thân phản hồi không phải JSON (proxy chặn, gateway chết trước khi tới
     // FastAPI). Rơi về mã HTTP còn hơn là nuốt lỗi.
@@ -46,12 +48,21 @@ async function readErrorDetail(response: Response): Promise<string> {
  * nó rơi về `status: 'unavailable'`, để panel nói "chưa dò được ảnh" thay vì
  * xoá sạch thông tin địa điểm vốn đã lấy được.
  */
-export function usePoiDetail(apiBaseUrl: string, poiId: string | null, position: Position | null) {
+export function usePoiDetail(
+  apiBaseUrl: string,
+  poiId: string | null,
+  position: Position | null,
+) {
   const [detail, setDetail] = useState<PoiDetail | null>(null);
   const [photos, setPhotos] = useState<PoiPhotos | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [photosLoading, setPhotosLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [detailRevision, setDetailRevision] = useState(0);
+  const refreshDetail = useCallback(
+    () => setDetailRevision((value) => value + 1),
+    [],
+  );
 
   // Tách lat/lng thành số nguyên thuỷ. Trang cha dựng một object `position` mới
   // sau mỗi ping GPS; phụ thuộc vào chính object thì effect chạy lại ngay cả
@@ -120,7 +131,7 @@ export function usePoiDetail(apiBaseUrl: string, poiId: string | null, position:
     })();
 
     return () => controller.abort();
-  }, [apiBaseUrl, poiId, latitude, longitude]);
+  }, [apiBaseUrl, poiId, latitude, longitude, detailRevision]);
 
   // Ảnh — CỐ TÌNH không phụ thuộc vị trí. Trang cha gọi setPosition sau mỗi ping
   // GPS đủ điều kiện (≥ 50 m hoặc ≥ 15 giây), mà ảnh của một địa điểm thì không
@@ -139,9 +150,12 @@ export function usePoiDetail(apiBaseUrl: string, poiId: string | null, position:
     const controller = new AbortController();
     void (async () => {
       try {
-        const response = await fetch(`${apiBaseUrl}/api/v1/pois/${poiId}/photos?limit=8`, {
-          signal: controller.signal,
-        });
+        const response = await fetch(
+          `${apiBaseUrl}/api/v1/pois/${poiId}/photos?limit=8`,
+          {
+            signal: controller.signal,
+          },
+        );
         if (controller.signal.aborted) return;
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = (await response.json()) as PoiPhotos;
@@ -152,7 +166,12 @@ export function usePoiDetail(apiBaseUrl: string, poiId: string | null, position:
         // 'unavailable' chứ KHÔNG phải mảng rỗng: mảng rỗng nghĩa là "đã dò và
         // quanh đây thật sự không có ảnh nào", còn đây mới chỉ là "chưa hỏi
         // được". Biến một lần rớt mạng thành lời khẳng định về dữ liệu là dối.
-        setPhotos({ poiId, status: 'unavailable', fetchedAt: null, photos: [] });
+        setPhotos({
+          poiId,
+          status: 'unavailable',
+          fetchedAt: null,
+          photos: [],
+        });
       } finally {
         if (!controller.signal.aborted) setPhotosLoading(false);
       }
@@ -161,5 +180,11 @@ export function usePoiDetail(apiBaseUrl: string, poiId: string | null, position:
     return () => controller.abort();
   }, [apiBaseUrl, poiId]);
 
-  return { detail, photos, loading: detailLoading || photosLoading, error };
+  return {
+    detail,
+    photos,
+    loading: detailLoading || photosLoading,
+    error,
+    refreshDetail,
+  };
 }

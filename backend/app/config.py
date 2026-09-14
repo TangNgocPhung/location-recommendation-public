@@ -61,7 +61,48 @@ class Settings(BaseSettings):
     #
     # Vẫn giữ ngưỡng hữu hạn và circuit breaker: OpenSearch chết thật thì phải
     # rơi về PostGIS nhanh, không bắt người dùng chờ.
-    opensearch_timeout_seconds: float = 3.0
+    #
+    # 3.0 vẫn THẤP HƠN chính con số nguội 3.329 ms ghi ở trên, nên truy vấn
+    # nguội tiếp tục hỏng — đã đo lại và thấy đúng như vậy: chạy cùng một truy
+    # vấn 6 lần liên tiếp thì lần đầu rơi về PostGIS, 5 lần sau dùng
+    # OpenSearch, và HAI ĐƯỜNG TRẢ KẾT QUẢ KHÁC HẲN NHAU. Tệ hơn fallback là
+    # trường hợp chỉ RIÊNG kênh vector timeout: nó bị nuốt bằng
+    # `logger.warning` rồi đi tiếp, nên response vẫn khai
+    # `retrievalBackend="opensearch"` trong khi thực chất chỉ còn 2 kênh.
+    #
+    # Đặt cao hơn con số nguội đã đo, kèm biên an toàn cho máy đang tải (heap
+    # OpenSearch ở compose chỉ 512 MB). Truy vấn ẤM vẫn 603-840 ms nên ngưỡng
+    # này gần như không bao giờ chạm tới trong lúc dùng bình thường — nó chỉ
+    # cứu đúng truy vấn đầu tiên sau khi dựng chỉ mục.
+    opensearch_timeout_seconds: float = 8.0
+    # Mũ của "cổng chất lượng" trong công thức xếp hạng tuyến tính.
+    #
+    # Vấn đề đo được: truy vấn "bệnh viện" trả `Công viên Bến Bạch Đằng` ở
+    # hạng 1 (score 0.546) còn `Bệnh Viện Mắt Sài Gòn` ở hạng 7 (0.395) — dù
+    # bệnh viện có textScore = 1.0000 (BM25 cao nhất) và công viên chỉ 0.7893.
+    # Công viên vẫn cao vì `category_label` "công viên" fold thành token
+    # `vien`, trùng với "bệnh viện"; cộng thêm rating 4.6 và popularity 0.96
+    # (dữ liệu seed) thì hai tín hiệu chất lượng đem lại +0.158 điểm chuẩn
+    # hóa, trong khi lợi thế văn bản của bệnh viện chỉ +0.052.
+    #
+    # Cách sửa: tin rating/popularity ÍT ĐI với ứng viên khớp văn bản kém hơn
+    # hẳn ứng viên tốt nhất. Hệ số = (textScore / max textScore) ** mũ này.
+    # 0 = tắt hẳn cổng (giữ nguyên hành vi cũ); càng lớn càng gắt.
+    # Đặt qua biến môi trường RANKING_QUALITY_GATE_EXPONENT để dò giá trị mà
+    # không phải build lại image.
+    ranking_quality_gate_exponent: float = 2.0
+    # `minimum_should_match` cho kênh BM25. Chuỗi rỗng = tắt (hành vi cũ).
+    #
+    # Vấn đề đo được: truy vấn "cơm tấm" trả `Tâm Silk` (shop lụa) ở HẠNG 1.
+    # Truy vấn đang dùng `operator: "or"` mà KHÔNG đặt minimum_should_match,
+    # nên khớp 1 trong 2 token là đủ — `Tâm Silk` khớp mỗi `tam`, và BM25
+    # chuẩn hóa theo độ dài field nên tên 2 token được thưởng đậm hơn hẳn
+    # `Quán Cơm Tấm Hoàng Minh` dù quán này khớp CẢ HAI token.
+    #
+    # "2<70%" = từ 2 token trở xuống thì bắt buộc khớp hết; trên 2 token thì
+    # cần 70%. Chọn ngưỡng theo token vì tiếng Việt đơn âm: "cơm tấm" là 2
+    # token ngắn, mất 1 token là mất nửa nghĩa truy vấn.
+    search_text_min_should_match: str = "2<70%"
     # Kênh không gian chạy những gì. "both" (mặc định) chạy cả vành hexagon H3
     # lẫn geo_distance như hai kênh riêng trong RRF — H3 lọc thô bằng một phép
     # tra `terms`, geo_distance lọc tinh theo đúng bán kính. "h3" và
@@ -86,6 +127,13 @@ class Settings(BaseSettings):
     # (None), KHÔNG được lặng lẽ rơi về đồ thị "car" — hai đồ thị không tương
     # thích network (đường ô tô có thể cấm người đi bộ và ngược lại).
     osrm_foot_url: str = ""
+    # Hồ sơ XE MÁY — đồ thị RIÊNG dựng từ osrm/motorbike.lua (kế thừa car.lua,
+    # cấm cao tốc, kích thước xe nhỏ để đi lọt hẻm, `motorcycle=*` thắng
+    # `motor_vehicle=*`). Dựng bằng scripts/build_osrm_motorbike.sh.
+    #
+    # Để rỗng thì KHÔNG mất tính năng: directions.py tự lùi về đồ thị ô tô và
+    # đánh dấu `approximate: true` — đúng hành vi trước khi có hồ sơ này.
+    osrm_motorbike_url: str = ""
     # Weather & Traffic Density Injection (Spatio-Temporal Enricher).
     #
     # Tắt được vì hai lý do thực tế: đo độ trễ sạch (thời tiết là một lần gọi

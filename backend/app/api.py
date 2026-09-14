@@ -307,12 +307,24 @@ def create_review(poi_id: str, payload: ReviewRequest, request: Request) -> Any:
         poi_id=poi_id,
         session_id=session_id,
         rating=payload.rating,
+        author_name=payload.author_name,
         title=payload.title,
         body=payload.body,
     )
     if result is None:
         return JSONResponse(status_code=404, content={"detail": "Không có địa điểm này"})
     return result
+
+
+@app.get("/api/v1/pois/{poi_id}/reviews/me")
+def get_my_review(poi_id: str, request: Request) -> Any:
+    """Đánh giá của phiên hiện tại, dùng để điền lại form khi người dùng sửa."""
+    if not is_postgres_uuid(poi_id):
+        return JSONResponse(status_code=400, content={"detail": "poi_id phải là UUID"})
+    session_id = getattr(request.state, "session_id", None)
+    if not session_id:
+        return JSONResponse(status_code=400, content={"detail": "Cần X-Session-ID"})
+    return {"review": reviews.get_user_review(poi_id, session_id)}
 
 
 @app.get("/api/v1/pois/{poi_id}/photos")
@@ -449,61 +461,88 @@ def get_feature_status() -> dict[str, Any]:
 def get_directions(
     from_lat: float = Query(ge=-90, le=90),
     from_lng: float = Query(ge=-180, le=180),
-    to_poi_id: str = Query(min_length=1, max_length=64),
+    to_poi_id: str | None = Query(default=None, min_length=1, max_length=64),
+    to_lat: float | None = Query(default=None, ge=-90, le=90),
+    to_lng: float | None = Query(default=None, ge=-180, le=180),
+    to_name: str = Query(default="Điểm đến", min_length=1, max_length=200),
     mode: str = Query(default=directions.DEFAULT_MODE, max_length=16),
 ) -> dict[str, Any]:
     """Tuyến đường thật từ vị trí người dùng tới một POI.
 
-    ``mode`` là "car" | "motorbike" | "foot" (xem ``directions.MODES``).
-    "motorbike" dùng lại đồ thị "car" (không có hồ sơ xe máy thật) — response
-    tự khai báo ``route.approximate = true`` trong trường hợp đó.
+    ``mode`` là "car" | "motorbike" | "foot" (xem ``directions.MODES``) — mỗi
+    hồ sơ một đồ thị OSRM riêng. Khi đồ thị của hồ sơ được yêu cầu chưa dựng,
+    response tự khai báo ``route.approximate = true`` để tầng gọi biết tuyến
+    đang tính bằng đồ thị mượn tạm.
 
-    Điểm đến nhận bằng ``to_poi_id`` chứ không nhận toạ độ: toạ độ đích lấy
-    thẳng từ ``pois.location``. Nhận toạ độ do client gửi thì một lỗi phía giao
-    diện sẽ vẽ tuyến tới sai chỗ mà không có gì phát hiện được — cùng lý do với
-    đăng ký geofence.
+    POI thật nhận bằng ``to_poi_id`` và luôn lấy toạ độ đích từ database. Cặp
+    ``to_lat``/``to_lng`` chỉ dành cho các địa điểm mẫu của giao diện, vốn chưa
+    có UUID trong database nhưng vẫn phải chỉ đường được ngay trong ứng dụng.
     """
-    if not geofence.is_uuid(to_poi_id):
-        return JSONResponse(status_code=400, content={"detail": "to_poi_id phải là UUID"})
     if mode not in directions.MODES:
         return JSONResponse(
             status_code=400,
             content={"detail": f"mode phải là một trong {sorted(directions.MODES)}"},
         )
 
-    with psycopg.connect(DATABASE_URL) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT name, ST_Y(location::geometry), ST_X(location::geometry)
-                FROM pois WHERE id = %s
-                """,
-                (to_poi_id,),
-            )
-            row = cursor.fetchone()
-    if row is None:
-        return JSONResponse(status_code=404, content={"detail": "Không có POI này"})
-    name, to_lat, to_lng = row
+    destination_id: str
+    if to_poi_id is not None:
+        if not geofence.is_uuid(to_poi_id):
+            return JSONResponse(status_code=400, content={"detail": "to_poi_id phải là UUID"})
+        with psycopg.connect(DATABASE_URL) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT name, ST_Y(location::geometry), ST_X(location::geometry)
+                    FROM pois WHERE id = %s
+                    """,
+                    (to_poi_id,),
+                )
+                row = cursor.fetchone()
+        if row is None:
+            return JSONResponse(status_code=404, content={"detail": "Không có POI này"})
+        name, destination_lat, destination_lng = row
+        destination_id = to_poi_id
+    elif to_lat is not None and to_lng is not None:
+        name = to_name.strip()
+        destination_lat, destination_lng = to_lat, to_lng
+        destination_id = "sample-coordinate"
+    else:
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "Cần to_poi_id hoặc đầy đủ to_lat và to_lng"},
+        )
 
-    result = directions.route(from_lat, from_lng, float(to_lat), float(to_lng), mode)
+    result = directions.route(
+        from_lat,
+        from_lng,
+        float(destination_lat),
+        float(destination_lng),
+        mode,
+    )
     if result is None:
         # 200 kèm route rỗng chứ không phải 5xx: "chưa dựng OSRM" và "OSRM chết"
         # đều là trạng thái BÌNH THƯỜNG của hệ thống này, và giao diện cần phân
         # biệt chúng với một lỗi thật để còn rơi về deep-link.
         osrm_url = getattr(settings, directions.MODES[mode]["osrm_url_attr"])
         return {
-            "poiId": to_poi_id,
+            "poiId": destination_id,
             "poiName": name,
-            "destination": {"latitude": float(to_lat), "longitude": float(to_lng)},
+            "destination": {
+                "latitude": float(destination_lat),
+                "longitude": float(destination_lng),
+            },
             "route": None,
             "reason": "osrm-unavailable" if not osrm_url else "no-route",
         }
 
     return {
-        "poiId": to_poi_id,
+        "poiId": destination_id,
         "poiName": name,
         "origin": {"latitude": from_lat, "longitude": from_lng},
-        "destination": {"latitude": float(to_lat), "longitude": float(to_lng)},
+        "destination": {
+            "latitude": float(destination_lat),
+            "longitude": float(destination_lng),
+        },
         "route": result,
     }
 

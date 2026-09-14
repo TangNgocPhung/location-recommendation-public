@@ -1,11 +1,15 @@
 """Phase 10.4 — khoá lại các case retrieval đã đo được thật qua API sống.
 
 Ba truy vấn này đến từ ``backend/tests/eval/production_queries.json`` (Phase
-10 production evaluation, đo 2026-09-12). Hai bug xfail dưới đây là lỗi TẦNG
-BM25/analyzer (``vi_folded``/asciifolding gộp token), không phải lỗi ranking —
-soft relevance gate ở Phase 6.5 (``ranking._is_text_relevant``) không sửa được
-vì các candidate sai này CÓ ``bm25Score`` thật (>0), không phải candidate
-"không tín hiệu văn bản" mà gate nhắm tới.
+10 production evaluation, đo 2026-09-12). Cả ba đều là lỗi mà soft relevance
+gate ở Phase 6.5 (``ranking._is_text_relevant``) KHÔNG sửa được, vì các
+candidate sai đều CÓ ``bm25Score`` thật (>0) — không phải candidate "không tín
+hiệu văn bản" mà gate đó nhắm tới.
+
+Cập nhật 2026-09-13: "cơm tấm" đã sửa xong (xem docstring của test tương ứng —
+nguyên nhân hoá ra là thiếu ``minimum_should_match`` chứ không phải chỉ do
+asciifolding). "bệnh viện" còn xfail: BM25 nay đã đúng, phần lật ngược thứ hạng
+chuyển sang tín hiệu rating/popularity của dữ liệu seed.
 
 Quy trình đã thống nhất: khoá test trước (file này) -> soi token qua
 ``_analyze`` của OpenSearch -> chỉ sửa analyzer nếu xác định đúng nguyên nhân
@@ -57,18 +61,23 @@ def test_ca_phe_gan_day_khong_con_dung_dau_boi_bun_rieu() -> None:
 @pytest.mark.xfail(
     strict=False,
     reason=(
-        "Lỗi TẦNG BM25/analyzer, không phải ranking — đo được thật (Phase 10, "
-        "2026-09-12): 'Công viên Bến Bạch Đằng' (bm25=15.6) và 'Công viên Lê "
-        "Văn Tám' (bm25=9.15) đứng TRÊN cả bệnh viện thật ('Bệnh viện Bình "
-        "Dân', 'Bệnh Viện Mắt Sài Gòn') cho truy vấn 'bệnh viện', ở CẢ HAI "
-        "ranker (linear và ltr) — vì hai công viên này có bm25Score THẬT > 0, "
-        "không phải candidate 'chỉ geo/trending' mà soft relevance gate của "
-        "Phase 6.5 nhắm demote. Nghi vấn: analyzer `vi_folded` (asciifolding) "
-        "gộp nhầm token giữa 'bệnh viện' và tên/mô tả hai công viên này — "
-        "cùng họ lỗi với case 'cơm tấm' bên dưới, chưa xác nhận nguyên nhân "
-        "chính xác qua `_analyze`, CHƯA sửa. Test XFAIL có chủ đích: khi "
-        "analyzer được sửa đúng, test sẽ tự PASS (xpass) — đó là tín hiệu để "
-        "xoá marker này, không phải để sửa ranking/LTR."
+        "CHƯA HẾT, nhưng đã thu hẹp và đã XÁC NHẬN nguyên nhân (đo lại "
+        "2026-09-13, sau khi dựng lại chỉ mục để field `.strict` của Phase 10 "
+        "thực sự có hiệu lực — trước đó chỉ mục đang chạy KHÔNG có field này "
+        "nên bản sửa analyzer chưa bao giờ tác dụng). "
+        "Đo được: 'Bệnh Viện Mắt Sài Gòn' có textScore = 1.0000, tức BM25 CAO "
+        "NHẤT tập ứng viên — `.strict` ĐÃ làm đúng việc của nó. 'Công viên Bến "
+        "Bạch Đằng' vẫn được 0.7893 vì `category_label` 'công viên' fold thành "
+        "token `vien`, trùng với 'bệnh viện'. Phần lật ngược thứ hạng KHÔNG "
+        "còn là BM25 nữa mà là rating 4.6 + popularity 0.96 của công viên "
+        "(dữ liệu seed): hai tín hiệu đó cho +0.158 điểm chuẩn hoá, lợi thế "
+        "văn bản của bệnh viện chỉ +0.052. "
+        "Cổng chất lượng (`settings.ranking_quality_gate_exponent`) đưa bệnh "
+        "viện từ hạng 7 lên hạng 3-4 và bão hoà ở đó; `minimum_should_match` "
+        "góp thêm một bậc. Muốn hạng 1 thì cần rating/review THẬT cho POI y tế "
+        "(hiện `rating=null`) hoặc train lại LTR trên click người dùng thật — "
+        "xem mục 3 của tài liệu bàn giao. KHÔNG sửa bằng cách hạ tay trọng số "
+        "rating cho tới khi có dữ liệu thật."
     ),
 )
 def test_benh_vien_khong_bi_cong_vien_bm25_gia_vuot_mat() -> None:
@@ -77,20 +86,28 @@ def test_benh_vien_khong_bi_cong_vien_bm25_gia_vuot_mat() -> None:
     assert results[0]["categoryLabel"] != "Công viên"
 
 
-@pytest.mark.xfail(
-    strict=False,
-    reason=(
-        "Lỗi TẦNG BM25/analyzer, không phải ranking — đo được thật (Phase 10, "
-        "2026-09-12): 'Công viên Lê Văn Tám' (bm25=11.89, bm25 THẬT > 0) đứng "
-        "hạng 1 cho truy vấn 'cơm tấm' ở CẢ HAI ranker. Nghi vấn: analyzer "
-        "`vi_folded` (asciifolding) xoá dấu THANH ĐIỆU chứ không chỉ dấu gốc, "
-        "khiến 'Tấm' (cơm tấm) và 'Tám' (Lê Văn Tám) cùng fold về một token "
-        "('tam') — chưa xác nhận qua `_analyze`, CHƯA sửa. Cùng nguyên nhân "
-        "nghi vấn với case 'bệnh viện' ở trên. XFAIL có chủ đích, xem lý do "
-        "đầy đủ ở test đó."
-    ),
-)
 def test_com_tam_khong_bi_le_van_tam_bm25_gia_vuot_mat() -> None:
+    """ĐÃ SỬA 2026-09-13 — marker xfail gỡ đi vì test đã xpass.
+
+    Nguyên nhân thật KHÔNG phải chỉ do asciifolding gộp 'Tấm'/'Tám' như đã
+    nghi. Sau khi dựng lại chỉ mục cho field `.strict` có hiệu lực, hạng 1 vẫn
+    sai — nhưng là 'Tâm Silk' (shop lụa), và top 5 còn có 'Commonwealth Bank'
+    lẫn 'Cộng Cà Phê'. Hai thứ đó lộ ra hai lỗi thật của câu truy vấn BM25:
+
+    1. `operator: "or"` mà KHÔNG đặt `minimum_should_match` — khớp 1 trong 2
+       token là đủ. 'Tâm Silk' khớp mỗi `tam`, và BM25 chuẩn hoá theo độ dài
+       field nên cái tên 2 token được thưởng đậm hơn hẳn 'Quán Cơm Tấm Hoàng
+       Minh' dù quán này khớp CẢ HAI token.
+    2. `fuzziness: "AUTO"` cho phép sửa 1 ký tự với token dài 3-5, mà tiếng
+       Việt đơn âm nên `com` khớp mờ sang `cong` ('Cộng Cà Phê') và `con`.
+
+    Sửa bằng `settings.search_text_min_should_match = "2<70%"`: từ 2 token trở
+    xuống bắt buộc khớp hết. Đo lại 3 lần liên tiếp, ổn định: hạng của quán cơm
+    tấm đi từ 2 lên 1, top 5 thành 'Quán Cơm Tâm Mộc', 'Tâm Silk', 'Quán Ăn Cô
+    Tấm', 'Quán Cơm Tấm Hoàng Minh', 'Cơm Tấm Cali' — ngân hàng và quán cà phê
+    khớp mờ đã biến mất. Ba truy vấn đã gán nhãn (cà phê/công viên/bảo tàng)
+    giữ nguyên hạng 1.
+    """
     results = _search("cơm tấm")
     assert results, "Không có kết quả nào cho 'cơm tấm'"
     assert results[0]["name"] != "Công viên Lê Văn Tám"

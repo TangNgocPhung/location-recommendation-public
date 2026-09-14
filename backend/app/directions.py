@@ -20,11 +20,16 @@ Thiết kế:
 - **Lỗi thì trả None, không ném.** OSRM chết thì nút chỉ đường mất tác dụng,
   chứ không được làm hỏng cả trang kết quả.
 
-Lưu ý phải ghi trong báo cáo: hồ sơ định tuyến mặc định của OSRM là **ô tô**.
-Xe máy ở TP.HCM đi được nhiều đường mà ô tô không đi được, nên thời gian OSRM
-trả về là cận trên cho xe máy. Muốn đúng hơn thì cần hồ sơ Lua riêng — nằm
-ngoài phạm vi bước này, nhưng phải nói ra thay vì để người đọc tưởng con số là
-thời gian xe máy.
+Xe máy nay có hồ sơ Lua RIÊNG (``osrm/motorbike.lua``, dựng bằng
+``scripts/build_osrm_motorbike.sh``) chứ không còn mượn đồ thị ô tô. Đo được
+trên đồ thị đã dựng, Bến Thành -> Thảo Điền: ô tô 9.03 km / 11.1 phút, xe máy
+8.49 km / 13.4 phút, và hai tuyến chỉ trùng 74/471 điểm — tức đúng là hai
+tuyến khác nhau, không phải cùng một tuyến đổi nhãn. Đoạn ngắn trong Quận 1
+thì hai tuyến trùng khít 62/62 điểm, đúng như mong đợi khi chỉ có một đường
+hợp lý.
+
+Máy chưa chạy script dựng đồ thị vẫn dùng được nút chỉ đường: ``_fetch_route``
+lùi về đồ thị ô tô và bắt buộc bật cờ ``approximate`` — xem ``MODES``.
 """
 
 from __future__ import annotations
@@ -56,15 +61,23 @@ CACHE_PRECISION = 4
 # trên cùng một file .osrm. Nên mỗi hồ sơ là MỘT container + MỘT base URL
 # riêng (xem docker-compose.yml: service "osrm" cho car, "osrm-foot" cho foot).
 #
-# KHÔNG có hồ sơ xe máy thật: ảnh chính thức chỉ có car/bicycle/foot, và viết
-# hồ sơ Lua riêng cho xe máy (tốc độ, access, turn theo đúng luật xe máy VN)
-# là việc lớn, nằm ngoài phạm vi một người làm đồ án (Phase 12.7). "motorbike"
-# vì vậy CỐ Ý dùng lại đồ thị "car" — kết quả là XẤP XỈ, và mọi response phải
-# tự khai báo `"approximate": true` để tầng gọi (API, giao diện) không được
-# phép im lặng coi nó là tuyến xe máy thật.
+# Xe máy nay có hồ sơ THẬT: osrm/motorbike.lua kế thừa /opt/car.lua rồi vá ba
+# thứ mà "ô tô chạy chậm hơn" không mô tả được — cấm cao tốc (luật VN), kích
+# thước xe 0.8 m để đi lọt hẻm có maxwidth, và `motorcycle=*` thắng
+# `motor_vehicle=*`. Đồ thị riêng, container riêng (service `osrm-motorbike`).
+#
+# `fallback_url_attr` giữ lại hành vi cũ khi CHƯA dựng đồ thị xe máy: lùi về đồ
+# thị ô tô và bắt buộc đánh dấu `approximate: true`. Không có nhánh này thì máy
+# nào chưa chạy build_osrm_motorbike.sh sẽ mất hẳn nút chỉ đường xe máy — một
+# bước lùi so với trước, chỉ vì thêm tính năng.
 MODES: dict[str, dict[str, Any]] = {
     "car": {"osrm_url_attr": "osrm_url", "api_profile": "driving", "approximate": False},
-    "motorbike": {"osrm_url_attr": "osrm_url", "api_profile": "driving", "approximate": True},
+    "motorbike": {
+        "osrm_url_attr": "osrm_motorbike_url",
+        "fallback_url_attr": "osrm_url",
+        "api_profile": "driving",
+        "approximate": False,
+    },
     "foot": {"osrm_url_attr": "osrm_foot_url", "api_profile": "foot", "approximate": False},
 }
 DEFAULT_MODE = "car"
@@ -185,9 +198,16 @@ def _fetch_route(
     config = MODES.get(mode)
     if config is None:
         return None
-    base_url = getattr(settings, config["osrm_url_attr"])
+    base_url = getattr(settings, config["osrm_url_attr"], "") or ""
+    approximate = config["approximate"]
     if not base_url:
-        return None
+        # Chưa dựng đồ thị riêng cho hồ sơ này -> dùng đồ thị thay thế, nhưng
+        # LUÔN đánh dấu approximate, kể cả khi hồ sơ gốc khai approximate=False.
+        fallback_attr = config.get("fallback_url_attr")
+        base_url = getattr(settings, fallback_attr, "") or "" if fallback_attr else ""
+        if not base_url:
+            return None
+        approximate = True
     # OSRM nhận toạ độ theo thứ tự KINH ĐỘ TRƯỚC. Đảo thứ tự không gây lỗi HTTP,
     # chỉ cho ra một tuyến đường ở giữa biển — đúng kiểu hỏng im lặng.
     coords = f"{from_lng:.6f},{from_lat:.6f};{to_lng:.6f},{to_lat:.6f}"
@@ -212,7 +232,7 @@ def _fetch_route(
         # không phải sự cố — ghi ở mức debug để log không đầy cảnh báo giả.
         logger.debug("OSRM trả mã %s (%s)", payload.get("code"), mode)
         return None
-    return _shape_response(payload, mode, config["approximate"])
+    return _shape_response(payload, mode, approximate)
 
 
 def route(

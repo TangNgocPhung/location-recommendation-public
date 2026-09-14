@@ -29,11 +29,15 @@ import {
   Sparkles,
   Star,
   Sun,
+  X,
 } from 'lucide-react';
 
 import { useProximityNotifications } from '@/hooks/use-proximity';
 import { usePoiDetail } from '@/hooks/use-poi-detail';
-import { PoiDetailPanel, type PoiRouteSummary } from '@/components/poi-detail-panel';
+import {
+  PoiDetailPanel,
+  type PoiRouteSummary,
+} from '@/components/poi-detail-panel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -74,7 +78,12 @@ type Poi = {
   // optional vì type Poi dùng chung cho cả POI mẫu, /trending và /recommendations.
   weather?: WeatherInfo | null;
   weatherFactor?: number;
-  traffic?: { factor: number; isPeakHour: boolean; densityPenalty: number; source: string } | null;
+  traffic?: {
+    factor: number;
+    isPeakHour: boolean;
+    densityPenalty: number;
+    source: string;
+  } | null;
   trendingScope?: 'hex' | 'global' | 'empty';
   liveNearbyUsers?: number;
   retrievalChannels?: string[];
@@ -83,7 +92,15 @@ type Poi = {
 type Position = { latitude: number; longitude: number };
 
 type GeoFilterInfo =
-  | { geoChannelMode: 'both' | 'h3' | 'geo_distance'; h3Resolution?: number; h3RingK?: number; h3CellCount?: number; h3Origin?: string; h3Skipped?: string; h3Outline?: GeoJSON.Polygon | GeoJSON.MultiPolygon }
+  | {
+      geoChannelMode: 'both' | 'h3' | 'geo_distance';
+      h3Resolution?: number;
+      h3RingK?: number;
+      h3CellCount?: number;
+      h3Origin?: string;
+      h3Skipped?: string;
+      h3Outline?: GeoJSON.Polygon | GeoJSON.MultiPolygon;
+    }
   | { geoFilter: 'postgis' }
   | null;
 
@@ -103,9 +120,17 @@ type ContextualSearchResponse = {
   results: Poi[];
 };
 
-type CategoryOption = { category: string; categoryLabel: string; count: number };
+type CategoryOption = {
+  category: string;
+  categoryLabel: string;
+  count: number;
+};
 type TrendingQuery = { query: string; score: number };
-type TrendingResponse = { redisConnected: boolean; pois: Poi[]; queries: TrendingQuery[] };
+type TrendingResponse = {
+  redisConnected: boolean;
+  pois: Poi[];
+  queries: TrendingQuery[];
+};
 type RecommendationsResponse = {
   personalized: boolean;
   preferredCategories: string[];
@@ -116,6 +141,7 @@ const DEFAULT_POSITION: Position = {
   latitude: 10.7757,
   longitude: 106.7009,
 };
+const MAX_USABLE_ACCURACY_METERS = 5_000;
 
 const SAMPLE_POIS: Poi[] = [
   {
@@ -201,28 +227,40 @@ const SAMPLE_POIS: Poi[] = [
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8081';
 const SELECTED_POINT_COLOR = '#0f8a62';
 // POI thật mang UUID từ database; POI mẫu hard-code mang id dạng 'poi-001'.
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Nền bản đồ. `demotiles` của MapLibre chỉ có đường biên quốc gia — marker POI
 // nổi trên nền trắng trống, vô nghĩa với một ứng dụng tìm địa điểm đô thị.
 // Mặc định dùng raster OpenStreetMap: không cần API key, có đường phố TP.HCM,
 // và kèm sẵn attribution ODbL mà giấy phép share-alike bắt buộc phải hiển thị.
-// Đặt NEXT_PUBLIC_MAP_STYLE_URL để chuyển sang style vector (MapTiler, Stadia,
-// hoặc tileserver-gl tự dựng) khi cần chất lượng hiển thị cao hơn.
-// `?? OSM_RASTER_STYLE` bên dưới chỉ bắt undefined/null. Compose luôn truyền biến
-// này xuống (mặc định rỗng), nên nếu không chuẩn hoá thì máy chưa có key sẽ nhận
-// style = '' và MapLibre chết ngay lúc khởi tạo thay vì lùi về raster OSM.
+// Đặt VITE_MAP_STYLE_URL để chuyển sang style vector (MapTiler, Stadia, hoặc
+// tileserver-gl tự dựng) khi cần chất lượng hiển thị cao hơn.
 //
-// Gán cứng thay vì chỉ đọc process.env: bản `vinext` (beta) dùng trong dự án
-// này không inline biến NEXT_PUBLIC_* vào bundle chạy trên trình duyệt ở chế
-// độ dev (chỉ hoạt động phía server) — đã kiểm chứng bằng cách patch trực
-// tiếp giá trị này, bản đồ vector MapTiler mới thực sự hiện lên. Ưu tiên biến
-// môi trường trước để không phá override khi vấn đề trên được framework sửa;
-// key dưới đây vốn đã thiết kế để lộ phía trình duyệt (không phải secret) nên
-// gán cứng an toàn — chỉ cần đổi nếu đưa repo lên GitHub công khai lâu dài.
+// Vì sao VITE_ chứ không phải NEXT_PUBLIC_: bản `vinext` (beta) dùng trong dự
+// án này KHÔNG inline biến NEXT_PUBLIC_* vào bundle chạy trên trình duyệt ở
+// chế độ dev — nó chỉ tồn tại phía server, nên `process.env.NEXT_PUBLIC_*`
+// đọc ra undefined ngay trong `new maplibregl.Map(...)`. Vite thì thay
+// `import.meta.env.VITE_*` bằng giá trị thật lúc transform, cho cả hai phía.
+// Vẫn đọc NEXT_PUBLIC_ sau đó để không phá cấu hình cũ nếu framework sửa.
+//
+// KHÔNG gán cứng API key ở đây: repo này công khai trên GitHub, và một key
+// nằm trong lịch sử git thì không xoá đi được nữa — phải revoke. Thiếu biến
+// môi trường thì lùi về raster OpenStreetMap (không cần key), đúng như thiết
+// kế ban đầu; bản đồ xấu hơn nhưng không ai phải lộ key để nó chạy.
+//
+// Chuỗi rỗng phải lùi về raster: compose luôn truyền biến này xuống (mặc định
+// rỗng), mà `style: ''` làm MapLibre chết ngay lúc khởi tạo. Dùng `||` chứ
+// không `??` vì `??` chỉ bắt undefined/null, không bắt chuỗi rỗng.
+const VITE_ENV = (
+  import.meta as unknown as {
+    env?: Record<string, string | undefined>;
+  }
+).env;
 const MAP_STYLE_URL =
+  VITE_ENV?.VITE_MAP_STYLE_URL?.trim() ||
   process.env.NEXT_PUBLIC_MAP_STYLE_URL?.trim() ||
-  'https://api.maptiler.com/maps/streets-v2/style.json?key=G6Wx38inb0S42HbQeJ3A';
+  '';
 // `as const` trên version/type để TypeScript giữ literal 8 và 'raster' thay vì
 // nới thành number/string — style spec của MapLibre yêu cầu đúng literal.
 const OSM_RASTER_STYLE = {
@@ -245,6 +283,9 @@ const OSM_RASTER_STYLE = {
   layers: [{ id: 'osm', type: 'raster' as const, source: 'osm' }],
 };
 const DEFAULT_POINT_COLOR = '#f97316';
+// Màu pin của POI đang chọn — đỏ quen mắt kiểu ghim Google Maps, tách hẳn khỏi
+// bảng cam/xanh của các chấm POI để nhìn phát biết ngay "đây là chỗ vừa bấm".
+const SELECTED_PIN_COLOR = '#ea4335';
 
 type WeatherInfo = {
   isWet: boolean;
@@ -256,7 +297,10 @@ type WeatherInfo = {
 
 /** Câu mô tả thời tiết. Không bao giờ trả chuỗi rỗng — ô trống đọc như hỏng. */
 function weatherLabel(w: WeatherInfo) {
-  const temp = typeof w.temperatureC === 'number' ? ` ${Math.round(w.temperatureC)}°C` : '';
+  const temp =
+    typeof w.temperatureC === 'number'
+      ? ` ${Math.round(w.temperatureC)}°C`
+      : '';
   if (w.isHeavyRain) return `Mưa to${temp}`;
   if (w.isWet) return `Đang mưa${temp}`;
   return `Trời khô${temp}`;
@@ -300,11 +344,12 @@ type RoutePlan = {
   approximate: boolean;
 };
 
-const TRANSPORT_MODES: { value: TransportMode; label: string; icon: string }[] = [
-  { value: 'motorbike', label: 'Xe máy', icon: '🏍️' },
-  { value: 'car', label: 'Ô tô', icon: '🚗' },
-  { value: 'foot', label: 'Đi bộ', icon: '🚶' },
-];
+const TRANSPORT_MODES: { value: TransportMode; label: string; icon: string }[] =
+  [
+    { value: 'motorbike', label: 'Xe máy', icon: '🏍️' },
+    { value: 'car', label: 'Ô tô', icon: '🚗' },
+    { value: 'foot', label: 'Đi bộ', icon: '🚶' },
+  ];
 
 function distanceInMeters(from: Position, to: Position) {
   const radius = 6_371_000;
@@ -318,7 +363,9 @@ function distanceInMeters(from: Position, to: Position) {
     Math.cos(fromLatitude) *
       Math.cos(toLatitude) *
       Math.sin(longitudeDelta / 2) ** 2;
-  return radius * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+  return (
+    radius * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine))
+  );
 }
 
 function formatDistance(distance = 0) {
@@ -342,9 +389,10 @@ function enrichSamplePois(
     }),
   }))
     .filter((poi) => {
-      const haystack = `${poi.name} ${poi.description} ${poi.categoryLabel}`.toLocaleLowerCase(
-        'vi',
-      );
+      const haystack =
+        `${poi.name} ${poi.description} ${poi.categoryLabel}`.toLocaleLowerCase(
+          'vi',
+        );
       return (
         poi.distanceMeters <= radius &&
         (!normalizedQuery || haystack.includes(normalizedQuery)) &&
@@ -358,7 +406,9 @@ function enrichSamplePois(
     );
 }
 
-function poisToFeatureCollection(pois: Poi[]): GeoJSON.FeatureCollection<GeoJSON.Point> {
+function poisToFeatureCollection(
+  pois: Poi[],
+): GeoJSON.FeatureCollection<GeoJSON.Point> {
   return {
     type: 'FeatureCollection',
     features: pois.map((poi) => ({
@@ -369,11 +419,22 @@ function poisToFeatureCollection(pois: Poi[]): GeoJSON.FeatureCollection<GeoJSON
   };
 }
 
-function pointColorExpression(selectedPoiId: string | null): maplibregl.ExpressionSpecification {
-  return ['case', ['==', ['get', 'id'], selectedPoiId ?? ''], SELECTED_POINT_COLOR, DEFAULT_POINT_COLOR];
+function pointColorExpression(
+  selectedPoiId: string | null,
+): maplibregl.ExpressionSpecification {
+  return [
+    'case',
+    ['==', ['get', 'id'], selectedPoiId ?? ''],
+    SELECTED_POINT_COLOR,
+    DEFAULT_POINT_COLOR,
+  ];
 }
 
-function fitMapToResults(map: MapLibreMap | null, position: Position, results: Poi[]) {
+function fitMapToResults(
+  map: MapLibreMap | null,
+  position: Position,
+  results: Poi[],
+) {
   if (!map || results.length === 0) return;
   const bounds = new maplibregl.LngLatBounds();
   bounds.extend([position.longitude, position.latitude]);
@@ -398,6 +459,10 @@ export function LocationExplorer() {
   const mapRef = useRef<MapLibreMap | null>(null);
   const mapLoadedRef = useRef(false);
   const userMarkerRef = useRef<Marker | null>(null);
+  // Pin đỏ đánh dấu POI đang chọn — kiểu ghim của Google Maps. Tách khỏi lớp
+  // circle 'unclustered-point': lớp đó vẫn tô màu mọi POI, còn pin chỉ có MỘT
+  // cái và luôn nổi trên cùng (Marker là overlay HTML, không bị layer che).
+  const selectedMarkerRef = useRef<Marker | null>(null);
   const selectedSinceRef = useRef<number | null>(null);
   const poisRef = useRef<Poi[]>([]);
   const selectedPoiIdRef = useRef<string | null>(null);
@@ -405,7 +470,9 @@ export function LocationExplorer() {
   // Handler click marker được gắn MỘT LẦN trong effect khởi tạo bản đồ, nên nó
   // đóng băng mọi closure của lần render đầu. Đi qua ref là cách duy nhất để nó
   // gọi được bản openDetail mới nhất — y hệt focusPoiRef ngay trên.
-  const openDetailRef = useRef<(poiId: string, source: string) => void>(() => {});
+  const openDetailRef = useRef<(poiId: string, source: string) => void>(
+    () => {},
+  );
   // POI cần bay tới NGAY KHI chi tiết về. Chỉ dùng cho đường vào không biết
   // trước toạ độ: mở bằng deep-link thì trong tay chỉ có mỗi UUID, mà để bản đồ
   // đứng yên ở Quận 1 trong khi panel nói về một quán ở Thủ Đức thì người nhận
@@ -414,8 +481,31 @@ export function LocationExplorer() {
   // Ngữ cảnh lần tìm kiếm gần nhất. Click phải mang cùng request_id và rank với
   // impression, nếu không thì không ghép cặp được để tính CTR theo vị trí —
   // tức mất một nửa mục đích của việc ghi impression.
-  const lastSearchRef = useRef<{ requestId: string; ranks: Map<string, number> } | null>(null);
+  const lastSearchRef = useRef<{
+    requestId: string;
+    ranks: Map<string, number>;
+  } | null>(null);
   const [position, setPosition] = useState(DEFAULT_POSITION);
+  // Bản sao cho các closure sống lâu (handler moveend của bản đồ, đăng ký một
+  // lần lúc mount): đọc thẳng `position` ở đó là đóng băng vị trí mặc định.
+  const positionRef = useRef<Position>(DEFAULT_POSITION);
+  useEffect(() => {
+    positionRef.current = position;
+  }, [position]);
+  // Vị trí đổi (người dùng vừa bật GPS, hoặc đang theo dõi liên tục) thì
+  // khoảng cách của các POI đã nạp theo vùng cũng phải tính lại — không thì
+  // thẻ vẫn khoe con số đo từ vị trí cũ cho tới lần kéo bản đồ kế tiếp.
+  useEffect(() => {
+    setAreaPois((current) =>
+      current.map((poi) => ({
+        ...poi,
+        distanceMeters: distanceInMeters(position, {
+          latitude: poi.latitude,
+          longitude: poi.longitude,
+        }),
+      })),
+    );
+  }, [position]);
   const [query, setQuery] = useState('');
   const [radius, setRadius] = useState(3_000);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -433,6 +523,11 @@ export function LocationExplorer() {
   const [pois, setPois] = useState<Poi[]>(() =>
     enrichSamplePois(DEFAULT_POSITION, '', 3_000, null),
   );
+  // POI trong vùng bản đồ đang nhìn — nạp lại mỗi khi kéo/zoom xong (moveend).
+  // Tách khỏi `pois`: danh sách kết quả bên trái vẫn là của lần tìm kiếm, còn
+  // các chấm trên bản đồ là hợp của cả hai — không có nó thì kéo bản đồ ra
+  // khỏi vùng tìm kiếm là trống trơn dù DB có hàng chục nghìn POI.
+  const [areaPois, setAreaPois] = useState<Poi[]>([]);
   const [selectedPoiId, setSelectedPoiId] = useState<string | null>('poi-001');
   // POI đang mở trong panel chi tiết. Cố tình TÁCH khỏi selectedPoiId: chọn một
   // POI (bấm thẻ trong danh sách, bấm marker) là thao tác nhẹ và xảy ra liên
@@ -453,17 +548,25 @@ export function LocationExplorer() {
   const watchIdRef = useRef<number | null>(null);
   const lastPingRef = useRef<{ at: number; position: Position } | null>(null);
   // POI đã đăng ký "nhắc khi tới gần": poiId -> subscriptionId.
-  const [geofences, setGeofences] = useState<Map<string, string>>(() => new Map());
+  const [geofences, setGeofences] = useState<Map<string, string>>(
+    () => new Map(),
+  );
   // Tuyến đường tới POI đang chọn, tính bằng OSRM tự dựng (lộ trình B16).
   // `null` phân biệt với `routeStatus` để giao diện nói được VÌ SAO chưa có
   // tuyến: đang tính, không có đường đi, hay chưa dựng dữ liệu định tuyến.
   const [route, setRoute] = useState<RoutePlan | null>(null);
-  const [routeStatus, setRouteStatus] = useState<'idle' | 'loading' | 'none' | 'off'>('idle');
-  // Mặc định "Xe máy" — phương tiện phổ biến nhất ở TP.HCM. Dùng lại đồ thị
-  // "car" (approximate) cho tới khi có hồ sơ Lua riêng cho xe máy (Phase 12.7).
-  const [transportMode, setTransportMode] = useState<TransportMode>('motorbike');
+  const [routeStatus, setRouteStatus] = useState<
+    'idle' | 'loading' | 'none' | 'off'
+  >('idle');
+  // Mặc định "Xe máy" — phương tiện phổ biến nhất ở TP.HCM. Từ Phase 12.8 đã
+  // có đồ thị riêng (osrm/motorbike.lua); máy nào chưa dựng thì backend lùi về
+  // đồ thị ô tô và bật cờ `approximate`, giao diện đọc cờ đó chứ không đoán.
+  const [transportMode, setTransportMode] =
+    useState<TransportMode>('motorbike');
   const [showSteps, setShowSteps] = useState(false);
-  const [parserStatus, setParserStatus] = useState('Sẵn sàng hiểu “gần Bến Thành”');
+  const [parserStatus, setParserStatus] = useState(
+    'Sẵn sàng hiểu “gần Bến Thành”',
+  );
   const [gatewayStatus, setGatewayStatus] = useState('Chưa gửi yêu cầu');
   const [telemetryState, setTelemetryState] = useState<TelemetryState>({
     sessionId: '',
@@ -530,6 +633,15 @@ export function LocationExplorer() {
     };
   }, [telemetryState.sessionId]);
 
+  // Kết quả tìm kiếm đứng trước và thắng khi trùng id: chúng mang request_id
+  // và rank phục vụ telemetry, còn bản ghi từ /api/pois/nearby thì không.
+  // Khai báo TRƯỚC effect lấy tuyến ngay dưới — deps của effect được đánh giá
+  // lúc render, đặt sau là ReferenceError (temporal dead zone).
+  const visiblePois = useMemo(() => {
+    const seen = new Set(pois.map((poi) => poi.id));
+    return [...pois, ...areaPois.filter((poi) => !seen.has(poi.id))];
+  }, [pois, areaPois]);
+
   // Lấy tuyến đường mỗi khi đổi POI đang chọn hoặc đổi vị trí người dùng.
   //
   // Huỷ bằng AbortController: chọn nhanh ba POI liên tiếp thì ba yêu cầu cùng
@@ -537,8 +649,11 @@ export function LocationExplorer() {
   // tới POI họ đã bỏ chọn. Đây là lỗi hay gặp và rất khó lần ra vì nó chỉ xảy
   // ra khi mạng chậm.
   useEffect(() => {
-    const poi = pois.find((item) => item.id === selectedPoiId);
-    if (!poi || !UUID_PATTERN.test(poi.id)) {
+    // visiblePois chứ không chỉ pois: POI nạp theo vùng bản đồ (areaPois) cũng
+    // chọn được từ marker, và thẻ của nó cũng phải có tuyến nội bộ — tra trong
+    // mỗi kết quả tìm kiếm thì các POI đó vĩnh viễn không có đường đi.
+    const poi = visiblePois.find((item) => item.id === selectedPoiId);
+    if (!poi) {
       setRoute(null);
       setRouteStatus('idle');
       return;
@@ -548,10 +663,27 @@ export function LocationExplorer() {
     setRouteStatus('loading');
     void (async () => {
       try {
-        const url =
-          `${API_BASE_URL}/api/v1/directions?from_lat=${position.latitude}` +
-          `&from_lng=${position.longitude}&to_poi_id=${poi.id}&mode=${transportMode}`;
-        const response = await fetch(url, { signal: controller.signal });
+        const params = new URLSearchParams({
+          from_lat: String(position.latitude),
+          from_lng: String(position.longitude),
+          mode: transportMode,
+        });
+        if (UUID_PATTERN.test(poi.id)) {
+          params.set('to_poi_id', poi.id);
+        } else {
+          // POI mẫu chưa tồn tại trong Postgres nên không có UUID. Gửi cặp toạ
+          // độ của chính dữ liệu mẫu để backend vẫn tính OSRM và giữ người dùng
+          // ở trong website.
+          params.set('to_lat', String(poi.latitude));
+          params.set('to_lng', String(poi.longitude));
+          params.set('to_name', poi.name);
+        }
+        const response = await fetch(
+          `${API_BASE_URL}/api/v1/directions?${params}`,
+          {
+            signal: controller.signal,
+          },
+        );
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = (await response.json()) as DirectionsResponse;
         if (controller.signal.aborted) return;
@@ -561,8 +693,11 @@ export function LocationExplorer() {
           return;
         }
         setRoute({
-          poiId: data.poiId,
-          poiName: data.poiName,
+          // Với POI mẫu backend trả id tổng quát vì nó chỉ nhận toạ độ. State
+          // phía giao diện phải giữ id thật của thẻ để startNavigation ghép đúng
+          // tuyến với địa điểm đang chọn.
+          poiId: poi.id,
+          poiName: poi.name,
           geometry: data.route.geometry,
           distanceMeters: data.route.distanceMeters,
           durationMinutes: data.route.durationMinutes,
@@ -581,7 +716,7 @@ export function LocationExplorer() {
     })();
 
     return () => controller.abort();
-  }, [selectedPoiId, pois, position, transportMode]);
+  }, [selectedPoiId, visiblePois, position, transportMode]);
 
   // Vẽ vành hexagon H3 của lần tìm kiếm gần nhất.
   useEffect(() => {
@@ -593,7 +728,10 @@ export function LocationExplorer() {
     const outline = info && !('geoFilter' in info) ? info.h3Outline : undefined;
     source.setData(
       outline
-        ? { type: 'FeatureCollection', features: [{ type: 'Feature', properties: {}, geometry: outline }] }
+        ? {
+            type: 'FeatureCollection',
+            features: [{ type: 'Feature', properties: {}, geometry: outline }],
+          }
         : { type: 'FeatureCollection', features: [] },
     );
   }, [searchMeta]);
@@ -620,13 +758,18 @@ export function LocationExplorer() {
     }
     // padding phải to hơn bình thường: thẻ POI và bảng điều khiển che mất hai
     // góc bản đồ, nên tuyến vẽ sát mép sẽ nằm dưới lớp phủ.
-    map.fitBounds(bounds, { padding: { top: 90, bottom: 190, left: 60, right: 330 }, duration: 700 });
+    map.fitBounds(bounds, {
+      padding: { top: 90, bottom: 190, left: 60, right: 330 },
+      duration: 700,
+    });
   }, [route]);
 
   // Thời tiết là tín hiệu CẤP TRUY VẤN: backend lấy một lần cho cả lượt tìm rồi
   // gắn cùng một object vào mọi ứng viên. Đọc từ kết quả đầu tiên là đủ.
   const queryWeather = useMemo<WeatherInfo | null>(
-    () => (pois.find((poi) => poi.weather)?.weather as WeatherInfo | undefined) ?? null,
+    () =>
+      (pois.find((poi) => poi.weather)?.weather as WeatherInfo | undefined) ??
+      null,
     [pois],
   );
 
@@ -650,23 +793,33 @@ export function LocationExplorer() {
     }
     return Array.from(counts.values());
   }, []);
-  const categoryOptions = categories.length > 0 ? categories : fallbackCategories;
+  const categoryOptions =
+    categories.length > 0 ? categories : fallbackCategories;
+  // Trending/gợi ý phục vụ trạng thái khám phá ban đầu. Khi người dùng đã gõ
+  // từ khoá hoặc chọn danh mục, đặt chúng trước kết quả sẽ đẩy đúng thứ họ vừa
+  // tìm xuống dưới nếp gấp — đặc biệt rõ trên màn hình laptop có chiều cao CSS
+  // thấp do display scaling.
+  const showDiscovery = query.trim().length === 0 && selectedCategory === null;
 
   const selectedPoi = useMemo(
-    () => pois.find((poi) => poi.id === selectedPoiId) ?? null,
-    [pois, selectedPoiId],
+    () => visiblePois.find((poi) => poi.id === selectedPoiId) ?? null,
+    [visiblePois, selectedPoiId],
   );
 
   useEffect(() => {
-    poisRef.current = pois;
-  }, [pois]);
+    poisRef.current = visiblePois;
+  }, [visiblePois]);
   useEffect(() => {
     selectedPoiIdRef.current = selectedPoiId;
   }, [selectedPoiId]);
 
   const focusPoi = useCallback(
     (poi: Poi, source = 'list') => {
-      if (selectedPoiId && selectedPoiId !== poi.id && selectedSinceRef.current !== null) {
+      if (
+        selectedPoiId &&
+        selectedPoiId !== poi.id &&
+        selectedSinceRef.current !== null
+      ) {
         telemetry.capture({
           // Đây là sự kiện RỜI một POI đã click, không phải impression. Trước
           // đây nó mang nhãn 'poi_impression', khiến impression trở thành tập
@@ -727,7 +880,9 @@ export function LocationExplorer() {
       // mở ra trống trơn. Nói thẳng nguyên nhân giống toggleGeofence thay vì
       // bày một khung rỗng để người dùng tự đoán.
       if (!UUID_PATTERN.test(poiId)) {
-        setStatus('Đây là địa điểm mẫu, chưa có trong dữ liệu thật — hãy tìm kiếm trước');
+        setStatus(
+          'Đây là địa điểm mẫu, chưa có trong dữ liệu thật — hãy tìm kiếm trước',
+        );
         return;
       }
       setDetailPoiId(poiId);
@@ -763,7 +918,8 @@ export function LocationExplorer() {
     // Chỉ lùi khi mục hiện tại DO CHÍNH TA đẩy (nhận ra qua history.state.poi).
     // Người vào thẳng bằng link chia sẻ ?poi= không có mục nào để lùi, gọi
     // back() là văng họ khỏi trang; trường hợp đó chỉ xoá tham số tại chỗ.
-    if (typeof window !== 'undefined' && window.history.state?.poi) window.history.back();
+    if (typeof window !== 'undefined' && window.history.state?.poi)
+      window.history.back();
     else syncDetailUrl(null, true);
   }, [syncDetailUrl]);
 
@@ -772,8 +928,17 @@ export function LocationExplorer() {
   // bản đồ, không phải chỗ người dùng đứng. Truyền nó đi thì panel in ra
   // "1,2 km · 15 phút đi bộ" đo từ một điểm không ai đứng, và nhánh trung thực
   // "Chưa biết khoảng cách — cần vị trí của bạn" trong panel thành mã chết.
-  const { detail: poiDetail, photos: poiPhotos, loading: detailLoading, error: detailError } =
-    usePoiDetail(API_BASE_URL, detailPoiId, hasLocationConsent ? position : null);
+  const {
+    detail: poiDetail,
+    photos: poiPhotos,
+    loading: detailLoading,
+    error: detailError,
+    refreshDetail: refreshPoiDetail,
+  } = usePoiDetail(
+    API_BASE_URL,
+    detailPoiId,
+    hasLocationConsent ? position : null,
+  );
 
   // Mở sẵn panel từ ?poi=<uuid> để link chia sẻ được. Chạy một lần lúc mount:
   // sau đó chính openDetail/closeDetail là nguồn sự thật của tham số này, đọc
@@ -867,7 +1032,11 @@ export function LocationExplorer() {
           ? current.map((item) => (item.id === enriched.id ? enriched : item))
           : [enriched, ...current];
       });
-      telemetry.capture({ event_type: 'poi_click', poi_id: enriched.id, metadata: { source } });
+      telemetry.capture({
+        event_type: 'poi_click',
+        poi_id: enriched.id,
+        metadata: { source },
+      });
       selectedSinceRef.current = Date.now();
       setSelectedPoiId(enriched.id);
       mapRef.current?.flyTo({
@@ -936,7 +1105,9 @@ export function LocationExplorer() {
           session_id: telemetryState.sessionId,
           limit: '6',
         });
-        const response = await fetch(`${API_BASE_URL}/api/v1/recommendations?${params}`);
+        const response = await fetch(
+          `${API_BASE_URL}/api/v1/recommendations?${params}`,
+        );
         if (!response.ok) return;
         const data = (await response.json()) as RecommendationsResponse;
         if (!cancelled) setRecommendations(data.results);
@@ -954,13 +1125,19 @@ export function LocationExplorer() {
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: MAP_STYLE_URL ?? OSM_RASTER_STYLE,
+      style: MAP_STYLE_URL || OSM_RASTER_STYLE,
       center: [DEFAULT_POSITION.longitude, DEFAULT_POSITION.latitude],
       zoom: 14,
       attributionControl: false,
     });
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
+    map.addControl(
+      new maplibregl.NavigationControl({ showCompass: false }),
+      'bottom-right',
+    );
+    map.addControl(
+      new maplibregl.AttributionControl({ compact: true }),
+      'bottom-left',
+    );
     mapRef.current = map;
 
     // MapLibre chỉ phát `load` khi MỌI source trong style báo đã tải xong. Style
@@ -996,7 +1173,12 @@ export function LocationExplorer() {
         id: 'h3-ring-outline',
         type: 'line',
         source: 'h3-ring',
-        paint: { 'line-color': '#0ea5e9', 'line-width': 1.5, 'line-opacity': 0.55, 'line-dasharray': [2, 2] },
+        paint: {
+          'line-color': '#0ea5e9',
+          'line-width': 1.5,
+          'line-opacity': 0.55,
+          'line-dasharray': [2, 2],
+        },
       });
 
       // Tuyến đường thêm TRƯỚC các lớp POI để nó nằm DƯỚI marker — thứ tự
@@ -1013,7 +1195,11 @@ export function LocationExplorer() {
         type: 'line',
         source: 'route',
         layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: { 'line-color': '#ffffff', 'line-width': 9, 'line-opacity': 0.9 },
+        paint: {
+          'line-color': '#ffffff',
+          'line-width': 9,
+          'line-opacity': 0.9,
+        },
       });
       map.addLayer({
         id: 'route-line',
@@ -1029,7 +1215,15 @@ export function LocationExplorer() {
         source: 'pois',
         filter: ['has', 'point_count'],
         paint: {
-          'circle-color': ['step', ['get', 'point_count'], '#6ee7b7', 10, '#34d399', 30, '#059669'],
+          'circle-color': [
+            'step',
+            ['get', 'point_count'],
+            '#6ee7b7',
+            10,
+            '#34d399',
+            30,
+            '#059669',
+          ],
           'circle-radius': ['step', ['get', 'point_count'], 16, 10, 20, 30, 26],
           'circle-stroke-width': 3,
           'circle-stroke-color': '#ffffff',
@@ -1063,15 +1257,22 @@ export function LocationExplorer() {
       });
 
       map.on('click', 'clusters', (event) => {
-        const features = map.queryRenderedFeatures(event.point, { layers: ['clusters'] });
-        const clusterId = features[0]?.properties?.cluster_id as number | undefined;
+        const features = map.queryRenderedFeatures(event.point, {
+          layers: ['clusters'],
+        });
+        const clusterId = features[0]?.properties?.cluster_id as
+          | number
+          | undefined;
         const source = map.getSource('pois') as GeoJSONSource | undefined;
         if (clusterId === undefined || !source) return;
         void source
           .getClusterExpansionZoom(clusterId)
           .then((zoom) => {
             const geometry = features[0].geometry as GeoJSON.Point;
-            map.easeTo({ center: geometry.coordinates as [number, number], zoom });
+            map.easeTo({
+              center: geometry.coordinates as [number, number],
+              zoom,
+            });
           })
           .catch(() => undefined);
       });
@@ -1081,11 +1282,11 @@ export function LocationExplorer() {
         const poiId = feature?.properties?.id as string | undefined;
         const poi = poisRef.current.find((item) => item.id === poiId);
         if (!poi) return;
-        // Giữ nguyên focusPoi: nó lo poi_dwell của POI trước, poi_click có
-        // request_id/rank, tô lại marker và lấy tuyến đường. openDetail chỉ
-        // thêm phần hiển thị, và cố tình đứng SAU để không phát trùng poi_click.
+        // CHỈ chọn (thẻ "Đang chọn" + tuyến đường), KHÔNG mở panel chi tiết:
+        // panel che gần nửa bản đồ và kéo theo hai yêu cầu mạng, bung nó ra
+        // theo mỗi cú bấm marker là quá tay. Muốn xem chi tiết thì bấm "Xem
+        // chi tiết" trên thẻ, hoặc bấm lần nữa vào ghim đỏ đang chọn.
         focusPoiRef.current(poi, 'map');
-        openDetailRef.current(poi.id, 'map');
       });
 
       for (const layer of ['clusters', 'unclustered-point']) {
@@ -1098,12 +1299,64 @@ export function LocationExplorer() {
       }
 
       mapLoadedRef.current = true;
+      loadAreaPois();
     };
+
+    // Nạp POI cho vùng đang nhìn. Bán kính lấy ~nửa đường chéo viewport (tâm →
+    // góc đông bắc) nên zoom xa thì quét rộng, zoom gần thì quét hẹp; kẹp theo
+    // giới hạn của API (100..50000 m). Chỉ đổ vào areaPois — không đụng danh
+    // sách kết quả tìm kiếm.
+    const loadAreaPois = () => {
+      const center = map.getCenter();
+      const radiusMeters = Math.min(
+        50_000,
+        Math.max(
+          300,
+          Math.round(center.distanceTo(map.getBounds().getNorthEast())),
+        ),
+      );
+      const params = new URLSearchParams({
+        lat: center.lat.toFixed(6),
+        lng: center.lng.toFixed(6),
+        radius: String(radiusMeters),
+        limit: '100',
+      });
+      fetch(`${API_BASE_URL}/api/pois/nearby?${params}`)
+        .then((response) =>
+          response.ok ? (response.json() as Promise<Poi[]>) : Promise.reject(),
+        )
+        // distanceMeters của API tính từ TÂM BẢN ĐỒ (tham số lat/lng ở trên) —
+        // hiển thị lên thẻ sẽ thành "cách 200 m" trong khi người dùng đứng cách
+        // 5 km. Tính lại từ vị trí thiết bị; đọc qua ref vì closure này đăng ký
+        // một lần lúc mount, còn vị trí thì đổi khi người dùng bật GPS.
+        .then((data) =>
+          setAreaPois(
+            data.map((poi) => ({
+              ...poi,
+              distanceMeters: distanceInMeters(positionRef.current, {
+                latitude: poi.latitude,
+                longitude: poi.longitude,
+              }),
+            })),
+          ),
+        )
+        // Backend chưa chạy thì thôi — bản đồ vẫn còn chấm của lần tìm kiếm.
+        .catch(() => undefined);
+    };
+    // Debounce: moveend bắn cả khi easeTo/flyTo kết thúc và khi người dùng thả
+    // tay giữa chuỗi thao tác kéo — không gõ backend theo từng cú hích.
+    let moveTimer: ReturnType<typeof setTimeout> | undefined;
+    const handleMoveEnd = () => {
+      clearTimeout(moveTimer);
+      moveTimer = setTimeout(loadAreaPois, 350);
+    };
+    map.on('moveend', handleMoveEnd);
 
     if (map.isStyleLoaded()) initMapLayers();
     else void map.once('styledata', initMapLayers);
 
     return () => {
+      clearTimeout(moveTimer);
       map.remove();
       mapRef.current = null;
       mapLoadedRef.current = false;
@@ -1148,9 +1401,13 @@ export function LocationExplorer() {
     if (!map || !mapLoadedRef.current) return;
     const source = map.getSource('pois') as GeoJSONSource | undefined;
     if (!source) return;
-    source.setData(poisToFeatureCollection(pois));
-    map.setPaintProperty('unclustered-point', 'circle-color', pointColorExpression(selectedPoiId));
-  }, [pois, selectedPoiId]);
+    source.setData(poisToFeatureCollection(visiblePois));
+    map.setPaintProperty(
+      'unclustered-point',
+      'circle-color',
+      pointColorExpression(selectedPoiId),
+    );
+  }, [visiblePois, selectedPoiId]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -1165,10 +1422,40 @@ export function LocationExplorer() {
       .addTo(map);
   }, [position]);
 
+  // Ghim pin đỏ lên POI đang chọn. Tạo mới thay vì setLngLat trên marker cũ:
+  // bỏ chọn (selectedPoi = null) thì pin phải BIẾN MẤT, mà một marker sống dai
+  // không có API "ẩn" — remove rồi tạo lại là đường đơn giản và đủ rẻ vì thao
+  // tác chọn không xảy ra hàng chục lần mỗi giây.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    selectedMarkerRef.current?.remove();
+    selectedMarkerRef.current = null;
+    if (!selectedPoi) return;
+    const marker = new maplibregl.Marker({ color: SELECTED_PIN_COLOR })
+      .setLngLat([selectedPoi.longitude, selectedPoi.latitude])
+      .addTo(map);
+    const element = marker.getElement();
+    element.style.cursor = 'pointer';
+    element.setAttribute('aria-label', selectedPoi.name);
+    // Pin là overlay HTML nên nó CHE chấm POI bên dưới — không bắt click ở đây
+    // thì bấm vào đúng địa điểm đang chọn không mở được panel chi tiết nữa.
+    // stopPropagation để cú bấm không lọt xuống bản đồ phía sau.
+    element.addEventListener('click', (event) => {
+      event.stopPropagation();
+      openDetailRef.current(selectedPoi.id, 'map');
+    });
+    selectedMarkerRef.current = marker;
+  }, [selectedPoi]);
+
   // `origin` cho phép tìm kiếm tại một toạ độ CHƯA kịp vào state. setPosition là
   // bất đồng bộ, nên gọi runSearch ngay sau nó vẫn đọc được `position` cũ trong
   // closure này và sẽ hỏi backend quanh vị trí trước đó.
-  async function runSearch(searchQuery: string, category: string | null, origin?: Position) {
+  async function runSearch(
+    searchQuery: string,
+    category: string | null,
+    origin?: Position,
+  ) {
     const searchOrigin = origin ?? position;
     // Có `origin` nghĩa là toạ độ vừa lấy từ GPS sau khi người dùng bấm đồng ý;
     // `hasLocationConsent` lúc này còn là giá trị cũ của lần render trước.
@@ -1179,7 +1466,11 @@ export function LocationExplorer() {
       query: searchQuery.trim(),
       location: consent ? searchOrigin : undefined,
       location_consent: consent,
-      metadata: { radius_meters: radius, source: 'search-form', category: category ?? undefined },
+      metadata: {
+        radius_meters: radius,
+        source: 'search-form',
+        category: category ?? undefined,
+      },
     });
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/search`, {
@@ -1214,7 +1505,9 @@ export function LocationExplorer() {
       if (isNewSearch) {
         lastSearchRef.current = {
           requestId: data.requestId,
-          ranks: new Map(data.results.map((poi, index) => [poi.id, poi.rank ?? index])),
+          ranks: new Map(
+            data.results.map((poi, index) => [poi.id, poi.rank ?? index]),
+          ),
         };
       }
       if (isNewSearch && data.results.length) {
@@ -1245,7 +1538,9 @@ export function LocationExplorer() {
         });
       } else {
         setParserStatus(
-          data.parsedLocation.locationText ? 'Không nhận ra địa danh' : 'Dùng tọa độ thiết bị',
+          data.parsedLocation.locationText
+            ? 'Không nhận ra địa danh'
+            : 'Dùng tọa độ thiết bị',
         );
         fitMapToResults(mapRef.current, searchOrigin, data.results);
       }
@@ -1260,10 +1555,18 @@ export function LocationExplorer() {
       // chính nó, ngay dòng chữ dưới ô tìm kiếm. Cùng loại lỗi mà trường
       // `retrievalBackend` được thêm vào để phơi ra, chỉ là lần này chỗ hỏng
       // nằm ở phía hiển thị.
-      const duong = data.retrievalBackend === 'opensearch' ? 'truy xuất đa kênh' : 'PostGIS dự phòng';
+      const duong =
+        data.retrievalBackend === 'opensearch'
+          ? 'truy xuất đa kênh'
+          : 'PostGIS dự phòng';
       setStatus(`${data.results.length} kết quả · ${duong}`);
     } catch {
-      const fallback = enrichSamplePois(searchOrigin, searchQuery, radius, category);
+      const fallback = enrichSamplePois(
+        searchOrigin,
+        searchQuery,
+        radius,
+        category,
+      );
       // Dữ liệu mẫu không thuộc lần tìm kiếm nào; xoá ngữ cảnh để click sau đó
       // không bị đóng dấu request_id cũ.
       lastSearchRef.current = null;
@@ -1272,7 +1575,9 @@ export function LocationExplorer() {
       // trong khi màn hình đang là 6 POI mẫu bịa sẵn.
       setSearchMeta(null);
       setSelectedPoiId(fallback[0]?.id ?? null);
-      setStatus(`${fallback.length} kết quả mẫu · khởi động backend để dùng PostGIS`);
+      setStatus(
+        `${fallback.length} kết quả mẫu · khởi động backend để dùng PostGIS`,
+      );
       setGatewayStatus('Gateway ngoại tuyến · dùng dữ liệu mẫu');
       fitMapToResults(mapRef.current, searchOrigin, fallback);
     } finally {
@@ -1298,6 +1603,19 @@ export function LocationExplorer() {
     setStatus('Đang lấy vị trí của bạn…');
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
+        // Máy bàn/laptop không có GPS: trình duyệt trả vị trí đoán theo IP với
+        // accuracy hàng chục-trăm km. Tin tọa độ đó là bay bản đồ về một huyện
+        // ngẫu nhiên và tìm kiếm 0 kết quả — tệ hơn hẳn đứng yên ở trung tâm
+        // TP.HCM. Quá ngưỡng thì coi như KHÔNG định vị được, nói rõ sai số.
+        if (coords.accuracy > MAX_USABLE_ACCURACY_METERS) {
+          setGpsStatus(
+            `Vị trí quá mờ (±${Math.round(coords.accuracy / 1000)} km) · dùng vị trí mặc định`,
+          );
+          setStatus(
+            'Máy không định vị chính xác được — đang dùng trung tâm TP.HCM',
+          );
+          return;
+        }
         const nextPosition = {
           latitude: coords.latitude,
           longitude: coords.longitude,
@@ -1330,6 +1648,20 @@ export function LocationExplorer() {
     );
   }
 
+  // Tự hỏi vị trí NGAY KHI MỞ TRANG thay vì đứng ở Quận 1 chờ người dùng bấm
+  // "Vị trí của tôi". Trình duyệt tự lo phần đồng ý: lần đầu nó hiện hộp xin
+  // quyền, đã cho phép từ trước thì vào thẳng, đã chặn thì rơi vào nhánh lỗi
+  // của useCurrentLocation và bản đồ đứng yên ở mặc định — không hỏi lại, không
+  // vòng lặp. Ref chặn StrictMode chạy effect hai lần: hai getCurrentPosition
+  // song song là hai lượt runSearch giẫm nhau.
+  const autoLocatedRef = useRef(false);
+  useEffect(() => {
+    if (autoLocatedRef.current) return;
+    autoLocatedRef.current = true;
+    useCurrentLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Ping mới chỉ được gửi khi đã đủ xa lần trước HOẶC đã đủ lâu. Không có bộ
   // lọc này thì watchPosition bắn mỗi lần GPS nhích một mét: hàng nghìn sự kiện
   // rác mỗi phiên, và bộ chấm chất lượng toạ độ sẽ thấy một chuỗi dịch chuyển
@@ -1354,12 +1686,18 @@ export function LocationExplorer() {
     }
     const id = navigator.geolocation.watchPosition(
       ({ coords }) => {
-        const nextPosition = { latitude: coords.latitude, longitude: coords.longitude };
+        const nextPosition = {
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        };
         const now = Date.now();
         const previous = lastPingRef.current;
-        const moved = previous ? distanceInMeters(previous.position, nextPosition) : Infinity;
+        const moved = previous
+          ? distanceInMeters(previous.position, nextPosition)
+          : Infinity;
         const elapsed = previous ? now - previous.at : Infinity;
-        if (moved < PING_MIN_DISTANCE_M && elapsed < PING_MIN_INTERVAL_MS) return;
+        if (moved < PING_MIN_DISTANCE_M && elapsed < PING_MIN_INTERVAL_MS)
+          return;
 
         lastPingRef.current = { at: now, position: nextPosition };
         setPosition(nextPosition);
@@ -1401,7 +1739,9 @@ export function LocationExplorer() {
     // tới API" trong khi API đang trả lời bình thường là đẩy người dùng đi tìm
     // sai chỗ — đúng loại thông báo lỗi tệ nhất.
     if (!UUID_PATTERN.test(poi.id)) {
-      setStatus('Đây là địa điểm mẫu, chưa có trong dữ liệu thật — hãy tìm kiếm trước');
+      setStatus(
+        'Đây là địa điểm mẫu, chưa có trong dữ liệu thật — hãy tìm kiếm trước',
+      );
       return;
     }
 
@@ -1426,7 +1766,10 @@ export function LocationExplorer() {
       const allowed = await proximity.requestPermission();
       const response = await fetch(`${API_BASE_URL}/api/v1/geofences`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Session-ID': sessionId },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Session-ID': sessionId,
+        },
         // KHÔNG gửi toạ độ: tâm vùng do backend lấy thẳng từ pois.location.
         body: JSON.stringify({ poi_id: poi.id, radius_meters: 300 }),
       });
@@ -1448,28 +1791,44 @@ export function LocationExplorer() {
     }
   }
 
-  // Google Maps dùng "travelmode" riêng, không khớp tên với TransportMode nội
-  // bộ. "two-wheeler" là chế độ xe máy/scooter THẬT của Google (có dữ liệu ở
-  // VN, khác hẳn "driving") — thử trước, nếu Google không hỗ trợ ở khu vực nào
-  // đó thì nó tự bỏ qua tham số lạ và rơi về driving, không tệ hơn hành vi cũ.
-  const GOOGLE_MAPS_TRAVEL_MODE: Record<TransportMode, string> = {
-    car: 'driving',
-    motorbike: 'two-wheeler',
-    foot: 'walking',
-  };
-
   function startNavigation(poi: Poi) {
+    // Nút chính luôn ở trong ứng dụng. Trước đây khi route chưa kịp tải hoặc
+    // POI mẫu không có UUID, nhánh cuối tự mở Google Maps — đúng cú nhảy trang
+    // mà người dùng không mong đợi.
+    const inAppRoute = route && route.poiId === poi.id ? route : null;
     telemetry.capture({
       event_type: 'navigation_start',
       poi_id: poi.id,
-      metadata: { provider: 'google-maps', mode: transportMode },
+      metadata: {
+        provider: 'in-app',
+        mode: transportMode,
+        route_ready: Boolean(inAppRoute),
+      },
     });
-    const travelmode = GOOGLE_MAPS_TRAVEL_MODE[transportMode];
-    window.open(
-      `https://www.google.com/maps/dir/?api=1&destination=${poi.latitude},${poi.longitude}&travelmode=${travelmode}`,
-      '_blank',
-      'noopener,noreferrer',
-    );
+    if (inAppRoute) {
+      setShowSteps(true);
+      const map = mapRef.current;
+      if (map) {
+        const bounds = new maplibregl.LngLatBounds();
+        for (const point of inAppRoute.geometry.coordinates) {
+          bounds.extend(point as [number, number]);
+        }
+        // Cùng padding với effect vẽ tuyến — thẻ POI và bảng điều khiển che
+        // hai góc bản đồ.
+        map.fitBounds(bounds, {
+          padding: { top: 90, bottom: 190, left: 60, right: 330 },
+          duration: 700,
+        });
+      }
+      return;
+    }
+    if (routeStatus === 'loading') {
+      setStatus('Đang tính tuyến đường trong ứng dụng…');
+    } else if (routeStatus === 'off') {
+      setStatus('Chưa khởi động dịch vụ định tuyến OSRM');
+    } else {
+      setStatus('Không tìm được đường bộ tới địa điểm này');
+    }
   }
 
   return (
@@ -1498,7 +1857,11 @@ export function LocationExplorer() {
               onClick={toggleTheme}
               aria-label="Chuyển giao diện sáng/tối"
             >
-              {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
+              {theme === 'dark' ? (
+                <Sun className="size-4" />
+              ) : (
+                <Moon className="size-4" />
+              )}
             </Button>
             <Button variant="outline" size="sm" onClick={useCurrentLocation}>
               <LocateFixed data-icon="inline-start" />
@@ -1520,19 +1883,23 @@ export function LocationExplorer() {
 
       <section className="mx-auto grid max-w-[1500px] gap-4 p-4 lg:h-[calc(100vh-65px)] lg:grid-cols-[430px_minmax(0,1fr)] lg:p-5">
         <aside className="flex min-h-0 flex-col gap-4">
-          <Card className="shrink-0 border-0 shadow-[0_12px_40px_rgb(14_68_48/8%)] ring-emerald-950/10">
-            <CardHeader>
+          <Card className="shrink-0 border-0 shadow-[0_12px_40px_rgb(14_68_48/8%)] ring-emerald-950/10 lg:max-h-[50%] lg:overflow-y-auto">
+            <CardHeader className="px-5 pt-5 pb-3">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-xl font-bold">Bạn muốn đi đâu?</CardTitle>
-                  <CardDescription>Tìm địa điểm phù hợp trong vài giây.</CardDescription>
+                  <CardTitle className="text-xl font-bold">
+                    Bạn muốn đi đâu?
+                  </CardTitle>
+                  <CardDescription>
+                    Tìm địa điểm phù hợp trong vài giây.
+                  </CardDescription>
                 </div>
                 <div className="grid size-10 place-items-center rounded-full bg-emerald-50 text-primary dark:bg-emerald-500/10">
                   <Sparkles className="size-5" />
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 px-5 pb-5">
               <form
                 className="flex gap-2"
                 onSubmit={(event) => {
@@ -1550,7 +1917,11 @@ export function LocationExplorer() {
                     aria-label="Từ khóa tìm kiếm"
                   />
                 </div>
-                <Button className="h-11 rounded-xl px-4" type="submit" disabled={isLoading}>
+                <Button
+                  className="h-11 rounded-xl px-4"
+                  type="submit"
+                  disabled={isLoading}
+                >
                   {isLoading ? 'Đang tìm…' : 'Tìm'}
                 </Button>
               </form>
@@ -1588,7 +1959,9 @@ export function LocationExplorer() {
                       key={option.category}
                       type="button"
                       onClick={() => toggleCategory(option.category)}
-                      className={chipClass(selectedCategory === option.category)}
+                      className={chipClass(
+                        selectedCategory === option.category,
+                      )}
                     >
                       {option.categoryLabel}
                     </button>
@@ -1617,7 +1990,9 @@ export function LocationExplorer() {
                           : 'OpenSearch không dùng được — đang chạy đường PostGIS dự phòng'
                       }
                     >
-                      {searchMeta.backend === 'opensearch' ? 'Đa kênh · RRF' : 'PostGIS dự phòng'}
+                      {searchMeta.backend === 'opensearch'
+                        ? 'Đa kênh · RRF'
+                        : 'PostGIS dự phòng'}
                     </span>
                   )}
                   {h3Badge && (
@@ -1645,7 +2020,9 @@ export function LocationExplorer() {
                       className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 font-medium text-muted-foreground"
                       title="Bộ xếp hạng ĐÃ CHẠY THẬT, không phải cái được yêu cầu"
                     >
-                      {searchMeta.ranker === 'ltr' ? 'LambdaMART' : 'Tuyến tính 9 tín hiệu'}
+                      {searchMeta.ranker === 'ltr'
+                        ? 'LambdaMART'
+                        : 'Tuyến tính 9 tín hiệu'}
                     </span>
                   )}
                 </div>
@@ -1655,7 +2032,9 @@ export function LocationExplorer() {
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                     Định vị
                   </p>
-                  <p className="mt-1 truncate text-xs font-medium">{gpsStatus}</p>
+                  <p className="mt-1 truncate text-xs font-medium">
+                    {gpsStatus}
+                  </p>
                 </div>
                 <div className="rounded-xl border border-border/70 bg-white px-3 py-2 dark:bg-card">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -1670,40 +2049,43 @@ export function LocationExplorer() {
           </Card>
 
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
-            {trending && (trending.pois.length > 0 || trending.queries.length > 0) && (
-              <div className="shrink-0 space-y-2 rounded-2xl border border-emerald-950/10 bg-white/70 p-3 dark:border-white/10 dark:bg-card/70">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-                  <Flame className="size-3.5 text-orange-500" /> Xu hướng gần đây
+            {showDiscovery &&
+              trending &&
+              (trending.pois.length > 0 || trending.queries.length > 0) && (
+                <div className="shrink-0 space-y-2 rounded-2xl border border-emerald-950/10 bg-white/70 p-3 dark:border-white/10 dark:bg-card/70">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                    <Flame className="size-3.5 text-orange-500" /> Xu hướng gần
+                    đây
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {trending.queries.map((item) => (
+                      <button
+                        key={item.query}
+                        type="button"
+                        onClick={() => {
+                          setQuery(item.query);
+                          void runSearch(item.query, selectedCategory);
+                        }}
+                        className={chipClass(false)}
+                      >
+                        {item.query}
+                      </button>
+                    ))}
+                    {trending.pois.map((poi) => (
+                      <button
+                        key={poi.id}
+                        type="button"
+                        onClick={() => spotlightPoi(poi, 'trending')}
+                        className={chipClass(false)}
+                      >
+                        {poi.name}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {trending.queries.map((item) => (
-                    <button
-                      key={item.query}
-                      type="button"
-                      onClick={() => {
-                        setQuery(item.query);
-                        void runSearch(item.query, selectedCategory);
-                      }}
-                      className={chipClass(false)}
-                    >
-                      {item.query}
-                    </button>
-                  ))}
-                  {trending.pois.map((poi) => (
-                    <button
-                      key={poi.id}
-                      type="button"
-                      onClick={() => spotlightPoi(poi, 'trending')}
-                      className={chipClass(false)}
-                    >
-                      {poi.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+              )}
 
-            {recommendations.length > 0 && (
+            {showDiscovery && recommendations.length > 0 && (
               <div className="shrink-0 space-y-2">
                 <div className="flex items-center gap-1.5 px-1 text-xs font-semibold text-muted-foreground">
                   <Sparkles className="size-3.5 text-primary" /> Gợi ý cho bạn
@@ -1716,14 +2098,17 @@ export function LocationExplorer() {
                       onClick={() => spotlightPoi(poi, 'recommendation')}
                       className="w-[180px] shrink-0 rounded-xl border border-emerald-950/10 bg-white p-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-white/10 dark:bg-card"
                     >
-                      <p className="truncate text-sm font-semibold">{poi.name}</p>
+                      <p className="truncate text-sm font-semibold">
+                        {poi.name}
+                      </p>
                       <p className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">
                         {poi.reason}
                       </p>
                       <div className="mt-2 flex items-center gap-2 text-[11px]">
                         {poi.rating !== null && (
                           <span className="flex items-center gap-0.5 font-semibold text-amber-600">
-                            <Star className="size-3 fill-current" /> {poi.rating.toFixed(1)}
+                            <Star className="size-3 fill-current" />{' '}
+                            {poi.rating.toFixed(1)}
                           </span>
                         )}
                         <span className="text-muted-foreground">
@@ -1738,7 +2123,9 @@ export function LocationExplorer() {
 
             <div className="shrink-0 flex items-center justify-between px-1">
               <h2 className="font-semibold">Địa điểm gần bạn</h2>
-              <span className="text-xs text-muted-foreground">{pois.length} kết quả</span>
+              <span className="text-xs text-muted-foreground">
+                {pois.length} kết quả
+              </span>
             </div>
             <div className="grid shrink-0 gap-3">
               {/* Số hiển thị là VỊ TRÍ TRONG DANH SÁCH ĐANG THẤY, không phải
@@ -1766,12 +2153,17 @@ export function LocationExplorer() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <h3 className="font-semibold leading-tight">{poi.name}</h3>
+                          <h3 className="font-semibold leading-tight">
+                            {poi.name}
+                          </h3>
                           <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
                             {poi.address}
                           </p>
                         </div>
-                        <Badge variant="outline" className="shrink-0 bg-white dark:bg-card">
+                        <Badge
+                          variant="outline"
+                          className="shrink-0 bg-white dark:bg-card"
+                        >
                           {poi.categoryLabel}
                         </Badge>
                       </div>
@@ -1780,13 +2172,18 @@ export function LocationExplorer() {
                       </p>
                       <div className="mt-3 flex items-center gap-3 text-xs">
                         {poi.rating === null ? (
-                          <span className="text-muted-foreground">Chưa có đánh giá</span>
+                          <span className="text-muted-foreground">
+                            Chưa có đánh giá
+                          </span>
                         ) : (
                           <>
                             <span className="flex items-center gap-1 font-semibold text-amber-600">
-                              <Star className="size-3.5 fill-current" /> {poi.rating.toFixed(1)}
+                              <Star className="size-3.5 fill-current" />{' '}
+                              {poi.rating.toFixed(1)}
                             </span>
-                            <span className="text-muted-foreground">{poi.reviewCount} đánh giá</span>
+                            <span className="text-muted-foreground">
+                              {poi.reviewCount} đánh giá
+                            </span>
                           </>
                         )}
                         <span className="ml-auto flex items-center gap-1 font-medium text-primary">
@@ -1825,14 +2222,15 @@ export function LocationExplorer() {
                               Hot quanh đây
                             </span>
                           )}
-                          {poi.retrievalChannels && poi.retrievalChannels.length > 1 && (
-                            <span
-                              className="rounded-full bg-muted px-1.5 py-0.5 font-medium text-muted-foreground"
-                              title={`Lọt vào ứng viên qua ${poi.retrievalChannels.length} kênh: ${poi.retrievalChannels.join(', ')}`}
-                            >
-                              {poi.retrievalChannels.length} kênh
-                            </span>
-                          )}
+                          {poi.retrievalChannels &&
+                            poi.retrievalChannels.length > 1 && (
+                              <span
+                                className="rounded-full bg-muted px-1.5 py-0.5 font-medium text-muted-foreground"
+                                title={`Lọt vào ứng viên qua ${poi.retrievalChannels.length} kênh: ${poi.retrievalChannels.join(', ')}`}
+                              >
+                                {poi.retrievalChannels.length} kênh
+                              </span>
+                            )}
                         </div>
                       )}
                       {(poi.openNow != null || poi.etaMinutes) && (
@@ -1849,14 +2247,16 @@ export function LocationExplorer() {
                             </span>
                           ) : poi.openNow === false ? (
                             <span className="rounded-full bg-muted px-2 py-0.5 font-medium text-muted-foreground">
-                              {poi.opensInMinutes != null && poi.opensInMinutes <= 120
+                              {poi.opensInMinutes != null &&
+                              poi.opensInMinutes <= 120
                                 ? `Mở sau ${poi.opensInMinutes} phút`
                                 : 'Đóng cửa'}
                             </span>
                           ) : null}
                           {poi.etaMinutes && (
                             <span className="flex items-center gap-1 text-muted-foreground">
-                              <Bike className="size-3.5" /> {poi.etaMinutes.motorbike} phút
+                              <Bike className="size-3.5" />{' '}
+                              {poi.etaMinutes.motorbike} phút
                               <Clock className="ml-0.5 size-3 opacity-60" />
                             </span>
                           )}
@@ -1891,7 +2291,8 @@ export function LocationExplorer() {
               <span className="size-2 rounded-full bg-sky-500" /> Vị trí của bạn
               <span className="ml-2 size-2 rounded-full bg-orange-500" /> POI
               <span className="ml-2 size-2 rounded-full bg-emerald-500" /> Cụm
-              <span className="ml-2 size-2 rounded-full bg-sky-500/60" /> Vành H3
+              <span className="ml-2 size-2 rounded-full bg-sky-500/60" /> Vành
+              H3
             </div>
           </div>
           <div className="absolute right-4 top-4 z-10 hidden w-[300px] rounded-2xl border border-white/75 bg-slate-950/88 p-4 text-white shadow-2xl backdrop-blur-xl xl:block">
@@ -1919,14 +2320,18 @@ export function LocationExplorer() {
                 <ShieldCheck className="mt-0.5 size-4 shrink-0 text-violet-300" />
                 <div className="min-w-0">
                   <p className="font-medium text-white">API Gateway</p>
-                  <p className="mt-0.5 truncate text-slate-300">{gatewayStatus}</p>
+                  <p className="mt-0.5 truncate text-slate-300">
+                    {gatewayStatus}
+                  </p>
                 </div>
               </div>
               <div className="flex gap-3">
                 <Activity className="mt-0.5 size-4 shrink-0 text-amber-300" />
                 <div className="min-w-0">
                   <p className="font-medium text-white">Geo-parser</p>
-                  <p className="mt-0.5 truncate text-slate-300">{parserStatus}</p>
+                  <p className="mt-0.5 truncate text-slate-300">
+                    {parserStatus}
+                  </p>
                 </div>
               </div>
               <div className="flex gap-3">
@@ -1939,7 +2344,8 @@ export function LocationExplorer() {
                     ) : null}
                   </div>
                   <p className="mt-0.5 text-slate-300">
-                    {telemetryState.delivered} đã gửi · {telemetryState.queued} đang chờ ·{' '}
+                    {telemetryState.delivered} đã gửi · {telemetryState.queued}{' '}
+                    đang chờ ·{' '}
                     {telemetryState.transport === 'online'
                       ? 'Redis Stream'
                       : telemetryState.transport === 'fallback'
@@ -1952,8 +2358,11 @@ export function LocationExplorer() {
               </div>
             </div>
             <div className="mt-4 rounded-xl bg-white/8 px-3 py-2 text-[10px] text-slate-300">
-              Session {telemetryState.sessionId ? telemetryState.sessionId.slice(0, 8) : 'đang tạo'} · batch ≤ 50
-              events
+              Session{' '}
+              {telemetryState.sessionId
+                ? telemetryState.sessionId.slice(0, 8)
+                : 'đang tạo'}{' '}
+              · batch ≤ 50 events
             </div>
           </div>
           {selectedPoi && (
@@ -1962,16 +2371,28 @@ export function LocationExplorer() {
                 <div>
                   <Badge variant="secondary">Đang chọn</Badge>
                   <h2 className="mt-2 text-lg font-bold">{selectedPoi.name}</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">{selectedPoi.address}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {selectedPoi.address}
+                  </p>
                 </div>
-                <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
-                  <MapPin className="size-5" />
+                <div className="flex shrink-0 items-start gap-1.5">
+                  <div className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground">
+                    <MapPin className="size-5" />
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Đóng thẻ địa điểm"
+                    onClick={() => setSelectedPoiId(null)}
+                    className="grid size-7 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    <X className="size-4" />
+                  </button>
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between border-t border-border pt-3 text-sm">
                 <span className="font-medium text-amber-600">
                   {selectedPoi.rating === null
-                    ? "Chưa có đánh giá"
+                    ? 'Chưa có đánh giá'
                     : `★ ${selectedPoi.rating.toFixed(1)}`}
                 </span>
                 <span>{formatDistance(selectedPoi.distanceMeters)}</span>
@@ -1979,10 +2400,10 @@ export function LocationExplorer() {
                   Chỉ đường
                 </Button>
               </div>
-              {/* Chọn phương tiện (Phase 12.7) — mỗi phương tiện gọi một đồ thị
-                  OSRM khác nhau (car/foot có đồ thị riêng; motorbike dùng lại
-                  đồ thị car, đánh dấu approximate). Đổi lựa chọn tự kích hoạt
-                  lại effect tính tuyến ở trên (transportMode nằm trong deps). */}
+              {/* Chọn phương tiện — mỗi phương tiện gọi một đồ thị OSRM
+                  riêng (car / foot / motorbike, xem docker-compose.yml). Đổi
+                  lựa chọn tự kích hoạt lại effect tính tuyến ở trên
+                  (transportMode nằm trong deps). */}
               <div className="mt-3 flex gap-1.5 border-t border-border pt-3">
                 {TRANSPORT_MODES.map((item) => (
                   <button
@@ -2010,7 +2431,7 @@ export function LocationExplorer() {
               )}
               {routeStatus === 'off' && (
                 <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
-                  Chưa dựng dữ liệu định tuyến — bấm “Chỉ đường” để mở Google Maps.
+                  Chưa khởi động dữ liệu định tuyến nội bộ.
                 </p>
               )}
               {routeStatus === 'none' && (
@@ -2026,20 +2447,26 @@ export function LocationExplorer() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold">
-                        {route.durationMinutes} phút · {formatDistance(route.distanceMeters)}
+                        {route.durationMinutes} phút ·{' '}
+                        {formatDistance(route.distanceMeters)}
                       </p>
                       {/* Nói rõ đây là ĐƯỜNG ĐI THẬT chứ không phải đường chim
                           bay — con số cũ (etaMinutes) tính bằng khoảng cách
-                          thẳng chia vận tốc cố định nên luôn lạc quan. Với
-                          "motorbike" phải nói rõ đang XẤP XỈ bằng đồ thị ô tô —
-                          không có hồ sơ xe máy thật (Phase 12.7), im lặng ở
-                          đây là lừa người dùng rằng hệ thống đo đúng xe máy. */}
+                          thẳng chia vận tốc cố định nên luôn lạc quan.
+                          `approximate` (backend bật khi phải mượn đồ thị ô tô)
+                          xét TRƯỚC tên hồ sơ: im lặng ở đây là lừa người dùng
+                          rằng hệ thống đo đúng phương tiện họ chọn. Phải có
+                          nhánh 'motorbike' riêng — thiếu nó thì tuyến xe máy
+                          THẬT bị ghi nhãn "hồ sơ ô tô", sai theo hướng ngược
+                          lại với cảnh báo xấp xỉ. */}
                       <p className="text-[11px] text-muted-foreground">
                         {route.approximate
                           ? 'Tuyến ô tô (xấp xỉ cho xe máy)'
                           : route.mode === 'foot'
                             ? 'Theo đường thật, hồ sơ đi bộ'
-                            : 'Theo đường thật, hồ sơ ô tô'}
+                            : route.mode === 'motorbike'
+                              ? 'Theo đường thật, hồ sơ xe máy'
+                              : 'Theo đường thật, hồ sơ ô tô'}
                         {route.cached ? ' · từ cache' : ''}
                       </p>
                     </div>
@@ -2090,7 +2517,9 @@ export function LocationExplorer() {
                   Xem chi tiết
                 </Button>
                 <Button
-                  variant={geofences.has(selectedPoi.id) ? 'default' : 'outline'}
+                  variant={
+                    geofences.has(selectedPoi.id) ? 'default' : 'outline'
+                  }
                   size="sm"
                   className="flex-1"
                   onClick={() => void toggleGeofence(selectedPoi)}
@@ -2100,7 +2529,9 @@ export function LocationExplorer() {
                   ) : (
                     <Bell data-icon="inline-start" />
                   )}
-                  {geofences.has(selectedPoi.id) ? 'Đang nhắc · 300 m' : 'Nhắc tôi khi tới gần'}
+                  {geofences.has(selectedPoi.id)
+                    ? 'Đang nhắc · 300 m'
+                    : 'Nhắc tôi khi tới gần'}
                 </Button>
               </div>
               {geofences.size > 0 && (
@@ -2125,12 +2556,15 @@ export function LocationExplorer() {
           {detailPoiId && (
             <div className="poi-detail-slide absolute inset-y-0 right-0 z-30 w-[92%] border-l border-emerald-950/10 bg-white shadow-[-20px_0_60px_rgb(14_68_48/18%)] sm:w-[420px] dark:border-white/10 dark:bg-card">
               <PoiDetailPanel
+                key={detailPoiId}
                 detail={poiDetail}
                 photos={poiPhotos}
                 loading={detailLoading}
                 error={detailError}
                 routeSummary={detailRouteSummary}
                 isGeofenced={geofences.has(detailPoiId)}
+                apiBaseUrl={API_BASE_URL}
+                sessionId={telemetryState.sessionId}
                 onClose={closeDetail}
                 onDirections={() => {
                   if (detailAsPoi) startNavigation(detailAsPoi);
@@ -2143,7 +2577,9 @@ export function LocationExplorer() {
                   // kiếm hiện tại, nên không gọi focusPoi được (nó tra cứu theo
                   // danh sách đó). Bay bản đồ bằng chính toạ độ panel đang giữ
                   // và để hook nạp phần còn lại.
-                  const target = poiDetail?.similar.find((item) => item.id === poiId);
+                  const target = poiDetail?.similar.find(
+                    (item) => item.id === poiId,
+                  );
                   openDetail(poiId, 'similar');
                   if (target) {
                     mapRef.current?.flyTo({
@@ -2154,6 +2590,22 @@ export function LocationExplorer() {
                   } else {
                     flyToOnDetailRef.current = poiId;
                   }
+                }}
+                onReviewSubmitted={({ ratingMean, ratingCount }) => {
+                  refreshPoiDetail();
+                  const updateRating = (items: Poi[]) =>
+                    items.map((item) =>
+                      item.id === detailPoiId
+                        ? {
+                            ...item,
+                            rating: ratingMean,
+                            reviewCount: ratingCount,
+                          }
+                        : item,
+                    );
+                  setPois(updateRating);
+                  setAreaPois(updateRating);
+                  setStatus('Đánh giá của bạn đã được lưu');
                 }}
               />
             </div>

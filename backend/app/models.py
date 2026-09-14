@@ -88,6 +88,7 @@ class ReviewRequest(BaseModel):
 
     session_id: UUID | None = None
     rating: int = Field(ge=1, le=5)
+    author_name: str | None = Field(default=None, max_length=80)
     title: str | None = Field(default=None, max_length=160)
     body: str | None = Field(default=None, max_length=2_000)
 

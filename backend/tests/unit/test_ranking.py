@@ -2,6 +2,7 @@ from copy import deepcopy
 
 import pytest
 
+from app.config import settings
 from app.ranking import _relevance_sort_key, diversify, rerank
 
 
@@ -138,3 +139,73 @@ def test_diversify_prevents_three_consecutive_categories_when_possible() -> None
     diversified = diversify(results, max_run=2)
 
     assert [item["id"] for item in diversified] == ["c1", "c2", "p1", "c3"]
+
+
+def test_cong_chat_luong_khong_cho_rating_cao_lat_nguoc_khop_van_ban(monkeypatch) -> None:
+    """Đo được thật trên dữ liệu đang chạy (3.010 POI, truy vấn "bệnh viện",
+    bán kính 3km): `Bệnh Viện Mắt Sài Gòn` có textScore = 1.0000 — tức BM25 CAO
+    NHẤT trong tập ứng viên — nhưng chỉ xếp HẠNG 7 (score 0.395), trong khi
+    `Công viên Bến Bạch Đằng` (textScore 0.7893) xếp HẠNG 1 (score 0.546).
+
+    Công viên vẫn có BM25 cao vì analyzer đã fold `category_label` "công viên"
+    thành token `vien`, trùng với "bệnh viện" — field `.strict` của Phase 10
+    kéo bệnh viện lên đầu BM25 nhưng KHÔNG xoá được điểm của công viên. Phần
+    lật ngược đến từ rating 4.6 và popularity 0.96 (dữ liệu seed): hai tín hiệu
+    này cho công viên +0.158 điểm chuẩn hoá, còn lợi thế văn bản của bệnh viện
+    chỉ +0.052 — gấp ba lần.
+
+    Cổng chất lượng nhân trọng số rating/popularity với
+    (textScore / max textScore) ** mũ, nên ứng viên khớp văn bản kém hơn hẳn
+    không còn cưỡi lên rating/popularity để thắng. Đo A/B trên cùng một tập
+    ứng viên (truy xuất một lần, chấm điểm nhiều lần): hạng của bệnh viện đi
+    từ 7 (mũ=0) lên 3-4 (mũ=2) và bão hoà ở đó — mũ=3 không cải thiện thêm.
+    Đo hai lần ở hai thời điểm ra 7->3 và 7->4; chênh lệch là do trending/
+    recency tính lại theo từng giây nên tập ứng viên hai lần không giống hệt.
+    Ba truy vấn đã gán nhãn "cà phê"/"công viên"/"bảo tàng" giữ nguyên hạng 1
+    ở mọi mũ, và "cơm tấm" đi từ 3 lên 2.
+
+    Hai ứng viên dưới đây đặt CÙNG khoảng cách để cô lập đúng phần tín hiệu
+    chất lượng; mũ=0 giữ lại hành vi cũ, dùng làm mốc đối chứng.
+    """
+    cong_vien = candidate(
+        "cong-vien", "park", distance=800, text=0.7893, rating=4.6, popularity=0.96
+    )
+    benh_vien = candidate(
+        "benh-vien", "hospital", distance=800, text=1.0, rating=None, popularity=0.0
+    )
+
+    def khoang_cach(mu: float) -> float:
+        monkeypatch.setattr(settings, "ranking_quality_gate_exponent", mu)
+        diem = {
+            item["id"]: item["score"]
+            for item in rerank(deepcopy([cong_vien, benh_vien]), has_query_text=True)
+        }
+        return diem["cong-vien"] - diem["benh-vien"]
+
+    cu = khoang_cach(0.0)  # mốc đối chứng: đúng hành vi trước khi có cổng
+    moi = khoang_cach(2.0)
+
+    assert cu > 0, "mốc đối chứng: tắt cổng thì công viên dẫn trước"
+    assert moi < cu, "bật cổng phải thu hẹp khoảng cách"
+    # Ở cặp CÔ LẬP này công viên vẫn dẫn: cổng chỉ hạ bớt phần rating/
+    # popularity, không xoá hẳn. Trong tập ứng viên thật (100 ứng viên, còn
+    # spatial/context/trending khác nhau) mức hạ đó đủ đưa bệnh viện từ hạng 7
+    # lên hạng 3-4 — ghi lại giới hạn này ở đây để lần sau không ai tưởng cổng
+    # là lời giải trọn vẹn.
+    assert moi > 0
+
+
+def test_cong_chat_luong_khong_doi_gi_khi_khong_co_query_text(monkeypatch) -> None:
+    """Duyệt theo vị trí (không có query text) thì mọi ứng viên có textScore =
+    1.0 như nhau, nên cổng phải mở hoàn toàn — nếu không, một thay đổi nhắm vào
+    đường TÌM KIẾM sẽ âm thầm đổi luôn đường DUYỆT."""
+    a = candidate("a", "park", distance=800, text=1.0, rating=4.6, popularity=0.96)
+    b = candidate("b", "hospital", distance=800, text=1.0, rating=None, popularity=0.0)
+
+    monkeypatch.setattr(settings, "ranking_quality_gate_exponent", 0.0)
+    tat = rerank(deepcopy([a, b]), has_query_text=False)
+    monkeypatch.setattr(settings, "ranking_quality_gate_exponent", 2.0)
+    bat = rerank(deepcopy([a, b]), has_query_text=False)
+
+    assert [i["id"] for i in tat] == [i["id"] for i in bat]
+    assert [i["score"] for i in tat] == [i["score"] for i in bat]

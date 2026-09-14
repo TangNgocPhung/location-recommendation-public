@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from ..config import settings
+
 
 def _geo_filter(latitude: float, longitude: float, radius_m: int) -> dict[str, Any]:
     return {
@@ -24,6 +26,18 @@ def _category_filter(category: str | None) -> list[dict[str, Any]]:
     # và người dùng chọn theo nhãn trên chip lọc — xem ranking.fetch_categories.
     return [{"term": {"category_label.raw": category}}] if category else []
 
+
+
+def _min_should_match() -> dict[str, Any]:
+    """``minimum_should_match`` cho hai clause văn bản, hoặc rỗng khi tắt.
+
+    Đọc `settings` mỗi lần gọi (không cache ở cấp module) để bật/tắt được
+    trong CÙNG một tiến trình lúc đo A/B — nếu đọc lúc import thì phải dựng
+    lại image cho từng giá trị, và khi đó hai lượt đo không còn chung tập dữ
+    liệu trending/recency nữa.
+    """
+    value = (settings.search_text_min_should_match or "").strip()
+    return {"minimum_should_match": value} if value else {}
 
 def bm25_body(
     query_text: str,
@@ -74,6 +88,7 @@ def bm25_body(
                                         ],
                                         "fuzziness": "AUTO",
                                         "operator": "or",
+                                        **_min_should_match(),
                                     }
                                 },
                                 {
@@ -87,6 +102,7 @@ def bm25_body(
                                             "description.strict^1.5",
                                         ],
                                         "operator": "or",
+                                        **_min_should_match(),
                                     }
                                 },
                             ],

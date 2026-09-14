@@ -278,10 +278,34 @@ def rerank(
             candidates.sort(key=sort_key)
             return candidates
 
+    # Mốc để chuẩn hóa cổng chất lượng. Phải tính TRƯỚC vòng lặp vì nó là đại
+    # lượng của cả tập ứng viên, không phải của từng ứng viên.
+    #
+    # Chuẩn hóa theo max thay vì dùng thẳng textScore vì hai đường truy xuất
+    # cho hai thang khác nhau: OpenSearch đã chia cho max BM25 (nên max = 1.0),
+    # còn PostGIS trả trigram similarity tuyệt đối, thường chỉ 0.15-0.5 kể cả
+    # khi khớp tốt. Dùng giá trị thô sẽ bóp nát rating/popularity của MỌI ứng
+    # viên trên nhánh PostGIS — tức là âm thầm đổi luôn baseline bậc A của
+    # ablation, chứ không chỉ sửa ca lỗi đang nhắm tới.
+    max_text = 0.0
+    if has_query_text:
+        max_text = max(
+            (float(item.get("textScore") or 0.0) for item in candidates), default=0.0
+        )
+
     for candidate in candidates:
         spatial_score = math.exp(-candidate["distanceMeters"] / SPATIAL_DECAY_METERS)
         in_graph = candidate["id"] in graph_boost
         rating = candidate.get("rating")
+        # Cổng chất lượng: tin rating/popularity ít đi khi ứng viên khớp văn
+        # bản kém hơn hẳn ứng viên tốt nhất. max_text = 0 nghĩa là KHÔNG ứng
+        # viên nào khớp văn bản — lúc đó không có gì để so sánh, mở cổng hoàn
+        # toàn và để bậc `demoted` của `_relevance_sort_key` xử lý.
+        if has_query_text and max_text > 0.0:
+            ratio = float(candidate.get("textScore") or 0.0) / max_text
+            quality_gate = ratio ** settings.ranking_quality_gate_exponent
+        else:
+            quality_gate = 1.0
 
         # (trọng số, giá trị) — giá trị None nghĩa là KHÔNG CÓ DỮ LIỆU, khác
         # hẳn giá trị 0. Xem `signal_values` để biết vì sao phân biệt này quan
@@ -290,8 +314,30 @@ def rerank(
         terms: list[tuple[float, float | None]] = [
             (weights["text"], candidate.get("textScore", 1.0)),
             (weights["spatial"], spatial_score),
-            (weights["rating"], None if rating is None else float(rating) / 5.0),
-            (weights["popularity"], candidate.get("popularityScore")),
+            # Cổng nhân vào TRỌNG SỐ chứ không vào giá trị: `applied` ở dưới
+            # cộng đúng phần trọng số thực sự dùng, nên điểm vẫn được chuẩn
+            # hóa lại trên phần khối lượng còn lại và vẫn nằm trong [0,1].
+            # Nếu nhân vào giá trị thì mẫu số giữ nguyên còn tử số tụt, đẩy
+            # điểm về 0 một cách giả tạo và làm hai ứng viên thiếu dữ liệu
+            # khác nhau không còn so sánh được với nhau.
+            #
+            # Cổng CHỈ áp cho `rating` và `popularity`. Đã thử mở rộng cho cả
+            # họ proxy độ phổ biến (thêm trending, recency, ctr) và đo được là
+            # TỆ HƠN HẲN: hạng của `Bệnh Viện Mắt Sài Gòn` đi 7 -> 14 -> 20 ->
+            # ngoài top 20 khi mũ tăng 0 -> 1 -> 2 -> 3.
+            #
+            # Lý do: cổng nhân vào TRỌNG SỐ, mà bệnh viện có trending/recency/
+            # ctr đều bằng 0. Thu nhỏ trọng số của một số hạng giá trị 0 chính
+            # là bỏ bớt khối lượng chết khỏi MẪU SỐ, nên nó NÂNG điểm đúng ứng
+            # viên mà ta đang muốn hạ. Cổng chỉ đúng hướng với tín hiệu mà ứng
+            # viên khớp-văn-bản-kém đang có giá trị CAO — tức rating và
+            # popularity, đúng hai thứ dữ liệu seed thổi phồng.
+            #
+            # KHÔNG áp cho `text` (chính nó), `spatial` (gần là bản chất của
+            # sản phẩm, không phải phần thưởng cho độ nổi tiếng) và `context`
+            # (đang mở cửa đúng/sai thì đúng/sai bất kể truy vấn là gì).
+            (weights["rating"] * quality_gate, None if rating is None else float(rating) / 5.0),
+            (weights["popularity"] * quality_gate, candidate.get("popularityScore")),
             (weights["trending"], candidate.get("trendingScore", 0.0)),
             (weights.get("recency", 0.0), candidate.get("recencyScore", 0.0)),
             (weights.get("context", 0.0), candidate.get("contextScore", 0.0)),

@@ -14,10 +14,12 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DATA_DIR="$ROOT/osrm"
-# Cắt rộng hơn OSM_BBOX của phần nhập POI (10.70,106.60,10.90,106.82) một chút:
-# tuyến đường có thể vòng ra ngoài hộp chứa hai đầu mút, và cắt sát quá thì
-# OSRM trả "NoRoute" cho những cặp điểm nằm gần rìa.
-BBOX="${OSRM_BBOX:-106.55,10.65,106.90,10.95}"
+# Cắt rộng hơn OSM_BBOX của phần nhập POI (10.20,106.00,11.40,107.40 — xem
+# config/development.env) một chút: tuyến đường có thể vòng ra ngoài hộp chứa
+# hai đầu mút, và cắt sát quá thì OSRM trả "NoRoute" cho những cặp điểm nằm gần
+# rìa. Lưu ý thứ tự tọa độ của osmium là west,south,east,north (lon trước lat),
+# NGƯỢC với OSM_BBOX của phần nhập POI (south,west,north,east).
+BBOX="${OSRM_BBOX:-105.95,10.15,107.45,11.45}"
 SOURCE_URL="${OSRM_SOURCE_URL:-https://download.geofabrik.de/asia/vietnam-latest.osm.pbf}"
 # Hồ sơ ô tô. OSRM dựng sẵn car/bicycle/foot trong /opt của ảnh chính thức.
 #

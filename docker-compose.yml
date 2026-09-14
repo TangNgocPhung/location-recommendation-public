@@ -22,6 +22,10 @@ x-backend-environment: &backend-environment
   # được lặng lẽ dùng nhầm đồ thị "car" — hai đồ thị KHÔNG tương thích, đường
   # ô tô có thể đi qua chỗ người đi bộ không được phép, và ngược lại.
   OSRM_FOOT_URL: ${OSRM_FOOT_URL:-http://osrm-foot:5000}
+  # Hồ sơ XE MÁY — đồ thị + container RIÊNG, dựng bằng
+  # scripts/build_osrm_motorbike.sh. Rỗng thì directions.py tự lùi về đồ thị ô
+  # tô và đánh dấu `approximate: true` (hành vi trước Phase 12.8).
+  OSRM_MOTORBIKE_URL: ${OSRM_MOTORBIKE_URL:-http://osrm-motorbike:5000}
 
 services:
   database:
@@ -222,6 +226,15 @@ services:
     build: ./frontend
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:${GATEWAY_PORT:-8081}
+      # VITE_ chứ không chỉ NEXT_PUBLIC_: vinext (beta) không inline biến
+      # NEXT_PUBLIC_* xuống bundle trình duyệt ở chế độ dev, Vite thì có —
+      # xem ghi chú ở components/location-explorer.tsx. Giữ cả hai để cấu
+      # hình cũ không gãy.
+      #
+      # Giá trị đến từ file `.env` ở gốc repo (đã .gitignore) chứ KHÔNG phải
+      # config/development.env — file đó được commit, mà đây là API key.
+      # Chạy: docker compose --env-file config/development.env --env-file .env ...
+      VITE_MAP_STYLE_URL: ${MAP_STYLE_URL:-}
       NEXT_PUBLIC_MAP_STYLE_URL: ${MAP_STYLE_URL:-}
     ports:
       - "${FRONTEND_PORT:-3001}:3000"
@@ -301,6 +314,36 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+
+  # Hồ sơ XE MÁY (Phase 12.8) — đồ thị RIÊNG "hcm-motorbike.osrm", dựng từ
+  # osrm/motorbike.lua bằng scripts/build_osrm_motorbike.sh. Cùng lý do tách
+  # container như `osrm-foot`: một osrm-routed chỉ phục vụ đúng một đồ thị.
+  #
+  # Thiếu file .osrm thì container này thoát và phần còn lại vẫn chạy — backend
+  # lùi về đồ thị ô tô kèm cờ `approximate`.
+  osrm-motorbike:
+    image: osrm/osrm-backend:latest
+    command:
+      ["osrm-routed", "--algorithm", "mld", "--max-matching-size", "-1", "/data/hcm-motorbike.osrm"]
+    volumes:
+      - ./osrm:/data:ro
+    ports:
+      - "${OSRM_MOTORBIKE_PORT:-5003}:5000"
+    restart: "no"
+    healthcheck:
+      # Cùng cách gọi HTTP bằng /dev/tcp của bash như hai service OSRM kia —
+      # ảnh này không có wget lẫn curl, và /bin/sh là dash nên phải gọi `bash`
+      # tường minh.
+      test:
+        - CMD
+        - bash
+        - -c
+        - "exec 3<>/dev/tcp/127.0.0.1/5000 && printf 'GET /route/v1/driving/106.7009,10.7757;106.7018,10.7784?overview=false HTTP/1.0\r\n\r\n' >&3 && grep -q '\"code\":\"Ok\"' <&3"
+      interval: 15s
+      timeout: 15s
+      retries: 5
+      # Graph xe máy lớn hơn và mất vài phút để mmap trên Docker Desktop.
+      start_period: 5m
 
   gateway:
     build: ./gateway

@@ -182,6 +182,11 @@ def multi_channel_candidates(
         return None
 
     channels: dict[str, list[str]] = {}
+    # Kênh đã CHẠY nhưng hỏng (timeout / k-NN lỗi). Khác hẳn kênh không chạy:
+    # truy vấn vẫn trả `retrievalBackend="opensearch"` nên nếu không ghi lại ở
+    # đây thì việc mất kênh là hoàn toàn vô hình — cả với người dùng lẫn với
+    # script đánh giá đang tưởng mình đo kiến trúc đủ 3 kênh.
+    degraded: list[str] = []
     bm25_scores: dict[str, float] = {}
     vector_scores: dict[str, float] = {}
     try:
@@ -203,6 +208,7 @@ def multi_channel_candidates(
                     logger.warning(
                         "Truy vấn %r cho embedding toàn 0, bỏ kênh vector lần này", clean_query
                     )
+                    degraded.append("vector")
                 else:
                     try:
                         vector_hits = _search_hits(
@@ -215,6 +221,7 @@ def multi_channel_candidates(
                         vector_scores = dict(vector_hits)
                     except Exception as error:  # noqa: BLE001 - k-NN có thể tắt/khác version
                         logger.warning("Kênh vector lỗi, bỏ qua: %s", error)
+                        degraded.append("vector")
         spatial, spatial_info = _spatial_channels(
             client, latitude, longitude, radius, category
         )
@@ -235,6 +242,12 @@ def multi_channel_candidates(
     trending = _trending_ids(50, latitude, longitude)
     if trending:
         channels["trending"] = trending
+
+    if telemetry is not None:
+        telemetry["channelsUsed"] = sorted(channels)
+        # Chỉ đặt khoá khi THỰC SỰ mất kênh: `None` trong response nghĩa là
+        # "đủ kênh", không phải "không biết".
+        telemetry["degradedChannels"] = sorted(set(degraded)) or None
 
     fused = reciprocal_rank_fusion(channels, weights=CHANNEL_WEIGHTS)
     ranked = _gate_by_text_relevance(fused, channels, clean_query)[:limit_candidates]

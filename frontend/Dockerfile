@@ -18,4 +18,7 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["pnpm", "exec", "vinext", "dev", "--hostname", "0.0.0.0"]
+# Vinext's development runner can lose its internal Workers connection inside
+# Docker and then return HTTP 500 indefinitely. Build with the runtime env (so
+# VITE_* values are embedded) and serve the generated Worker instead.
+CMD ["sh", "-c", "pnpm build && exec pnpm exec wrangler dev --config dist/server/wrangler.json --ip 0.0.0.0 --port 3000"]
