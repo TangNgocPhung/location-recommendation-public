@@ -1,0 +1,26 @@
+# Lớp phủ cho bản demo qua Cloudflare Tunnel.
+#
+#   bash scripts/tunnel_public.sh
+#
+# Khác với lớp phủ prod: KHÔNG có Caddy (Cloudflare lo TLS), không đổi image,
+# không đụng cổng. Chỉ sửa đúng những biến phụ thuộc vào URL công khai.
+services:
+  frontend:
+    environment:
+      # Frontend nhúng giá trị này VÀO BUNDLE TRÌNH DUYỆT lúc `pnpm build`, và
+      # Dockerfile build ngay khi container khởi động. Giá trị gốc trong
+      # docker-compose.yml là http://localhost:8081 — đúng cho máy dev, nhưng
+      # khách truy cập từ xa sẽ gọi về localhost CỦA HỌ và thấy trang trống.
+      NEXT_PUBLIC_API_URL: ${PUBLIC_URL:?PUBLIC_URL must be set}
+      VITE_API_URL: ${PUBLIC_URL:?PUBLIC_URL must be set}
+
+  backend:
+    environment:
+      # Giữ cả localhost để vẫn mở được http://localhost:8081 trên máy này.
+      ALLOWED_ORIGINS: "${PUBLIC_URL:?PUBLIC_URL must be set},http://localhost:8081,http://127.0.0.1:8081"
+      # Chuỗi proxy thành client -> cloudflared -> nginx -> backend. cloudflared
+      # đặt X-Forwarded-For = IP client, nginx nối thêm IP của cloudflared, nên
+      # backend thấy [client, cloudflared] và phải bỏ 2 hop — giống hệt trường
+      # hợp có Caddy. Để nguyên 1 (giá trị dev) thì mọi khách chia chung một
+      # hạn mức vì đều quy về IP của cloudflared.
+      TRUSTED_PROXY_HOPS: "2"
