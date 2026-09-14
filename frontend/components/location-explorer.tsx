@@ -642,6 +642,18 @@ export function LocationExplorer() {
     return [...pois, ...areaPois.filter((poi) => !seen.has(poi.id))];
   }, [pois, areaPois]);
 
+  // POI đang chọn. Khai báo PHẢI nằm trên effect lấy tuyến bên dưới: mảng
+  // dependency của effect đó đọc `selectedPoi?.id` NGAY TRONG LÚC RENDER, nên
+  // để khai báo ở dưới là chạm vùng chết (TDZ) chứ không phải hoisting vô hại.
+  //
+  // `visiblePois` đổi ĐỊNH DANH mỗi lần areaPois nạp lại — chuyện bình thường
+  // khi kéo bản đồ — nên effect lấy tuyến không được phụ thuộc vào chính mảng
+  // đó, xem ghi chú ở effect.
+  const selectedPoi = useMemo(
+    () => visiblePois.find((item) => item.id === selectedPoiId) ?? null,
+    [visiblePois, selectedPoiId],
+  );
+
   // Lấy tuyến đường mỗi khi đổi POI đang chọn hoặc đổi vị trí người dùng.
   //
   // Huỷ bằng AbortController: chọn nhanh ba POI liên tiếp thì ba yêu cầu cùng
@@ -652,7 +664,7 @@ export function LocationExplorer() {
     // visiblePois chứ không chỉ pois: POI nạp theo vùng bản đồ (areaPois) cũng
     // chọn được từ marker, và thẻ của nó cũng phải có tuyến nội bộ — tra trong
     // mỗi kết quả tìm kiếm thì các POI đó vĩnh viễn không có đường đi.
-    const poi = visiblePois.find((item) => item.id === selectedPoiId);
+    const poi = selectedPoi;
     if (!poi) {
       setRoute(null);
       setRouteStatus('idle');
@@ -716,7 +728,27 @@ export function LocationExplorer() {
     })();
 
     return () => controller.abort();
-  }, [selectedPoiId, visiblePois, position, transportMode]);
+    // CHỈ phụ thuộc giá trị nguyên thuỷ, không phụ thuộc object/mảng.
+    //
+    // Bản cũ liệt kê `visiblePois` và `position` và tạo ra một vòng lặp fetch
+    // VÔ HẠN: setRoute trả object mới -> effect [route] gọi map.fitBounds ->
+    // hoạt ảnh kết thúc bắn moveend -> loadAreaPois -> setAreaPois trả mảng
+    // mới -> visiblePois đổi định danh -> effect này chạy lại -> setRoute...
+    // Đo được 179 request /api/v1/directions và 160 request /api/pois/nearby
+    // chỉ trong MỘT lượt xem trang, đủ để backend trả 429.
+    //
+    // Toạ độ và id là thứ thực sự quyết định tuyến đường; định danh của mảng
+    // chứa chúng thì không.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    selectedPoi?.id,
+    selectedPoi?.latitude,
+    selectedPoi?.longitude,
+    selectedPoi?.name,
+    position.latitude,
+    position.longitude,
+    transportMode,
+  ]);
 
   // Vẽ vành hexagon H3 của lần tìm kiếm gần nhất.
   useEffect(() => {
@@ -800,11 +832,6 @@ export function LocationExplorer() {
   // tìm xuống dưới nếp gấp — đặc biệt rõ trên màn hình laptop có chiều cao CSS
   // thấp do display scaling.
   const showDiscovery = query.trim().length === 0 && selectedCategory === null;
-
-  const selectedPoi = useMemo(
-    () => visiblePois.find((poi) => poi.id === selectedPoiId) ?? null,
-    [visiblePois, selectedPoiId],
-  );
 
   useEffect(() => {
     poisRef.current = visiblePois;
