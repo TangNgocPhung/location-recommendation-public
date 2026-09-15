@@ -1,12 +1,15 @@
-# Lớp phủ production cho Oracle Cloud Ampere A1 (arm64).
+# Lớp phủ production, chạy được trên CẢ amd64 và arm64.
+#
+# Đã dùng thật: VPS OVH VPS-4 (8 vCPU / 24 GB / amd64, Ubuntu 24.04).
 #
 #   docker compose --env-file config/production.env \
 #     -f docker-compose.yml -f deploy/docker-compose.prod.yml up -d
 #
 # Chỉ chứa những gì KHÁC so với docker-compose.yml. Ba nhóm khác biệt:
 #
-# 1. ẢNH arm64. `postgis/postgis` và `osrm/osrm-backend` chỉ có bản amd64 (đã
-#    kiểm chứng bằng Registry API), nên phải thay.
+# 1. ẢNH THEO KIẾN TRÚC. `postgis/postgis` và `osrm/osrm-backend` chỉ có bản
+#    amd64. VPS OVH này là amd64 nên dùng thẳng cả hai; trên arm64 phải thay
+#    cả hai — xem POSTGIS_IMAGE dưới đây và OSRM_IMAGE trong production.env.
 # 2. TLS. Caddy đứng trước gateway, tự xin chứng chỉ Let's Encrypt.
 # 3. KHÔNG PHƠI CỔNG RA INTERNET. Việc này làm bằng biến môi trường trong
 #    config/production.env (POSTGRES_PORT=127.0.0.1:5432, ...) chứ không phải ở
@@ -17,10 +20,12 @@
 
 services:
   database:
-    # Bản build cộng đồng multi-arch. `postgis/postgis:16-3.4` chính thức là
-    # manifest v2 đơn kiến trúc amd64 — trên Ampere A1 sẽ chết "exec format
-    # error". Cùng PostgreSQL 16 + PostGIS 3.4 nên migration không đổi.
-    image: imresamu/postgis:16-3.4
+    # Mặc định là ảnh CHÍNH THỨC — đúng ảnh máy dev đã chạy, nên migration và
+    # phần mở rộng PostGIS không có gì khác biệt. Nó là manifest amd64 đơn
+    # kiến trúc: trên arm64 (Ampere A1) sẽ chết "exec format error", lúc đó
+    # đặt POSTGIS_IMAGE=imresamu/postgis:16-3.4 (bản cộng đồng multi-arch,
+    # cùng PostgreSQL 16 + PostGIS 3.4) trong config/production.env.
+    image: ${POSTGIS_IMAGE:-postgis/postgis:16-3.4}
     restart: unless-stopped
 
   redis:

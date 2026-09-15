@@ -4,6 +4,11 @@
 !.env.example
 !*.env.example
 config/production.env
+# Bản sao lưu do scripts/ sinh ra khi sửa production.env — chứa mật khẩu
+# THẬT (POSTGRES_PASSWORD, NEO4J_PASSWORD) y như bản gốc, nên phải chặn
+# luôn; tên có hậu tố ngày giờ nên dòng `config/production.env` ở trên
+# (khớp tuyệt đối) KHÔNG bắt được.
+config/production.env.bak-*
 
 # Python
 __pycache__/

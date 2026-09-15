@@ -27,7 +27,10 @@ fi
 
 # Placeholder còn sót là lỗi hay gặp nhất và hậu quả nặng: Caddy sẽ xin chứng
 # chỉ cho một tên không phải của bạn và bị Let's Encrypt giới hạn tần suất.
-if grep -q 'REPLACE_ME' "$ENV_FILE"; then
+# Chỉ soi dòng CẤU HÌNH: bản thân file .example có chữ REPLACE_ME trong phần
+# chú thích hướng dẫn, và chú thích đó được giữ lại khi chép sang
+# production.env — soi cả file thì một cấu hình đã điền đúng vẫn bị chặn.
+if grep -vE '^[[:space:]]*#' "$ENV_FILE" | grep -q 'REPLACE_ME'; then
   bad "còn chuỗi REPLACE_ME — sửa PUBLIC_HOST / PUBLIC_URL / ALLOWED_ORIGINS thành IP thật"
 else
   ok "không còn placeholder REPLACE_ME"
@@ -87,14 +90,17 @@ else
 fi
 
 echo
-echo "== 4. Image OSRM arm64 =="
+echo "== 4. Image OSRM =="
 osrm_image="$(grep -E '^OSRM_IMAGE=' "$ENV_FILE" | head -1 | cut -d= -f2-)"
 if docker image inspect "$osrm_image" >/dev/null 2>&1; then
   ok "$osrm_image đã có trên máy"
   image_ver="$(docker run --rm "$osrm_image" osrm-routed --version 2>/dev/null | head -1 | tr -d '\r')"
   ok "  phiên bản binary: ${image_ver:-không đọc được}"
 else
-  bad "$osrm_image chưa có — chạy: bash deploy/build-osrm-image-arm64.sh"
+  case "$arch" in
+    aarch64|arm64) bad "$osrm_image chưa có — dựng: bash deploy/build-osrm-image-arm64.sh" ;;
+    *)             bad "$osrm_image chưa có — tải: docker pull $osrm_image" ;;
+  esac
   image_ver=""
 fi
 

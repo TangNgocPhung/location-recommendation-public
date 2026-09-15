@@ -268,11 +268,24 @@ const OSM_RASTER_STYLE = {
   sources: {
     osm: {
       type: 'raster' as const,
-      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      // KHÔNG dùng tile.openstreetmap.org: DNS ở Việt Nam (kiểm chứng trên máy
+      // dev 14/09/2026) trả 127.0.0.1 / ::1 cho tên miền này, trong khi
+      // Cloudflare DoH trả đúng IP Fastly — tức là chặn ở tầng phân giải tên,
+      // không phải mạng hỏng. Hậu quả: mọi tile ERR_CONNECTION_REFUSED,
+      // canvas MapLibre rỗng và lớp `.map-fallback` (nền CSS giả trong
+      // globals.css) lộ ra. Người dùng đọc màn hình đó là "bản đồ vẽ xấu" chứ
+      // không đoán được là bản đồ không tải nổi, nên đây là lỗi im lặng.
+      //
+      // tile.openstreetmap.de phục vụ cùng dữ liệu OSM, cùng cách render, không
+      // cần key, và phân giải bình thường từ đây (200 OK, image/png). Vẫn giữ
+      // raster ở nhánh dự phòng này: nó chỉ chạy khi KHÔNG có MAP_STYLE_URL, và
+      // raster không cần glyphs/sprite nên ít thứ hỏng hơn khi mạng đã khó.
+      tiles: ['https://tile.openstreetmap.de/{z}/{x}/{y}.png'],
       tileSize: 256,
+      // Giữ 19: đã thử tay z18 và z19 trên máy chủ này, cả hai trả 200 PNG.
       maxzoom: 19,
       attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL)',
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL) &middot; tiles <a href="https://www.openstreetmap.de/">openstreetmap.de</a>',
     },
   },
   // Style raster không có sẵn font. Thiếu `glyphs`, lớp `cluster-count` (dùng

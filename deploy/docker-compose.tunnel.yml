@@ -14,14 +14,26 @@ services:
       NEXT_PUBLIC_API_URL: ${PUBLIC_URL:?PUBLIC_URL must be set}
       VITE_API_URL: ${PUBLIC_URL:?PUBLIC_URL must be set}
 
-      # Tắt style vector MapTiler cho bản demo qua tunnel. Khóa MapTiler bị
-      # giới hạn theo origin, mà URL trycloudflare.com là NGẪU NHIÊN mỗi lần
-      # chạy nên không thể đăng ký trước — kết quả là style.json trả 403 và
-      # bản đồ TRẮNG TRƠN (maplibre không tự lùi khi style lỗi, chỉ lùi khi
-      # biến rỗng). Chuỗi rỗng đưa location-explorer.tsx về raster
-      # OpenStreetMap: không cần key, có đủ đường phố TP.HCM.
-      VITE_MAP_STYLE_URL: ""
-      NEXT_PUBLIC_MAP_STYLE_URL: ""
+      # KHÔNG dùng MapTiler: khóa bị giới hạn theo origin, mà URL
+      # trycloudflare.com là NGẪU NHIÊN mỗi lần chạy nên không đăng ký trước
+      # được — style.json trả 403 và bản đồ TRẮNG TRƠN (maplibre không tự lùi
+      # khi style lỗi, chỉ lùi khi biến rỗng). Khóa trong config/production.env
+      # hiện cũng đã 403 khi gọi thẳng, kiểm chứng 14/09/2026.
+      #
+      # Cũng KHÔNG để rỗng nữa. Chuỗi rỗng đưa location-explorer.tsx về raster
+      # OpenStreetMap, nhưng DNS ở đây trả 127.0.0.1/::1 cho
+      # tile.openstreetmap.org (Cloudflare DoH trả đúng IP Fastly) nên mọi tile
+      # chết ERR_CONNECTION_REFUSED và người dùng chỉ thấy lớp nền CSS giả
+      # `.map-fallback` — trông như bản đồ vẽ xấu chứ không như bản đồ hỏng.
+      #
+      # CARTO Voyager: style VECTOR, không cần key, có nhãn đường/POI/khối nhà
+      # nên gần Google Maps hơn hẳn raster. Đã kiểm chứng từ máy này:
+      # style.json 200 (93 lớp), tiles.json 200, glyphs Noto Sans Regular 200 —
+      # font đó là bắt buộc vì lớp `cluster-count` dùng text-field. Ghi công
+      # CARTO + OpenStreetMap nằm sẵn trong tiles.json nên AttributionControl
+      # tự hiện, không phải thêm tay.
+      VITE_MAP_STYLE_URL: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+      NEXT_PUBLIC_MAP_STYLE_URL: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
 
   backend:
     environment:
