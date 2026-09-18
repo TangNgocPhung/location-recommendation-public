@@ -2,6 +2,19 @@
 
 MVP tìm kiếm và xếp hạng địa điểm theo vị trí tại TP.HCM.
 
+## Giới thiệu
+
+**Trường Đại học Sư phạm Thành phố Hồ Chí Minh** — Khoa Công nghệ thông tin
+
+- Giảng viên hướng dẫn: TS.GVC. Nguyễn Quốc Huy
+- Học viên thực hiện:
+  1. Tăng Ngọc Phụng — KHMT836027
+  2. Hoàng Châu Ngọc Phương — KHMT836028
+  3. Lê Thị Mai Len — KHMT836015
+
+Trên giao diện, nút **Giới thiệu** ở thanh trên cùng mở lại thông tin này; hộp
+giới thiệu tự hiện ở lần truy cập đầu tiên của mỗi trình duyệt.
+
 ## Thành phần
 
 - `frontend/`: React/Vinext, MapLibre và giao diện danh sách POI.

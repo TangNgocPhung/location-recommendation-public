@@ -32,6 +32,7 @@ import {
   X,
 } from 'lucide-react';
 
+import { AboutDialog, useAboutDialog } from '@/components/about-dialog';
 import { useProximityNotifications } from '@/hooks/use-proximity';
 import { usePoiDetail } from '@/hooks/use-poi-detail';
 import {
@@ -476,6 +477,7 @@ function chipClass(active: boolean) {
 export function LocationExplorer() {
   const telemetry = useMemo(() => getTelemetry(API_BASE_URL), []);
   const { theme, toggleTheme } = useTheme();
+  const about = useAboutDialog();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const mapLoadedRef = useRef(false);
@@ -1915,6 +1917,15 @@ export function LocationExplorer() {
             <Button
               variant="outline"
               size="sm"
+              onClick={() => about.setOpen(true)}
+              aria-label="Giới thiệu đồ án"
+            >
+              <Info data-icon="inline-start" />
+              <span className="hidden sm:inline">Giới thiệu</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={toggleTheme}
               aria-label="Chuyển giao diện sáng/tối"
             >
@@ -1941,6 +1952,7 @@ export function LocationExplorer() {
           </div>
         </div>
       </header>
+      <AboutDialog open={about.open} onOpenChange={about.onOpenChange} />
 
       <section className="mx-auto grid max-w-[1500px] gap-4 p-4 lg:h-[calc(100vh-65px)] lg:grid-cols-[430px_minmax(0,1fr)] lg:p-5">
         <aside className="flex min-h-0 flex-col gap-4">
