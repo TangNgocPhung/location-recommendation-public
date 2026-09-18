@@ -457,6 +457,14 @@ function fitMapToResults(
   map.fitBounds(bounds, { padding: 72, maxZoom: 15, duration: 600 });
 }
 
+// Mốc lọc theo số sao. 0 = không lọc. POI chưa có rating (null) bị loại khi
+// bật lọc — không có dữ liệu thì không thể khẳng định nó đạt ngưỡng.
+const MIN_RATING_OPTIONS = [0, 3, 3.5, 4, 4.5] as const;
+
+function meetsMinRating(poi: Poi, minRating: number) {
+  return minRating <= 0 || (poi.rating !== null && poi.rating >= minRating);
+}
+
 function chipClass(active: boolean) {
   return `whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
     active
@@ -522,6 +530,7 @@ export function LocationExplorer() {
   const [query, setQuery] = useState('');
   const [radius, setRadius] = useState(3_000);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [minRating, setMinRating] = useState(0);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [trending, setTrending] = useState<TrendingResponse | null>(null);
   // Metadata CẤP TRUY VẤN: đường truy xuất đã chạy, vành H3 đã quét, thời tiết
@@ -646,14 +655,26 @@ export function LocationExplorer() {
     };
   }, [telemetryState.sessionId]);
 
+  // Lọc rating chạy phía client trên kết quả đã có: đổi mốc sao không cần gọi
+  // lại API, và danh sách lẫn bản đồ luôn khớp nhau.
+  const ratedPois = useMemo(
+    () => pois.filter((poi) => meetsMinRating(poi, minRating)),
+    [pois, minRating],
+  );
+
   // Kết quả tìm kiếm đứng trước và thắng khi trùng id: chúng mang request_id
   // và rank phục vụ telemetry, còn bản ghi từ /api/pois/nearby thì không.
   // Khai báo TRƯỚC effect lấy tuyến ngay dưới — deps của effect được đánh giá
   // lúc render, đặt sau là ReferenceError (temporal dead zone).
   const visiblePois = useMemo(() => {
-    const seen = new Set(pois.map((poi) => poi.id));
-    return [...pois, ...areaPois.filter((poi) => !seen.has(poi.id))];
-  }, [pois, areaPois]);
+    const seen = new Set(ratedPois.map((poi) => poi.id));
+    return [
+      ...ratedPois,
+      ...areaPois.filter(
+        (poi) => !seen.has(poi.id) && meetsMinRating(poi, minRating),
+      ),
+    ];
+  }, [ratedPois, areaPois, minRating]);
 
   // POI đang chọn. Khai báo PHẢI nằm trên effect lấy tuyến bên dưới: mảng
   // dependency của effect đó đọc `selectedPoi?.id` NGAY TRONG LÚC RENDER, nên
@@ -1982,6 +2003,37 @@ export function LocationExplorer() {
                   <option value={10_000}>10 km</option>
                 </select>
               </div>
+              <div className="flex flex-col gap-2 rounded-xl bg-muted/65 px-3 py-2.5">
+                <div className="flex items-center gap-2 text-sm">
+                  <Star className="size-4 fill-amber-400 text-amber-500" />
+                  <span>Đánh giá tối thiểu</span>
+                </div>
+                <div
+                  className="flex flex-wrap gap-1.5"
+                  role="radiogroup"
+                  aria-label="Lọc theo đánh giá tối thiểu"
+                >
+                  {MIN_RATING_OPTIONS.map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      role="radio"
+                      aria-checked={minRating === value}
+                      onClick={() => setMinRating(value)}
+                      className={`inline-flex items-center gap-1 ${chipClass(minRating === value)}`}
+                    >
+                      {value === 0 ? (
+                        'Tất cả'
+                      ) : (
+                        <>
+                          {value.toLocaleString('vi-VN')}
+                          <Star className="size-3 fill-current" />+
+                        </>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
               {categoryOptions.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   <button
@@ -2164,7 +2216,9 @@ export function LocationExplorer() {
             <div className="shrink-0 flex items-center justify-between px-1">
               <h2 className="font-semibold">Địa điểm gần bạn</h2>
               <span className="text-xs text-muted-foreground">
-                {pois.length} kết quả
+                {minRating > 0 && ratedPois.length !== pois.length
+                  ? `${ratedPois.length}/${pois.length} kết quả`
+                  : `${pois.length} kết quả`}
               </span>
             </div>
             <div className="grid shrink-0 gap-3">
@@ -2174,7 +2228,7 @@ export function LocationExplorer() {
                   hai dòng cùng số 1. Thứ hạng server vẫn được ghi riêng vào
                   telemetry lúc impression — đó mới là số dùng để phân tích
                   position bias, và nó không cần khớp với số đang hiển thị. */}
-              {pois.map((poi, index) => (
+              {ratedPois.map((poi, index) => (
                 <button
                   type="button"
                   key={poi.id}
@@ -2306,12 +2360,14 @@ export function LocationExplorer() {
                   </div>
                 </button>
               ))}
-              {pois.length === 0 && (
+              {ratedPois.length === 0 && (
                 <div className="rounded-2xl border border-dashed border-border bg-white/70 p-8 text-center dark:bg-card/70">
                   <MapPin className="mx-auto size-8 text-muted-foreground" />
                   <p className="mt-3 font-medium">Chưa có địa điểm phù hợp</p>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Thử từ khóa khác hoặc tăng bán kính tìm kiếm.
+                    {minRating > 0 && pois.length > 0
+                      ? `Không có địa điểm nào đạt từ ${minRating.toLocaleString('vi-VN')}★ — hãy hạ mức đánh giá tối thiểu.`
+                      : 'Thử từ khóa khác hoặc tăng bán kính tìm kiếm.'}
                   </p>
                 </div>
               )}
