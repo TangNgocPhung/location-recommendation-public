@@ -444,6 +444,9 @@ function pointColorExpression(
   ];
 }
 
+// Mức zoom tối đa khi khung bản đồ theo tuyến đường — xem effect vẽ tuyến.
+const ROUTE_MAX_ZOOM = 16;
+
 function fitMapToResults(
   map: MapLibreMap | null,
   position: Position,
@@ -826,8 +829,13 @@ export function LocationExplorer() {
     }
     // padding phải to hơn bình thường: thẻ POI và bảng điều khiển che mất hai
     // góc bản đồ, nên tuyến vẽ sát mép sẽ nằm dưới lớp phủ.
+    // maxZoom bắt buộc: POI đầu tiên được tự chọn có thể cách người dùng chỉ
+    // vài mét (đo được 10 m ở Quận 11) — tuyến ngắn như vậy mà không kẹp zoom
+    // thì fitBounds đẩy bản đồ tới mức sát nóc nhà, khung nhìn còn vài chục mét
+    // và mọi POI khác rơi ra ngoài: người dùng thấy "quanh tôi không có gì".
     map.fitBounds(bounds, {
       padding: { top: 90, bottom: 190, left: 60, right: 330 },
+      maxZoom: ROUTE_MAX_ZOOM,
       duration: 700,
     });
   }, [route]);
@@ -1880,6 +1888,7 @@ export function LocationExplorer() {
         // hai góc bản đồ.
         map.fitBounds(bounds, {
           padding: { top: 90, bottom: 190, left: 60, right: 330 },
+          maxZoom: ROUTE_MAX_ZOOM,
           duration: 700,
         });
       }
