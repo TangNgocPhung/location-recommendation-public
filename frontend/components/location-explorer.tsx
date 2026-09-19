@@ -1526,6 +1526,9 @@ export function LocationExplorer() {
     searchQuery: string,
     category: string | null,
     origin?: Position,
+    // Cùng lý do với `origin`: đổi bán kính rồi tìm lại ngay thì `radius` trong
+    // closure này vẫn là giá trị cũ.
+    searchRadius: number = radius,
   ) {
     const searchOrigin = origin ?? position;
     // Có `origin` nghĩa là toạ độ vừa lấy từ GPS sau khi người dùng bấm đồng ý;
@@ -1538,7 +1541,7 @@ export function LocationExplorer() {
       location: consent ? searchOrigin : undefined,
       location_consent: consent,
       metadata: {
-        radius_meters: radius,
+        radius_meters: searchRadius,
         source: 'search-form',
         category: category ?? undefined,
       },
@@ -1554,7 +1557,7 @@ export function LocationExplorer() {
           query: searchQuery.trim(),
           latitude: searchOrigin.latitude,
           longitude: searchOrigin.longitude,
-          radius,
+          radius: searchRadius,
           limit: 50,
           session_id: telemetry.sessionId,
           category: category ?? undefined,
@@ -1635,7 +1638,7 @@ export function LocationExplorer() {
       const fallback = enrichSamplePois(
         searchOrigin,
         searchQuery,
-        radius,
+        searchRadius,
         category,
       );
       // Dữ liệu mẫu không thuộc lần tìm kiếm nào; xoá ngữ cảnh để click sau đó
@@ -2015,7 +2018,19 @@ export function LocationExplorer() {
                 <select
                   className="rounded-lg border border-border bg-white px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring/40 dark:bg-input/40"
                   value={radius}
-                  onChange={(event) => setRadius(Number(event.target.value))}
+                  onChange={(event) => {
+                    // Trước đây chỉ setRadius: bán kính mới chỉ có hiệu lực ở lần
+                    // bấm "Tìm" kế tiếp, nên đổi 1 km <-> 10 km trông như không
+                    // làm gì với danh sách đang hiện.
+                    const nextRadius = Number(event.target.value);
+                    setRadius(nextRadius);
+                    void runSearch(
+                      query,
+                      selectedCategory,
+                      undefined,
+                      nextRadius,
+                    );
+                  }}
                   aria-label="Bán kính tìm kiếm"
                 >
                   <option value={1_000}>1 km</option>
