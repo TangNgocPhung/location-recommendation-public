@@ -86,7 +86,14 @@ def bm25_body(
                                             "brand^1.5",
                                             "description",
                                         ],
-                                        "fuzziness": "AUTO",
+                                        # AUTO:5,8 thay cho AUTO (=3,6): token <= 4 ký tự phải khớp
+                                        # ĐÚNG. Âm tiết tiếng Việt sau khi bỏ dấu phần lớn chỉ 2-4 ký
+                                        # tự, và sửa 1 ký tự trên đó là đổi hẳn sang chữ khác: đo được
+                                        # 19/09/2026 "benh" khớp mờ sang "ben" (Công viên BẾN Bạch
+                                        # Đằng) và "binh" (Công viên Lãnh BINH Thăng), nên "bệnh viện"
+                                        # trả công viên. Lỗi gõ phổ biến nhất (thiếu/sai dấu) đã được
+                                        # analyzer vi_folded lo, không cần fuzzy.
+                                        "fuzziness": "AUTO:5,8",
                                         "operator": "or",
                                         **_min_should_match(),
                                     }

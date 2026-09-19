@@ -6,7 +6,7 @@ def test_bm25_body_has_fuzzy_geo_and_category_filters() -> None:
 
     should = body["query"]["bool"]["must"][0]["bool"]["should"]
     folded_match = should[0]["multi_match"]
-    assert folded_match["fuzziness"] == "AUTO"
+    assert folded_match["fuzziness"] == "AUTO:5,8"
     assert "name^3" in folded_match["fields"]
 
     filters = body["query"]["bool"]["filter"]
@@ -71,3 +71,14 @@ def test_extract_ranked_ids_prefers_source_then_id() -> None:
 def test_extract_ranked_ids_handles_empty() -> None:
     assert q.extract_ranked_ids({}) == []
     assert q.extract_ranked_ids({"hits": {"hits": []}}) == []
+
+
+def test_bm25_fuzzy_khong_ap_len_am_tiet_ngan() -> None:
+    """Âm tiết <= 4 ký tự không được khớp mờ: với "AUTO" (=3,6), "benh" sửa 1 ký
+    tự thành "ben"/"binh" và "bệnh viện" trả Công viên Bến Bạch Đằng / Công
+    viên Lãnh Binh Thăng (đo được 19/09/2026)."""
+    body = q.bm25_body("bệnh viện", 10.77, 106.70, 3000, None, 50)
+
+    folded_match = body["query"]["bool"]["must"][0]["bool"]["should"][0]["multi_match"]
+    low, high = folded_match["fuzziness"].removeprefix("AUTO:").split(",")
+    assert int(low) >= 5

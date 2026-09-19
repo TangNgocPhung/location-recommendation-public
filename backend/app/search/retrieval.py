@@ -139,30 +139,35 @@ def _gate_by_text_relevance(
     channels: dict[str, list[str]],
     clean_query: str,
 ) -> list[tuple[str, float]]:
-    """Chặn gần/trending tự do thắng candidate có liên quan văn bản.
+    """Có truy vấn chữ mà BM25 đã khớp được thì CHỈ trả candidate khớp chữ.
 
     Đo được thật (không phải suy đoán): truy vấn "bệnh viện" trả "Phở Nhà
-    Mình" ở RANK 0 — không qua BM25, không qua vector, chỉ vì gần (174m) và
-    đang trending. RRF gộp điểm cả 5 kênh nên một POI "gần + hot" có thể thắng
-    một POI thật sự khớp truy vấn nhưng ở xa hơn.
+    Mình" ở RANK 0 — không qua BM25, chỉ vì gần (174m) và đang trending. RRF
+    gộp điểm cả 5 kênh nên một POI "gần + hot" có thể thắng một POI thật sự
+    khớp truy vấn nhưng ở xa hơn.
 
-    Không bỏ geo/trending — chúng vẫn cần cho recall và vẫn được DÙNG ĐỂ BỔ
-    SUNG khi BM25/vector không đủ candidate (ví dụ truy vấn hiếm chỉ có 2 kết
-    quả khớp văn bản). Chỉ đổi THỨ TỰ ƯU TIÊN: candidate có ít nhất một tín
-    hiệu liên quan văn bản (BM25 hoặc vector) luôn đứng trước candidate chỉ có
-    geo/h3/trending, bất kể điểm RRF gộp là bao nhiêu.
+    Bản trước chỉ ĐẨY candidate geo/h3/trending xuống sau, vẫn giữ lại để "bổ
+    sung recall". Đo lại 19/09/2026: "bệnh viện" bán kính 1 km có đúng MỘT bệnh
+    viện, 49 dòng còn lại là quán ăn, trường học, công viên — danh sách luôn đủ
+    50 bất kể có liên quan hay không, và người dùng đọc thẳng nó là kết quả
+    tìm kiếm. Nên giờ bỏ hẳn phần bổ sung khi đã có candidate khớp chữ.
 
-    Không áp dụng khi không có query text: lúc đó geo mới là kênh chính đáng
-    (duyệt theo vị trí), không có "liên quan văn bản" nào để so sánh.
+    Chỉ BM25 được tính là bằng chứng liên quan. Kênh vector là embedding băm
+    bag-of-words (``text_embedding``) và k-NN LUÔN trả đủ k hit gần nhất kể cả
+    khi cosine ~ 0, nên mọi POI trong bán kính đều lọt vào kênh này — tính nó
+    là "liên quan" thì cổng này không chặn được gì. Vector vẫn góp vào điểm
+    RRF để xếp thứ tự bên trong nhóm khớp chữ.
+
+    Không áp dụng khi không có query text (duyệt theo vị trí — geo là kênh
+    chính đáng), và giữ nguyên RRF khi BM25 không khớp được gì (truy vấn quá
+    lạ: trả thứ gần nhất vẫn hơn trả rỗng).
     """
     if not clean_query:
         return fused
-    relevant_ids = set(channels.get("bm25", [])) | set(channels.get("vector", []))
+    relevant_ids = set(channels.get("bm25", []))
     if not relevant_ids:
         return fused
-    relevant = [item for item in fused if item[0] in relevant_ids]
-    supplementary = [item for item in fused if item[0] not in relevant_ids]
-    return relevant + supplementary
+    return [item for item in fused if item[0] in relevant_ids]
 
 
 def multi_channel_candidates(

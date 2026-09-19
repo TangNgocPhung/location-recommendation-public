@@ -10,25 +10,36 @@ from app.search.client import is_search_configured, reset_client_cache
 # khoá lại đúng hành vi phải có sau khi vá.
 
 
-def test_gate_day_candidate_chi_geo_trending_xuong_sau_candidate_lien_quan() -> None:
+def test_gate_bo_candidate_chi_geo_trending_khi_da_co_candidate_khop_chu() -> None:
     # RRF xếp "gan-trending" (chỉ geo+trending) TRƯỚC "lien-quan" (có bm25) —
-    # đúng tình huống lỗi đã đo được. Gate phải đảo lại thứ tự này.
+    # đúng tình huống lỗi đã đo được. Candidate không khớp chữ phải bị bỏ hẳn,
+    # không chỉ bị đẩy xuống (danh sách bị độn đủ 50 bằng quán ăn/trường học).
     fused = [("gan-trending", 0.05), ("lien-quan", 0.03)]
     channels = {"bm25": ["lien-quan"], "geo": ["gan-trending", "lien-quan"], "trending": ["gan-trending"]}
 
     gated = retrieval._gate_by_text_relevance(fused, channels, "benh vien")
 
-    assert [poi_id for poi_id, _ in gated] == ["lien-quan", "gan-trending"]
+    assert [poi_id for poi_id, _ in gated] == ["lien-quan"]
 
 
-def test_gate_giu_nguyen_thu_tu_trong_tung_nhom() -> None:
-    """Không xáo trộn RRF trong mỗi nhóm con — chỉ tách nhóm liên quan lên trước."""
+def test_gate_khong_tinh_vector_la_bang_chung_lien_quan() -> None:
+    """k-NN trên embedding băm luôn trả đủ k hit kể cả cosine ~ 0 — candidate
+    chỉ có ở kênh vector (vd. "Công viên" cho "bệnh viện") không được giữ."""
+    fused = [("cong-vien", 0.06), ("benh-vien", 0.04)]
+    channels = {"bm25": ["benh-vien"], "vector": ["cong-vien", "benh-vien"], "geo": ["cong-vien"]}
+
+    gated = retrieval._gate_by_text_relevance(fused, channels, "benh vien")
+
+    assert [poi_id for poi_id, _ in gated] == ["benh-vien"]
+
+
+def test_gate_giu_nguyen_thu_tu_rrf_trong_nhom_khop_chu() -> None:
     fused = [("b", 0.5), ("a", 0.4), ("d", 0.3), ("c", 0.2)]
     channels = {"bm25": ["a", "b"], "geo": ["c", "d"]}
 
     gated = retrieval._gate_by_text_relevance(fused, channels, "ca phe")
 
-    assert [poi_id for poi_id, _ in gated] == ["b", "a", "d", "c"]
+    assert [poi_id for poi_id, _ in gated] == ["b", "a"]
 
 
 def test_gate_khong_ap_dung_khi_khong_co_query_text() -> None:
