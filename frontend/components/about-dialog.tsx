@@ -85,7 +85,7 @@ export function AboutDialog({
         </div>
 
         <div className="grid gap-5 px-6 pb-2">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-[5fr_7fr]">
             <section className="rounded-xl border bg-muted/40 p-4">
               <h3 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
                 <UserRound className="size-4" />
@@ -102,9 +102,9 @@ export function AboutDialog({
                 {MEMBERS.map((member, index) => (
                   <li
                     key={member.id}
-                    className="flex items-baseline justify-between gap-3"
+                    className="flex flex-wrap items-baseline justify-between gap-x-3"
                   >
-                    <span className="font-medium">
+                    <span className="font-medium whitespace-nowrap">
                       {index + 1}. {member.name}
                     </span>
                     <span className="font-mono text-xs text-muted-foreground tabular-nums">
